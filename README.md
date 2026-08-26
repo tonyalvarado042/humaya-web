@@ -1,10 +1,17 @@
 # HUMAYA Costa Rica — landing
 
-Una sola página. Negro · bone · oro `#C8AD85` (el tono exacto sacado del logo).
+Sitio de una sola página para **Humaya**, el hotel en La Fortuna, Arenal
+(Etapa 2 de Bike & Bed). Apertura noviembre 2026.
+
+Negro · bone · oro `#C8AD85` (el tono exacto sacado del logo).
 Cuatro idiomas: **ES · EN · DE · FR**. Eslogan fijo en inglés: *Become more human*.
 
+- **Repo:** <https://github.com/tonyalvarado042/humaya-web>
+- **Dominio:** `stayhumaya.com`
+- **Redes:** [@stayhumaya](https://instagram.com/stayhumaya) en Instagram y Facebook
+
 ```
-humaya-hotel/
+humaya-web/
 ├── index.html          ← todo el sitio (HTML + CSS + JS en un solo archivo)
 ├── assets/img/         ← logos e imágenes
 │   └── _extra/         ← fotos de la brand board que no se usan en el sitio
@@ -24,6 +31,19 @@ Después abrí <http://localhost:4321>. Para bajarlo: `Get-Process python | Stop
 
 **Tiene que ser por `http://`**, no abriendo el archivo directo — si no, el formulario
 de correo no pasa el control de origen (CORS).
+
+## Subirlo a producción
+
+Es un sitio estático: no hay build, no hay servidor. Cualquiera de estas sirve.
+
+| Opción | Cómo |
+|---|---|
+| **Vercel** (recomendado) | Importar el repo, sin comandos de build, output = raíz. Dominio en Settings → Domains. |
+| **Netlify** | Igual: repo, sin build, publish directory = `.` |
+| **GitHub Pages** | Settings → Pages → branch `main` / carpeta raíz. Para el dominio hay que agregar un archivo `CNAME` con `stayhumaya.com`. |
+
+En el DNS del dominio: `A` / `CNAME` apuntando a donde diga el proveedor que elijás,
+y `www` como `CNAME` al mismo lado.
 
 ## Idiomas
 
@@ -48,6 +68,7 @@ La tabla tiene **RLS activo y cero políticas**: nadie la lee ni la escribe desd
 afuera. Solo las dos funciones (con service role) la tocan. Es a propósito.
 
 Frenos ya puestos: máximo 6 altas por IP por hora, y un reenvío cada 2 minutos por correo.
+Orígenes permitidos: `stayhumaya.com`, `www.stayhumaya.com` y localhost.
 
 ### Ver quién se registró
 
@@ -64,30 +85,31 @@ proveedor. En Supabase → Edge Functions → Secrets:
 | Secret | Valor |
 |---|---|
 | `RESEND_API_KEY` | la llave de [resend.com](https://resend.com) (gratis hasta 3.000/mes) |
-| `MAIL_FROM` | `HUMAYA <hola@humaya.cr>` — el dominio hay que verificarlo en Resend |
-| `SITE_URL` | `https://humaya.cr` — a dónde vuelve el botón de la página de confirmación |
+| `MAIL_FROM` | `HUMAYA <hola@stayhumaya.com>` — el dominio hay que verificarlo en Resend |
+| `SITE_URL` | `https://stayhumaya.com` — a dónde vuelve el botón de la página de confirmación |
 
 Sin eso el correo queda registrado igual, y la respuesta trae `email_sent: false`.
 
-### Cuando se suba a un dominio
-
-En `subscribe/index.ts`, agregar el dominio real a `ALLOWED_ORIGINS`. Ya están
-`humaya.cr`, `www.humaya.cr` y localhost.
-
 ## Lo que queda pendiente
 
-1. **Renders reales.** Los que están son los de MODO Studio sacados de los PDF en
-   Descargas, más cinco imágenes generadas con el volcán y las aguas termales
-   (`vol-*.jpg`, `termales.jpg`). Los renders nuevos que mandaste por chat no
-   quedaron en disco. Si los dejás en `assets/img/`, se cambian en un minuto.
-2. **Correo y WhatsApp reales.** `hola@humaya.cr` es un provisional — está marcado
-   con `TODO Tony` en el HTML, en dos lugares.
-3. **El formulario de reserva de abajo no manda nada todavía.** Solo muestra el
+1. **Renders reales.** Los que están son los de MODO Studio sacados de los PDF, más
+   cinco imágenes **generadas con IA** para el volcán y las aguas termales
+   (`vol-*.jpg`, `termales.jpg`). Hay que cambiarlas antes de la campaña grande.
+2. **El buzón `hola@stayhumaya.com` todavía no existe.** Hay que crearlo cuando el
+   dominio esté conectado.
+3. **Las cuentas @stayhumaya** de Instagram y Facebook hay que crearlas — los enlaces
+   ya están puestos y apuntan ahí.
+4. **El formulario de reserva de abajo no manda nada todavía.** Solo muestra el
    "gracias". Se conecta a Supabase igual que la lista de correos cuando digás.
 
 ## Datos que se usaron (y de dónde salen)
 
-- 10 villas, apertura noviembre 2026, La Fortuna de San Carlos → de tu cerebro.
+- 10 villas, apertura noviembre 2026, La Fortuna de San Carlos → confirmados por Tony.
 - Eslogan, los cinco pilares y "a place to become who you were created to be" → de
   la brand board.
-- **No hay precios, teléfonos, distancias ni metrajes**, porque no los tengo confirmados.
+- **No hay precios, teléfonos, distancias ni metrajes**, porque no están confirmados.
+
+---
+
+© 2026 Humaya Costa Rica. El logo, los renders y los textos son de la marca —
+el repo es público para poder desplegarlo, no para reutilizar los assets.
