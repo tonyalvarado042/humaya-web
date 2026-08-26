@@ -6,17 +6,32 @@ Sitio de una sola página para **Humaya**, el hotel en La Fortuna, Arenal
 Negro · bone · oro `#C8AD85` (el tono exacto sacado del logo).
 Cuatro idiomas: **ES · EN · DE · FR**. Eslogan fijo en inglés: *Become more human*.
 
-- **Repo:** <https://github.com/tonyalvarado042/humaya-web>
-- **Dominio:** `stayhumaya.com`
-- **Redes:** [@stayhumaya](https://instagram.com/stayhumaya) en Instagram y Facebook
+| | |
+|---|---|
+| **En línea** | <https://stayhumaya.com> |
+| **Hospedaje** | SiteGround · IP `34.174.253.132` |
+| **Dominio** | GoDaddy, delegado a `ns1.siteground.net` / `ns2.siteground.net` |
+| **Repo** | <https://github.com/tonyalvarado042/humaya-web> |
+| **Redes** | [@stayhumaya](https://instagram.com/stayhumaya) en Instagram y Facebook |
 
 ```
 humaya-web/
 ├── index.html          ← todo el sitio (HTML + CSS + JS en un solo archivo)
-├── assets/img/         ← logos e imágenes
-│   └── _extra/         ← fotos de la brand board que no se usan en el sitio
-└── .claude/launch.json ← config del servidor local
+├── .htaccess           ← HTTPS, quitar www, gzip, caché
+└── assets/img/         ← logos e imágenes
+    └── _extra/         ← fotos de la brand board que no se usan
 ```
+
+## Publicar un cambio
+
+**No hay despliegue automático.** El sitio se sube a mano:
+
+1. Empaquetar `index.html`, `.htaccess` y `assets/img/` en un ZIP.
+2. SiteGround → **Site Tools → Site → File Manager** → `public_html`.
+3. Subir el ZIP, botón derecho → **Extract**, borrar el ZIP.
+
+> El `.htaccess` es un **archivo oculto**. Si no aparece después de extraer,
+> activá "Show hidden files" en el File Manager.
 
 ## Verlo local
 
@@ -27,23 +42,8 @@ python -m http.server 4321 --directory "C:\Users\Usuario\.claude\humaya-hotel"
 Después abrí <http://localhost:4321>. Para bajarlo: `Get-Process python | Stop-Process`.
 
 > **Ojo:** una sola línea, sin `cd` y sin `&&`. Windows PowerShell 5.1 **no soporta
-> `&&`** — tira "The token '&&' is not a valid statement separator in this version".
-
-**Tiene que ser por `http://`**, no abriendo el archivo directo — si no, el formulario
-de correo no pasa el control de origen (CORS).
-
-## Subirlo a producción
-
-Es un sitio estático: no hay build, no hay servidor. Cualquiera de estas sirve.
-
-| Opción | Cómo |
-|---|---|
-| **Vercel** (recomendado) | Importar el repo, sin comandos de build, output = raíz. Dominio en Settings → Domains. |
-| **Netlify** | Igual: repo, sin build, publish directory = `.` |
-| **GitHub Pages** | Settings → Pages → branch `main` / carpeta raíz. Para el dominio hay que agregar un archivo `CNAME` con `stayhumaya.com`. |
-
-En el DNS del dominio: `A` / `CNAME` apuntando a donde diga el proveedor que elijás,
-y `www` como `CNAME` al mismo lado.
+> `&&`**. Y tiene que ser por `http://`, no abriendo el archivo directo, o los
+> formularios fallan por CORS.
 
 ## Idiomas
 
@@ -51,56 +51,77 @@ Detecta el idioma del navegador y recuerda la elección en `localStorage`.
 Todos los textos viven en el objeto `I18N` dentro de `index.html`. Para cambiar
 una frase, se cambia ahí en los cuatro idiomas — el HTML solo lleva `data-i18n="clave"`.
 
-## Lista de correos (Supabase)
+## Lo que corre en Supabase
 
-Proyecto: **`mlhhhwbgymobcxiklnoz`** · `https://mlhhhwbgymobcxiklnoz.supabase.co`
+Proyecto **`mlhhhwbgymobcxiklnoz`** · `https://mlhhhwbgymobcxiklnoz.supabase.co`
 
-**Doble opt-in**: se guarda como `pending`, sale un correo con un enlace, y al hacer
-clic pasa a `confirmed`. Así la lista queda limpia y lista para migrar a Mailchimp.
+### 1 · Lista de espera (doble opt-in)
+
+Se guarda como `pending`, sale un correo con un enlace, y al hacer clic pasa a
+`confirmed`. Así la lista queda limpia para migrar a Mailchimp cuando se quiera.
 
 | Pieza | Qué hace |
 |---|---|
-| tabla `public.subscribers` | email, nombre, idioma, origen, estado, token, IP, fechas |
-| función `subscribe` | `POST` desde el sitio → guarda en `pending` y manda el correo |
-| función `confirm` | `GET ?token=…` → marca `confirmed` y muestra una página con la marca |
+| tabla `subscribers` | email, idioma, origen, estado, token, IP, fechas |
+| función `subscribe` | `POST` → guarda en `pending` y manda el correo |
+| función `confirm` | `GET ?token=…` → marca `confirmed`, página con la marca |
 
-La tabla tiene **RLS activo y cero políticas**: nadie la lee ni la escribe desde
-afuera. Solo las dos funciones (con service role) la tocan. Es a propósito.
+### 2 · Solicitudes de reserva
 
-Frenos ya puestos: máximo 6 altas por IP por hora, y un reenvío cada 2 minutos por correo.
+El formulario de abajo del sitio. Guarda la solicitud, **le avisa a Humaya** por
+correo y **le acusa recibo al huésped** en su idioma.
+
+| Pieza | Qué hace |
+|---|---|
+| tabla `booking_requests` | nombre, email, fechas, personas, idioma, mensaje, estado |
+| función `book` | `POST` → guarda + los dos correos |
+
+Estados: `nueva` → `leida` → `contestada` (o `descartada`).
+
+### Seguridad
+
+Las dos tablas tienen **RLS activo y cero políticas**: no se leen ni se escriben
+desde afuera. Solo las Edge Functions (service role) las tocan. Es a propósito —
+el advisor de Supabase lo marca como INFO y está bien así.
+
+Frenos: 6 altas de correo por IP/hora, 4 solicitudes de reserva por IP/hora, y un
+reenvío cada 2 minutos por dirección.
+
 Orígenes permitidos: `stayhumaya.com`, `www.stayhumaya.com` y localhost.
 
-### Ver quién se registró
+### Ver qué ha llegado
 
 ```sql
 select email, lang, status, created_at, confirmed_at
 from public.subscribers order by created_at desc;
+
+select name, email, arrival, departure, guests, message, status, created_at
+from public.booking_requests where status = 'nueva' order by created_at desc;
 ```
 
 ### ⚠️ Falta para que salgan los correos
 
-Hoy el alta **se guarda bien pero el correo no sale**, porque falta la llave del
-proveedor. En Supabase → Edge Functions → Secrets:
+`stayhumaya.com` **ya está verificado en Resend**. Lo único que falta es la llave.
+En Supabase → Edge Functions → Secrets:
 
 | Secret | Valor |
 |---|---|
-| `RESEND_API_KEY` | la llave de [resend.com](https://resend.com) (gratis hasta 3.000/mes) |
-| `MAIL_FROM` | `HUMAYA <hola@stayhumaya.com>` — el dominio hay que verificarlo en Resend |
-| `SITE_URL` | `https://stayhumaya.com` — a dónde vuelve el botón de la página de confirmación |
+| `RESEND_API_KEY` | la llave de [resend.com](https://resend.com) |
+| `MAIL_FROM` | `HUMAYA <hola@stayhumaya.com>` |
+| `SITE_URL` | `https://stayhumaya.com` |
+| `BOOKING_INBOX` | a dónde llegan las solicitudes (por defecto `hola@stayhumaya.com`) |
 
-Sin eso el correo queda registrado igual, y la respuesta trae `email_sent: false`.
+**Sin la llave todo se guarda igual**, solo que nadie recibe correo. Las funciones
+ya leen esos valores con `Deno.env.get` — no hay que tocar código.
 
 ## Lo que queda pendiente
 
 1. **Renders reales.** Los que están son los de MODO Studio sacados de los PDF, más
    cinco imágenes **generadas con IA** para el volcán y las aguas termales
    (`vol-*.jpg`, `termales.jpg`). Hay que cambiarlas antes de la campaña grande.
-2. **El buzón `hola@stayhumaya.com` todavía no existe.** Hay que crearlo cuando el
-   dominio esté conectado.
-3. **Las cuentas @stayhumaya** de Instagram y Facebook hay que crearlas — los enlaces
-   ya están puestos y apuntan ahí.
-4. **El formulario de reserva de abajo no manda nada todavía.** Solo muestra el
-   "gracias". Se conecta a Supabase igual que la lista de correos cuando digás.
+2. **El buzón `hola@stayhumaya.com`** — crearlo en SiteGround → E-mail → Cuentas.
+   Los MX ya están puestos.
+3. **Las cuentas @stayhumaya** de Instagram y Facebook — los enlaces ya apuntan ahí.
 
 ## Datos que se usaron (y de dónde salen)
 

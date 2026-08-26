@@ -6,6 +6,8 @@
 <title>HUMAYA · Costa Rica — Become More Human</title>
 <meta name="description" content="Diez villas al pie del Volcán Arenal, en La Fortuna, Costa Rica. Un lugar para llegar a ser quien fuiste creado para ser. Apertura noviembre 2026.">
 <meta name="theme-color" content="#0A0A0A">
+<meta name="humaya-version" content="1.1.0">
+<meta name="humaya-desplegado" content="2026-08-26">
 <link rel="icon" href="assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/">
 
@@ -550,7 +552,9 @@ form{ display:grid; gap:clamp(16px,1.7vw,24px); }
 .form-ok{
   display:none; border:1px solid var(--line); padding:clamp(22px,2.6vw,34px);
   font-family:var(--display); letter-spacing:.06em; color:var(--gold);
+  line-height:1.6;
 }
+.form-ok.bad{ color:#E0A08A; border-color:rgba(224,160,138,.4); margin-top:18px; }
 form.sent{ display:none; }
 form.sent + .form-ok{ display:block; }
 
@@ -1354,19 +1358,65 @@ subForm.addEventListener("submit", async e=>{
   }
 });
 
-/* formulario de reserva — TODO Tony: conectar a un endpoint real (Formspree, WhatsApp o CRM) */
-const form = document.getElementById("bookForm");
-form.addEventListener("submit", e=>{
+/* ============================================================
+   Formulario de reserva → Supabase
+   Guarda la solicitud, le avisa a Humaya y le acusa recibo
+   al huésped. Si el correo falla, la solicitud igual queda.
+   ============================================================ */
+const form   = document.getElementById("bookForm");
+const formOk = document.getElementById("formOk");
+
+form.addEventListener("submit", async e=>{
   e.preventDefault();
+  const dict = I18N[document.documentElement.lang] || I18N.es;
+
   const req = form.querySelectorAll("[required]");
   let ok = true;
   req.forEach(f=>{
-    if(!f.value.trim()){ f.style.borderBottomColor = "#8a3a3a"; ok = false; }
-    else f.style.borderBottomColor = "";
+    const malo = !f.value.trim() ||
+      (f.type === "email" && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(f.value.trim()));
+    f.style.borderBottomColor = malo ? "#8a3a3a" : "";
+    if(malo){ ok = false; }
   });
-  if(!ok) return;
-  console.log("Reserva:", Object.fromEntries(new FormData(form)));
-  form.classList.add("sent");
+  if(!ok){ form.querySelector('[style*="8a3a3a"]')?.focus(); return; }
+
+  const d = Object.fromEntries(new FormData(form));
+  const btn = form.querySelector('button[type="submit"]');
+  const label = btn.querySelector("span");
+  const original = label.textContent;
+  btn.disabled = true; label.textContent = dict["sub.sending"];
+
+  try{
+    const r = await fetch(SUPABASE_FN + "/book", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        name: d.nombre, email: d.email,
+        arrival: d.llegada || null, departure: d.salida || null,
+        guests: d.personas, message: d.mensaje || null,
+        lang: d.idioma || document.documentElement.lang,
+        source: "landing"
+      })
+    });
+    const data = await r.json().catch(()=>({}));
+
+    if(r.ok && data.ok){
+      formOk.textContent = dict["form.ok"];
+      formOk.classList.remove("bad");
+      form.classList.add("sent");
+    } else {
+      formOk.textContent = dict[r.status === 429 ? "sub.rate" : "sub.err"];
+      formOk.classList.add("bad");
+      formOk.style.display = "block";
+    }
+  }catch(err){
+    console.error(err);
+    formOk.textContent = dict["sub.err"];
+    formOk.classList.add("bad");
+    formOk.style.display = "block";
+  }finally{
+    btn.disabled = false; label.textContent = original;
+  }
 });
 </script>
 </body>
