@@ -6,7 +6,7 @@
 <title>HUMAYA · Costa Rica — Become More Human</title>
 <meta name="description" content="Diez villas al pie del Volcán Arenal, en La Fortuna, Costa Rica. Un lugar para llegar a ser quien fuiste creado para ser. Apertura noviembre 2026.">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.2.0">
+<meta name="humaya-version" content="1.2.1">
 <meta name="humaya-desplegado" content="2026-08-27">
 <link rel="icon" href="assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/">
@@ -257,7 +257,9 @@ body.menu-open .burger span:nth-child(3){ transform:translateY(-7px) rotate(-45d
 .hero-inner{
   position:relative; z-index:3; height:100%;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; padding-inline:var(--pad); padding-top:40px;
+  text-align:center; padding-inline:var(--pad);
+  /* el padding de abajo sube el bloque centrado y deja aire para "Descubrí" */
+  padding-top:32px; padding-bottom:clamp(112px,14vh,168px);
 }
 /* velo suave detrás del bloque de texto: legible sobre cualquier slide */
 .hero-inner::before{
@@ -319,6 +321,17 @@ body.menu-open .burger span:nth-child(3){ transform:translateY(-7px) rotate(-45d
   background:var(--gold); animation:cue 2.6s infinite var(--ease);
 }
 @keyframes cue{ 0%{top:-46px} 55%{top:46px} 100%{top:46px} }
+
+/* Pantallas bajas (portátiles): apretar el bloque del hero y encoger el
+   indicador, para que "Descubrí" no se pegue a los botones. */
+@media (max-height:830px) and (min-width:901px){
+  .hero-inner{ padding-bottom:clamp(92px,11vh,124px); }
+  .hero-mark{ height:clamp(50px,5.6vw,74px); margin-bottom:clamp(14px,1.6vw,20px); }
+  .hero-rule{ height:clamp(20px,2.6vw,32px); margin:clamp(15px,1.9vw,22px) 0 clamp(13px,1.5vw,18px); }
+  .hero-sub{ margin-top:clamp(11px,1.3vw,16px); }
+  .hero-cta{ margin-top:clamp(19px,2.2vw,28px); }
+  .scroll-cue{ transform:translateX(-50%) scale(.82); transform-origin:bottom center; bottom:18px; }
+}
 
 /* ---------- reveal ---------- */
 .rv{ opacity:0; transform:translateY(38px); transition:opacity 1.15s var(--ease), transform 1.15s var(--ease); }
