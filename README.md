@@ -99,20 +99,23 @@ select name, email, arrival, departure, guests, message, status, created_at
 from public.booking_requests where status = 'nueva' order by created_at desc;
 ```
 
-### ⚠️ Falta para que salgan los correos
+### Los correos ya salen
 
-`stayhumaya.com` **ya está verificado en Resend**. Lo único que falta es la llave.
-En Supabase → Edge Functions → Secrets:
+`stayhumaya.com` está verificado en Resend y los cuatro secretos están puestos en
+Supabase → Edge Functions → Secrets:
 
-| Secret | Valor |
+| Secret | Qué es |
 |---|---|
 | `RESEND_API_KEY` | la llave de [resend.com](https://resend.com) |
 | `MAIL_FROM` | `HUMAYA <hola@stayhumaya.com>` |
-| `SITE_URL` | `https://stayhumaya.com` |
-| `BOOKING_INBOX` | a dónde llegan las solicitudes (por defecto `hola@stayhumaya.com`) |
+| `SITE_URL` | `https://stayhumaya.com` — a dónde vuelve el botón de confirmación |
+| `BOOKING_INBOX` | a dónde llegan las solicitudes de reserva |
 
-**Sin la llave todo se guarda igual**, solo que nadie recibe correo. Las funciones
-ya leen esos valores con `Deno.env.get` — no hay que tocar código.
+Probado de punta a punta el 26 de agosto de 2026: alta en la lista → correo de
+confirmación; solicitud de reserva → aviso a Humaya + acuse al huésped.
+
+Las funciones leen todo con `Deno.env.get`. Si algún día hay que rotar la llave,
+se cambia el Secret y listo — no se toca código.
 
 ## Lo que queda pendiente
 
@@ -120,7 +123,8 @@ ya leen esos valores con `Deno.env.get` — no hay que tocar código.
    cinco imágenes **generadas con IA** para el volcán y las aguas termales
    (`vol-*.jpg`, `termales.jpg`). Hay que cambiarlas antes de la campaña grande.
 2. **El buzón `hola@stayhumaya.com`** — crearlo en SiteGround → E-mail → Cuentas.
-   Los MX ya están puestos.
+   Los MX ya están puestos. ⚠️ Los avisos de reserva ya se están mandando ahí, así
+   que hasta que exista el buzón esos correos rebotan.
 3. **Las cuentas @stayhumaya** de Instagram y Facebook — los enlaces ya apuntan ahí.
 
 ## Datos que se usaron (y de dónde salen)
