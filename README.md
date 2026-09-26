@@ -4,23 +4,44 @@ Sitio de una sola página para **Humaya**, el hotel en La Fortuna, Arenal
 (Etapa 2 de Bike & Bed). Apertura noviembre 2026.
 
 Negro · bone · oro `#C8AD85` (el tono exacto sacado del logo).
-Cuatro idiomas: **ES · EN · DE · FR**. Eslogan fijo en inglés: *Become more human*.
+Cuatro idiomas: **ES · EN · DE · FR**. Eslogan fijo en inglés: _Become more human_.
 
-| | |
-|---|---|
-| **En línea** | <https://stayhumaya.com> |
-| **Hospedaje** | SiteGround · IP `34.174.253.132` |
-| **Dominio** | GoDaddy, delegado a `ns1.siteground.net` / `ns2.siteground.net` |
-| **Repo** | <https://github.com/tonyalvarado042/humaya-web> |
-| **Redes** | [@stayhumaya](https://instagram.com/stayhumaya) en Instagram y Facebook |
+|               |                                                                         |
+| ------------- | ----------------------------------------------------------------------- |
+| **En línea**  | <https://stayhumaya.com>                                                |
+| **Hospedaje** | SiteGround · IP `34.174.253.132`                                        |
+| **Dominio**   | GoDaddy, delegado a `ns1.siteground.net` / `ns2.siteground.net`         |
+| **Repo**      | <https://github.com/tonyalvarado042/humaya-web>                         |
+| **Redes**     | [@stayhumaya](https://instagram.com/stayhumaya) en Instagram y Facebook |
 
 ```
 humaya-web/
 ├── index.html          ← todo el sitio (HTML + CSS + JS en un solo archivo)
 ├── .htaccess           ← HTTPS, quitar www, gzip, caché
-└── assets/img/         ← logos e imágenes
-    └── _extra/         ← fotos de la brand board que no se usan
+├── assets/img/         ← logos e imágenes
+│   └── _extra/         ← fotos de la brand board que no se usan
+└── metodo-humaya/      ← app del huésped, recepción y PWA (React/Vite)
 ```
+
+## Método Humaya
+
+`metodo-humaya/` es una aplicación independiente dentro del mismo repositorio. Todavía no se
+despliega junto con la landing: su URL y document root en SiteGround deben definirse antes para aislar
+el service worker y evitar que su `index.html` reemplace el del sitio público.
+
+Para correrla y verificarla:
+
+```bash
+npm --prefix metodo-humaya install
+npm --prefix metodo-humaya run dev
+npm --prefix metodo-humaya run lint
+npm --prefix metodo-humaya run typecheck
+npm --prefix metodo-humaya run test
+npm --prefix metodo-humaya run build
+```
+
+Las reglas completas están en `AGENTS.md`; la arquitectura y el estado del MVP, dentro de
+`metodo-humaya/`.
 
 ## Publicar un cambio
 
@@ -60,21 +81,21 @@ Proyecto **`mlhhhwbgymobcxiklnoz`** · `https://mlhhhwbgymobcxiklnoz.supabase.co
 Se guarda como `pending`, sale un correo con un enlace, y al hacer clic pasa a
 `confirmed`. Así la lista queda limpia para migrar a Mailchimp cuando se quiera.
 
-| Pieza | Qué hace |
-|---|---|
-| tabla `subscribers` | email, idioma, origen, estado, token, IP, fechas |
-| función `subscribe` | `POST` → guarda en `pending` y manda el correo |
-| función `confirm` | `GET ?token=…` → marca `confirmed`, página con la marca |
+| Pieza               | Qué hace                                                |
+| ------------------- | ------------------------------------------------------- |
+| tabla `subscribers` | email, idioma, origen, estado, token, IP, fechas        |
+| función `subscribe` | `POST` → guarda en `pending` y manda el correo          |
+| función `confirm`   | `GET ?token=…` → marca `confirmed`, página con la marca |
 
 ### 2 · Solicitudes de reserva
 
 El formulario de abajo del sitio. Guarda la solicitud, **le avisa a Humaya** por
 correo y **le acusa recibo al huésped** en su idioma.
 
-| Pieza | Qué hace |
-|---|---|
+| Pieza                    | Qué hace                                                 |
+| ------------------------ | -------------------------------------------------------- |
 | tabla `booking_requests` | nombre, email, fechas, personas, idioma, mensaje, estado |
-| función `book` | `POST` → guarda + los dos correos |
+| función `book`           | `POST` → guarda + los dos correos                        |
 
 Estados: `nueva` → `leida` → `contestada` (o `descartada`).
 
@@ -104,12 +125,12 @@ from public.booking_requests where status = 'nueva' order by created_at desc;
 `stayhumaya.com` está verificado en Resend y los cuatro secretos están puestos en
 Supabase → Edge Functions → Secrets:
 
-| Secret | Qué es |
-|---|---|
-| `RESEND_API_KEY` | la llave de [resend.com](https://resend.com) |
-| `MAIL_FROM` | `HUMAYA <hola@stayhumaya.com>` |
-| `SITE_URL` | `https://stayhumaya.com` — a dónde vuelve el botón de confirmación |
-| `BOOKING_INBOX` | a dónde llegan las solicitudes de reserva |
+| Secret           | Qué es                                                             |
+| ---------------- | ------------------------------------------------------------------ |
+| `RESEND_API_KEY` | la llave de [resend.com](https://resend.com)                       |
+| `MAIL_FROM`      | `HUMAYA <hola@stayhumaya.com>`                                     |
+| `SITE_URL`       | `https://stayhumaya.com` — a dónde vuelve el botón de confirmación |
+| `BOOKING_INBOX`  | a dónde llegan las solicitudes de reserva                          |
 
 Probado de punta a punta el 26 de agosto de 2026: alta en la lista → correo de
 confirmación; solicitud de reserva → aviso a Humaya + acuse al huésped.
