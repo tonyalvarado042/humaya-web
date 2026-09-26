@@ -12,7 +12,8 @@ Decisiones tomadas sin confirmar con Anthony y espacio para su feedback una vez 
 Las 8 pantallas del MVP están construidas. La app del huésped ya funciona en español e inglés y el
 build genera una PWA. La Fase 5 está cerrada. En la rama `metodo-humaya`, la aplicación ya vive en
 esta carpeta dentro del repo oficial, mientras la landing productiva permanece intacta en la raíz.
-La Fase 6 sigue abierta por Playwright, URL/document root, despliegue, validación física y demo.
+La rama está publicada como `origin/metodo-humaya`. La Fase 6 sigue abierta por Playwright,
+URL/document root, despliegue, validación física y demo.
 
 Qué se puede hacer hoy:
 
@@ -518,6 +519,6 @@ reales de `src/router.tsx` en jsdom; no se hizo una revisión visual en un naveg
 
 ## Próximo paso
 
-Verificar y publicar la rama `metodo-humaya`. Después confirmar con Anthony la URL/document root y la
-topología de despliegue para continuar con Playwright, publicación en SiteGround, validación física de
-la PWA y guion de demo.
+Comprobar el CI y revisar el pull request de `metodo-humaya`. Después confirmar con Anthony la
+URL/document root y la topología de despliegue para continuar con Playwright, publicación en
+SiteGround, validación física de la PWA y guion de demo.

@@ -165,18 +165,19 @@ inicial.
 
 ## Posición actual
 
-| Frente                           | Estado                                   |
-| -------------------------------- | ---------------------------------------- |
-| MVP funcional                    | Listo: fases 0–5, 188 tests y build PWA  |
-| Repositorio oficial identificado | Listo: clonado, limpio y auditado        |
-| Assets oficiales                 | Listo: coincidencia exacta confirmada    |
-| Estrategia de convivencia        | Código aislado; despliegue por decidir   |
-| Escritura en repo oficial        | Autorizada en `metodo-humaya`            |
-| Integración de código            | Copiada en `metodo-humaya/`              |
-| CI oficial                       | Configurado; falta comprobarlo en GitHub |
-| Playwright                       | No iniciado                              |
-| Despliegue del MVP               | No configurado                           |
-| Validación PWA física            | Pendiente del origen HTTPS definitivo    |
+| Frente                           | Estado                                  |
+| -------------------------------- | --------------------------------------- |
+| MVP funcional                    | Listo: fases 0–5, 188 tests y build PWA |
+| Repositorio oficial identificado | Listo: clonado, limpio y auditado       |
+| Assets oficiales                 | Listo: coincidencia exacta confirmada   |
+| Estrategia de convivencia        | Código aislado; despliegue por decidir  |
+| Escritura en repo oficial        | Autorizada en `metodo-humaya`           |
+| Integración de código            | Copiada en `metodo-humaya/`             |
+| CI oficial                       | Publicado; falta comprobar la corrida   |
+| Playwright                       | No iniciado                             |
+| Despliegue del MVP               | No configurado                          |
+| Validación PWA física            | Pendiente del origen HTTPS definitivo   |
 
-El siguiente paso es verificar y publicar la rama. Después se resuelven URL, document root y
-topología de despliegue antes de continuar con Playwright y la publicación de la PWA.
+El siguiente paso es comprobar el CI de la rama y abrir/revisar el pull request. Después se resuelven
+URL, document root y topología de despliegue antes de continuar con Playwright y la publicación de la
+PWA.

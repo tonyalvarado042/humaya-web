@@ -32,7 +32,7 @@ El repositorio oficial ya fue clonado y auditado. La revisión completa está en
 - [x] MVP copiado a `metodo-humaya/` sin reemplazar archivos de la landing.
 - [x] Contratos raíz y de la aplicación adaptados al repositorio mixto.
 - [x] Workflow de CI agregado con ejecución aislada en el workspace.
-- [ ] Rama verificada, commiteada y publicada en GitHub.
+- [x] Rama verificada, commiteada y publicada como `origin/metodo-humaya`.
 - [ ] Topología de despliegue aprobada.
 
 ## Condiciones para empezar
