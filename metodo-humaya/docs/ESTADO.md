@@ -49,6 +49,7 @@ Los cuatro chequeos pasan en limpio: `npm run lint`, `npm run typecheck`, `npm r
 - Landing, confirmación, `.htaccess` y assets productivos conservados sin cambios.
 - Contrato raíz agregado para proteger ambos productos.
 - CI agregado con Node 22 y comandos ejecutados dentro de `metodo-humaya/`.
+- Primera corrida remota del CI completada en verde: Prettier, lint, typecheck, 188 tests y build.
 - No se desplegó nada ni se registró un service worker en `stayhumaya.com`.
 
 La consulta automatizada a `stayhumaya.com` recibió HTTP 403; no se toma como caída del sitio. Falta
@@ -519,6 +520,6 @@ reales de `src/router.tsx` en jsdom; no se hizo una revisión visual en un naveg
 
 ## Próximo paso
 
-Comprobar el CI y revisar el pull request de `metodo-humaya`. Después confirmar con Anthony la
-URL/document root y la topología de despliegue para continuar con Playwright, publicación en
-SiteGround, validación física de la PWA y guion de demo.
+Abrir/revisar el pull request de `metodo-humaya`. Después confirmar con Anthony la URL/document root
+y la topología de despliegue para continuar con Playwright, publicación en SiteGround, validación
+física de la PWA y guion de demo.

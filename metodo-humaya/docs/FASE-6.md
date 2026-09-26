@@ -33,6 +33,7 @@ El repositorio oficial ya fue clonado y auditado. La revisión completa está en
 - [x] Contratos raíz y de la aplicación adaptados al repositorio mixto.
 - [x] Workflow de CI agregado con ejecución aislada en el workspace.
 - [x] Rama verificada, commiteada y publicada como `origin/metodo-humaya`.
+- [x] CI remoto pasa instalación, Prettier, lint, typecheck, 188 tests y build.
 - [ ] Topología de despliegue aprobada.
 
 ## Condiciones para empezar

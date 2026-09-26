@@ -173,11 +173,10 @@ inicial.
 | Estrategia de convivencia        | Código aislado; despliegue por decidir  |
 | Escritura en repo oficial        | Autorizada en `metodo-humaya`           |
 | Integración de código            | Copiada en `metodo-humaya/`             |
-| CI oficial                       | Publicado; falta comprobar la corrida   |
+| CI oficial                       | Publicado y verificado en verde         |
 | Playwright                       | No iniciado                             |
 | Despliegue del MVP               | No configurado                          |
 | Validación PWA física            | Pendiente del origen HTTPS definitivo   |
 
-El siguiente paso es comprobar el CI de la rama y abrir/revisar el pull request. Después se resuelven
-URL, document root y topología de despliegue antes de continuar con Playwright y la publicación de la
-PWA.
+El siguiente paso es abrir/revisar el pull request. Después se resuelven URL, document root y
+topología de despliegue antes de continuar con Playwright y la publicación de la PWA.
