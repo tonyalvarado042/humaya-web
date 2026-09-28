@@ -1,11 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { render, screen, waitFor } from '@testing-library/react';
+import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
-import { routes } from '@/router';
+import { createRoutes, routes } from '@/router';
 
-function renderAt(path: string) {
-  const router = createMemoryRouter(routes, { initialEntries: [path] });
+function renderAt(path: string, routeSet: RouteObject[] = routes) {
+  const router = createMemoryRouter(routeSet, { initialEntries: [path] });
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
   return render(
@@ -21,21 +21,32 @@ describe('rutas base', () => {
     expect(await screen.findByRole('navigation', { name: 'Navegación principal' })).toBeVisible();
   });
 
-  it('redirige la raíz a la app del huésped', async () => {
+  it('muestra la portada con accesos a huésped y recepción', async () => {
+    document.documentElement.lang = 'en';
     renderAt('/');
-    expect(await screen.findByRole('navigation', { name: 'Navegación principal' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Become More Human' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'App del huésped' })).toHaveAttribute('href', '/app');
+    expect(screen.getByRole('link', { name: 'Recepción' })).toHaveAttribute('href', '/staff');
+    expect(screen.getByText(/Demo con datos ficticios/)).toBeVisible();
+    await waitFor(() => expect(document.documentElement.lang).toBe('es'));
   });
 
-  it('muestra el placeholder de recepción en /staff', () => {
+  it('muestra recepción en /staff', () => {
     renderAt('/staff');
     expect(screen.getByText('Recepción')).toBeInTheDocument();
   });
 
-  it('monta el catálogo del sistema visual en /dev/ui', () => {
+  it('monta el catálogo del sistema visual en desarrollo', () => {
     renderAt('/dev/ui');
     expect(screen.getByRole('heading', { name: 'Sistema visual' })).toBeInTheDocument();
     expect(screen.getByRole('radiogroup', { name: 'Tema' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'SlotGrid' })).toBeInTheDocument();
+  });
+
+  it('excluye el catálogo del árbol de producción', () => {
+    renderAt('/dev/ui', createRoutes({ includeDevUi: false }));
+    expect(screen.getByRole('heading', { name: 'Esta dirección no existe' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Sistema visual' })).not.toBeInTheDocument();
   });
 
   it('muestra el 404 en una ruta que no existe', () => {
