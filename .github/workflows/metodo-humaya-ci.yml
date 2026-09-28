@@ -3,10 +3,12 @@ name: Metodo Humaya CI
 on:
   push:
     paths:
+      - "index.html"
       - "metodo-humaya/**"
       - ".github/workflows/metodo-humaya-ci.yml"
   pull_request:
     paths:
+      - "index.html"
       - "metodo-humaya/**"
       - ".github/workflows/metodo-humaya-ci.yml"
 
