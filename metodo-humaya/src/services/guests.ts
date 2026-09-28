@@ -65,14 +65,14 @@ export async function acceptPrivacy(stayId: string): Promise<string> {
 }
 
 /** Si este huésped ya aceptó la política, y cuándo. */
-export async function getPrivacyConsent(stayId: string): Promise<string | undefined> {
+export async function getPrivacyConsent(stayId: string): Promise<string | null> {
   assertMocks('guests.getPrivacyConsent');
   await delay();
 
   const stay = STAYS.find((item) => item.id === stayId);
   const guest = GUESTS.find((item) => item.id === stay?.guestId);
 
-  return state.privacyAcceptedAt[stayId] ?? guest?.consent.privacyAcceptedAt;
+  return state.privacyAcceptedAt[stayId] ?? guest?.consent.privacyAcceptedAt ?? null;
 }
 
 export async function saveTeamNotes(stayId: string, notes: string): Promise<void> {

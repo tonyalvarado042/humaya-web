@@ -32,3 +32,38 @@ jobs:
       - run: npm run typecheck
       - run: npm run test
       - run: npm run build
+      - name: Guardar build para SiteGround
+        uses: actions/upload-artifact@v4
+        with:
+          name: metodo-humaya-dist
+          path: metodo-humaya/dist
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14
+
+  e2e:
+    needs: checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: metodo-humaya
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: metodo-humaya/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+      - name: Guardar evidencia de fallos E2E
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metodo-humaya-playwright-failure
+          path: |
+            metodo-humaya/playwright-report
+            metodo-humaya/test-results
+          if-no-files-found: ignore
+          retention-days: 14

@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { resetMockState } from '@/mocks';
-import { getAlerts, getGuestProfile, saveTeamNotes } from './guests';
+import {
+  acceptPrivacy,
+  getAlerts,
+  getGuestProfile,
+  getPrivacyConsent,
+  saveTeamNotes,
+} from './guests';
 import { saveAnswer } from './interview';
 import { getVillaInfo } from './villa';
 
@@ -86,6 +92,18 @@ describe('notas del equipo', () => {
 
     const profile = await getGuestProfile('s-mendez-rojas');
     expect(profile.teamNotes).toBe('Llegaron cansados del vuelo.');
+  });
+});
+
+describe('consentimiento de privacidad', () => {
+  it('devuelve null cuando Hannah todavía no aceptó', async () => {
+    await expect(getPrivacyConsent('s-weber')).resolves.toBeNull();
+  });
+
+  it('devuelve la fecha después de aceptar', async () => {
+    const acceptedAt = await acceptPrivacy('s-weber');
+
+    await expect(getPrivacyConsent('s-weber')).resolves.toBe(acceptedAt);
   });
 });
 
