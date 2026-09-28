@@ -13,8 +13,8 @@ Las 8 pantallas del MVP están construidas. La app del huésped ya funciona en e
 build genera una PWA. La Fase 5 está cerrada. En la rama `metodo-humaya`, la aplicación ya vive en
 esta carpeta dentro del repo oficial, mientras la landing productiva permanece intacta en la raíz.
 La rama `metodo-humaya` prepara el MVP para `metodo.stayhumaya.com`, con origen y document root
-separados de la landing. La Fase 6 sigue abierta por el CI final del PR, la creación del subdominio y
-SSL, el despliegue, la validación física y el ensayo de la demo.
+separados de la landing. El PR #1 está abierto y su CI pasa. La Fase 6 sigue abierta por la creación
+del subdominio y SSL, el despliegue, la validación física y el ensayo de la demo.
 
 Qué se puede hacer hoy:
 
@@ -56,6 +56,8 @@ landing productiva.
   disponible de Sauna para Valeria y abren su perfil desde Llegadas.
 - El CI separa chequeos base de E2E. Primero ejecuta Prettier, lint, typecheck, 191 tests y build;
   después instala Chromium y ejecuta Playwright.
+- El PR #1 pasó ambos trabajos remotos y publicó el artefacto `metodo-humaya-dist` con retención de
+  14 días.
 - Dos pruebas de servicio adicionales fijan el contrato del consentimiento de privacidad como `null`
   antes de aceptarlo y como fecha ISO después de aceptarlo.
 
@@ -559,6 +561,6 @@ reales de `src/router.tsx` en jsdom; no se hizo una revisión visual en un naveg
 
 ## Próximo paso
 
-Abrir y revisar el pull request de `metodo-humaya` y confirmar que ambos trabajos del CI estén verdes.
-Después, crear el subdominio, SSL y document root, cargar el artefacto de CI y completar la validación
-física de la PWA y el ensayo de la demo. No fusionar ni desplegar como parte de esta ejecución.
+Revisar el pull request #1, cuyos trabajos de CI están verdes. Después, crear el subdominio, SSL y
+document root, cargar el artefacto de CI y completar la validación física de la PWA y el ensayo de la
+demo. No fusionar ni desplegar como parte de esta ejecución.

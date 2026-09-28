@@ -271,7 +271,7 @@ no se despliega desde esta ejecución.
 
 - [~] Código y artefacto preparados sin reemplazar la landing; faltan PR, revisión, merge y hosting
   del MVP en SiteGround
-- [~] Los 3 recorridos de Playwright pasan localmente; falta confirmar el CI del PR
+- [x] Los 3 recorridos de Playwright pasan localmente y en el CI del PR
 - [ ] PWA instalada, standalone y offline validada en Android y iPhone sobre la URL HTTPS real
 - [~] Guion de demo de 5 minutos escrito; falta ensayarlo sobre HTTPS
 

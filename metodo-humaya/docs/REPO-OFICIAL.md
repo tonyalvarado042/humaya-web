@@ -177,7 +177,7 @@ inicial.
 | Estrategia de convivencia        | `metodo.stayhumaya.com`, origen aislado |
 | Escritura en repo oficial        | Autorizada en `metodo-humaya`           |
 | Integración de código            | Copiada en `metodo-humaya/`             |
-| CI oficial                       | Checks y E2E preparados; falta PR final |
+| CI oficial                       | PR #1: checks y E2E en verde            |
 | Playwright                       | 3 recorridos pasan localmente           |
 | Despliegue del MVP               | Artefacto listo; SiteGround pendiente   |
 | Validación PWA física            | Pendiente del origen HTTPS definitivo   |

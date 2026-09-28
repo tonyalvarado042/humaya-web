@@ -39,7 +39,7 @@ El repositorio oficial ya fue clonado y auditado. La revisión completa está en
 - [x] Topología y URL de despliegue aprobadas: `metodo.stayhumaya.com`, document root separado.
 - [x] Portada, rutas de producción, `.htaccess`, Playwright y artefacto de CI implementados.
 - [x] 191 tests unitarios, build PWA y los 3 E2E pasan localmente.
-- [ ] CI del pull request final confirmado en verde.
+- [x] Pull request #1 abierto; `checks` y `e2e` confirmados en verde.
 
 ## Condiciones para empezar
 
@@ -318,7 +318,7 @@ npm run e2e
 
 Luego:
 
-- [ ] CI del pull request final verde en el repositorio oficial.
+- [x] CI del pull request verde en el repositorio oficial.
 - [ ] Pull request revisado y fusionado según el proceso de Anthony.
 - [ ] Despliegue HTTPS verificado.
 - [ ] PWA validada en Android y iPhone con evidencia registrada.
