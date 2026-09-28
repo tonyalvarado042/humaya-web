@@ -5,15 +5,16 @@ Documento vivo. Se actualiza al cerrar cada fase de `docs/PLAN.md`.
 Decisiones tomadas sin confirmar con Anthony y espacio para su feedback una vez que vea la demo:
 `docs/FEEDBACK.md`.
 
-Última actualización: **26 sep 2026** · MVP copiado al repositorio oficial; Fase 6 en curso.
+Última actualización: **28 sep 2026** · Fase 6 completa en código; cierre operativo pendiente.
 
 ## Estado actual
 
 Las 8 pantallas del MVP están construidas. La app del huésped ya funciona en español e inglés y el
 build genera una PWA. La Fase 5 está cerrada. En la rama `metodo-humaya`, la aplicación ya vive en
 esta carpeta dentro del repo oficial, mientras la landing productiva permanece intacta en la raíz.
-La rama está publicada como `origin/metodo-humaya`. La Fase 6 sigue abierta por Playwright,
-URL/document root, despliegue, validación física y demo.
+La rama `metodo-humaya` prepara el MVP para `metodo.stayhumaya.com`, con origen y document root
+separados de la landing. La Fase 6 sigue abierta por el CI final del PR, la creación del subdominio y
+SSL, el despliegue, la validación física y el ensayo de la demo.
 
 Qué se puede hacer hoy:
 
@@ -24,10 +25,48 @@ npm run dev        # http://localhost:5173
 
 - `/app` — Inicio, Entrevista, Concierge, Mi villa, Reservas (con el selector de huésped de la demo)
 - `/staff` — Llegadas · `/staff/guests/:stayId` — Perfil del huésped · `/staff/spa` — Spa y bienestar
-- `/dev/ui` — catálogo del sistema visual
+- `/dev/ui` — catálogo del sistema visual, disponible únicamente en desarrollo
 
-Los cuatro chequeos pasan en limpio: `npm run lint`, `npm run typecheck`, `npm run test`
-(188 tests), `npm run build`.
+Los chequeos pasan en limpio: `npm run lint`, `npm run typecheck`, `npm run test` (191 tests),
+`npm run build` y `npm run e2e` (3 recorridos).
+
+## Fase 6 — Entrega del Método Humaya · código preparado el 28 sep 2026
+
+La fase está **completa en código, pero no cerrada operativamente**. No se desplegó ni se modificó la
+landing productiva.
+
+### Aplicación y hosting
+
+- `/` muestra una portada responsive con la marca oficial, “Become More Human”, aviso de datos
+  ficticios y accesos a `/app` y `/staff`.
+- La definición de rutas es una fábrica comprobable. `/dev/ui` existe en desarrollo y cae en la
+  pantalla de ruta inexistente en producción.
+- Vite conserva `base: /`; el manifest conserva `start_url` y `scope` en `/app`. El aislamiento del
+  service worker se resuelve con `metodo.stayhumaya.com`, no con prefijos adicionales.
+- El build incluye un `.htaccess` propio con fallback SPA, HTTPS, caché inmutable para assets con hash
+  y revalidación para HTML, manifest y service worker.
+- El workflow publica `metodo-humaya-dist` incluyendo archivos ocultos. Ese artefacto debe extraerse
+  solo en el document root independiente del subdominio.
+
+### Automatización
+
+- `@playwright/test` corre en Chromium, con un worker y contextos limpios. Capturas, video y trazas se
+  conservan únicamente al fallar.
+- Los tres E2E completan la entrevista light de Hannah con consentimiento, reservan el primer horario
+  disponible de Sauna para Valeria y abren su perfil desde Llegadas.
+- El CI separa chequeos base de E2E. Primero ejecuta Prettier, lint, typecheck, 191 tests y build;
+  después instala Chromium y ejecuta Playwright.
+- Dos pruebas de servicio adicionales fijan el contrato del consentimiento de privacidad como `null`
+  antes de aceptarlo y como fecha ISO después de aceptarlo.
+
+### Entrega pendiente
+
+- Crear DNS/subdominio, document root y SSL para `metodo.stayhumaya.com`.
+- Aprobar y fusionar el PR; descargar y cargar el artefacto sin tocar `public_html` de la landing.
+- Verificar rutas HTTPS, responsive final y PWA standalone/offline en Android y iPhone.
+- Ensayar sobre HTTPS el recorrido de cinco minutos escrito en [`docs/DEMO.md`](DEMO.md).
+
+Estos puntos son bloqueantes para marcar la Fase 6 como cerrada.
 
 ## Revisión del repositorio oficial · 26 sep 2026
 
@@ -38,10 +77,10 @@ Los cuatro chequeos pasan en limpio: `npm run lint`, `npm run typecheck`, `npm r
   marca y registro de despliegues.
 - Marca, wordmark y `villa-02.jpg` coinciden exactamente con los tres archivos usados por el MVP.
 - La landing usa Jost + Inter y el dorado `#C8AD85`; el MVP usa Cormorant + Jost y un dorado cercano.
-- El service worker del MVP hoy tiene alcance `/`. Publicarlo sin aislamiento en el mismo origen
-  podría controlar la landing y usar su `index.html` como fallback equivocado.
-- Recomendación pendiente de Anthony: carpeta propia para el código del MVP y origen/document root
-  separado en SiteGround, manteniendo ambos proyectos en el mismo repositorio.
+- El service worker se aislará de la landing mediante `metodo.stayhumaya.com`; el manifest conserva
+  alcance y arranque en `/app`.
+- La topología aprobada mantiene el código del MVP en su carpeta y lo publica en un document root
+  separado en SiteGround.
 
 ### Integración ejecutada
 
@@ -82,7 +121,7 @@ La fase queda **cerrada a nivel de implementación**. La validación física pas
   de 192, 512, maskable 512 y Apple Touch 180, además del favicon. El ícono maskable usa fondo opaco
   y conserva la marca dentro de la zona segura.
 - El build genera `manifest.webmanifest`, `registerSW.js`, `sw.js` y Workbox. No hay configuración de
-  Vercel. El repo oficial usa SiteGround; la URL y el document root del MVP siguen por decidir.
+  Vercel. El destino es `metodo.stayhumaya.com`; crear y cargar su document root sigue pendiente.
 
 ### Marca y fotografía oficiales
 
@@ -520,6 +559,6 @@ reales de `src/router.tsx` en jsdom; no se hizo una revisión visual en un naveg
 
 ## Próximo paso
 
-Abrir/revisar el pull request de `metodo-humaya`. Después confirmar con Anthony la URL/document root
-y la topología de despliegue para continuar con Playwright, publicación en SiteGround, validación
-física de la PWA y guion de demo.
+Abrir y revisar el pull request de `metodo-humaya` y confirmar que ambos trabajos del CI estén verdes.
+Después, crear el subdominio, SSL y document root, cargar el artefacto de CI y completar la validación
+física de la PWA y el ensayo de la demo. No fusionar ni desplegar como parte de esta ejecución.

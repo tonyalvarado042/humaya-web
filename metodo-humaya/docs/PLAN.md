@@ -266,21 +266,23 @@ Prompt: "Prepará el proyecto para trasladarlo al repositorio de Anthony. Agreg�
 
 Runbook de ejecución: [`docs/FASE-6.md`](FASE-6.md). El repositorio oficial ya fue auditado; el
 diagnóstico está en [`docs/REPO-OFICIAL.md`](REPO-OFICIAL.md). El código ya vive aislado en la rama
-`metodo-humaya`; no se despliega hasta que Anthony apruebe la topología.
+`metodo-humaya`. La topología aprobada usa `metodo.stayhumaya.com` y un document root independiente;
+no se despliega desde esta ejecución.
 
-- [~] Proyecto copiado sin reemplazar la landing; faltan revisión, merge y hosting del MVP en
-  SiteGround
-- [ ] Playwright pasa en CI
+- [~] Código y artefacto preparados sin reemplazar la landing; faltan PR, revisión, merge y hosting
+  del MVP en SiteGround
+- [~] Los 3 recorridos de Playwright pasan localmente; falta confirmar el CI del PR
 - [ ] PWA instalada, standalone y offline validada en Android y iPhone sobre la URL HTTPS real
-- [ ] Guion de demo de 5 minutos para Anthony
+- [~] Guion de demo de 5 minutos escrito; falta ensayarlo sobre HTTPS
 
 ## Calidad, privacidad y entrega
 
 - Pruebas: Vitest (servicios, lógica de entrevista, disponibilidad), Testing Library (Chip, SegmentedControl, SlotGrid con teclado), Playwright (3 flujos).
 - Accesibilidad: elementos nativos, `aria-current`, `aria-expanded`, `aria-live` en el chat, alertas con texto, revisión con axe al cerrar cada fase.
 - Privacidad (Ley 8968): consentimiento antes de preguntas sensibles con enlace a la política (texto lo provee Anthony); preguntas `sensitive` explican su uso y se pueden saltar; mocks solo con personas inventadas.
-- Entrega: este workspace no configura hosting todavía. El deploy del MVP se hará en SiteGround con
-  la topología que apruebe Anthony; mantener `VITE_USE_MOCKS=true` en la demo.
+- Entrega: el build está preparado para la raíz de `metodo.stayhumaya.com`, en un document root
+  separado de la landing. El alta del subdominio, SSL y deploy manual siguen pendientes; mantener
+  `VITE_USE_MOCKS=true` en la demo.
 
 ## Cronograma estimado (4–6 h diarias)
 
@@ -302,14 +304,14 @@ Mostrarle avances a Anthony al terminar la Fase 3.
 - [ ] Presupuesto, forma de pago y fecha de entrega
 - [x] Marca y wordmark oficiales en PNG, foto de las villas
 - [x] Fuentes de la landing identificadas: Jost para display e Inter para cuerpo
-- [ ] ¿La app adopta Jost + Inter y el dorado oficial, o conserva la dirección visual del prototipo?
+- [x] Para esta fase, la app conserva la dirección visual, fuentes y tokens actuales
 - [ ] Preguntas reales de la entrevista (light y profunda) por pilar
 - [ ] Instructivos reales de la villa
 - [ ] Horarios y capacidad de sauna y cold plunge
 - [ ] Texto de la política de privacidad
 - [x] Repo `tonyalvarado042/humaya-web`, dominio `stayhumaya.com`, hosting SiteGround
-- [ ] ¿MVP en origen/document root separado —recomendado— o bajo el mismo origen de la landing?
+- [x] MVP en `metodo.stayhumaya.com`, con origen y document root separados de la landing
 - [x] Rama `metodo-humaya` creada y autorizada para integrar el código
-- [ ] URL del MVP, revisión/merge y flujo de despliegue
+- [~] URL del MVP definida; faltan revisión/merge y ejecutar el despliegue manual en SiteGround
 
 Para la etapa de backend: ¿dónde reservan los huéspedes (PMS/motor con API)?, ¿qué CRM usan y tiene API?, ¿tienen WhatsApp Business (API oficial y plantillas de Meta)?

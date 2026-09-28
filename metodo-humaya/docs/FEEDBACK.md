@@ -33,9 +33,10 @@ si Anthony prefiere otra, es trabajo acotado.
 | 15  | El indicador "Experiencias WOW por preparar" cuenta solo las de las llegadas **del día**, no las del hotel entero.                                                                                        | Llegadas                    | ☐          |
 | 16  | Inglés cubre toda la app del huésped, pero recepción continúa solo en español. El idioma inicial sale de la preferencia del huésped y cada elección se recuerda por estadía.                              | Todo `/app`                 | ☐          |
 | 17  | La PWA usa la marca oficial dorada sobre fondo oscuro en los íconos maskable y Apple.                                                                                                                     | Ícono al instalar la app    | ☑          |
-| 18  | Propongo mantener la landing intacta y desplegar el MVP desde una carpeta del mismo repo hacia un origen/document root separado en SiteGround.                                                            | Integración Fase 6          | ☐          |
-| 19  | La landing oficial usa Jost + Inter y `#C8AD85`; la app usa Cormorant + Jost y tonos adaptados. Falta elegir cuál dirección visual debe prevalecer.                                                       | Marca de app y recepción    | ☐          |
+| 18  | La landing queda intacta y el MVP se desplegará en `metodo.stayhumaya.com`, con origen/document root separado en SiteGround.                                                                              | Integración Fase 6          | ☑          |
+| 19  | La landing usa Jost + Inter y `#C8AD85`; durante esta fase la app conserva Cormorant + Jost y sus tonos accesibles, sin una realineación visual completa.                                                 | Marca de app y recepción    | ☑          |
 | 20  | Alemán y francés existen en la landing, pero continúan fuera del MVP de huésped y caen temporalmente a español.                                                                                           | Idiomas de `/app`           | ☐          |
+| 21  | `/dev/ui` sirve como catálogo interno solo en desarrollo; el build público responde con la pantalla de ruta inexistente.                                                                                  | Rutas de Fase 6             | ☑          |
 
 ## 2. Lo que necesito de él para reemplazar contenido provisional
 

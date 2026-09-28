@@ -9,8 +9,10 @@ en la rama `metodo-humaya`.
 - El código vive en `metodo-humaya/`; la landing permanece en la raíz.
 - Se agregó un contrato raíz para proteger landing, formularios y proceso de despliegue.
 - Se agregó CI con Node 22 y `working-directory: metodo-humaya`.
-- No se configuró despliegue ni se publicó el service worker.
-- La URL y el document root siguen pendientes; por eso producción continúa intacta.
+- El build y el artefacto para Apache están preparados, pero no se desplegó ni se publicó el service
+  worker.
+- La URL aprobada es `metodo.stayhumaya.com`; crear su subdominio, SSL y document root separado sigue
+  pendiente. Producción continúa intacta.
 
 ## Conclusión ejecutiva
 
@@ -23,9 +25,9 @@ El MVP puede vivir en el mismo repositorio, pero **no se debe copiar en la raíz
 se registra con alcance `/`; si se publicara sin ajuste en el mismo origen, podría controlar también
 el sitio público.
 
-La opción de menor riesgo es conservar intacta la landing y agregar el código del MVP en una carpeta
-propia del repositorio, desplegándolo en un origen separado —por ejemplo, un subdominio definido por
-Anthony— con su propio document root en SiteGround. El nombre y la URL no se deciden acá.
+La decisión aprobada conserva intacta la landing y mantiene el código del MVP en una carpeta propia
+del repositorio. Su build se desplegará en `metodo.stayhumaya.com`, con un document root separado en
+SiteGround.
 
 ## Estado comprobado del repositorio
 
@@ -72,7 +74,7 @@ la integración debe decidir una sola ubicación canónica para los assets compa
 | Raíz `/`         | Landing pública y formularios reales              | Portada demo prevista para Fase 6                             | La portada demo no puede reemplazar la raíz productiva.                                                |
 | Stack            | Archivo estático sin build                        | React/Vite/TypeScript                                         | Conviene alojar el MVP en una subcarpeta con ciclo de build independiente.                             |
 | Hosting          | SiteGround manual                                 | Sin hosting configurado                                       | El runbook debe adaptarse a SiteGround, no a Vercel.                                                   |
-| Rutas            | Anclas dentro de `/`                              | `/app`, `/staff`, `/dev/ui`                                   | Hace falta aislar el origen o añadir fallback SPA cuidadosamente.                                      |
+| Rutas            | Anclas dentro de `/`                              | `/app`, `/staff`; `/dev/ui` solo en desarrollo                | El origen separado usa un fallback SPA propio sin tocar la landing.                                    |
 | Service worker   | No existe                                         | Se registra en `/sw.js` con alcance `/`                       | En el mismo origen podría controlar y cachear la landing.                                              |
 | Fallback offline | No aplica                                         | Hoy apunta a `/index.html`                                    | En el mismo origen apuntaría a la landing, no al shell React.                                          |
 | Idiomas          | ES, EN, DE y FR reales                            | ES y EN; DE/FR caen a español                                 | Es una diferencia visible, aunque DE/FR siguen fuera del MVP.                                          |
@@ -80,7 +82,7 @@ la integración debe decidir una sola ubicación canónica para los assets compa
 | Dorado principal | `#C8AD85`, documentado como color exacto del logo | Guest `#C8A565`; staff usa un dorado más oscuro por contraste | Hay que armonizar marca sin perder contraste AA.                                                       |
 | Fondo claro      | `#F4F1EA`                                         | Staff `#F4F0E8`                                               | Diferencia menor, pero debe resolverse como token de marca.                                            |
 | Fuentes          | Google Fonts                                      | `@fontsource`, empaquetadas y offline                         | Conviene mantener fuentes locales para la PWA, aunque cambien las familias.                            |
-| Calidad          | Sin tests ni CI                                   | 188 tests, lint, typecheck y build                            | El CI nuevo debe trabajar dentro de la carpeta del MVP sin imponer Node a la landing.                  |
+| Calidad          | Sin tests ni CI                                   | 191 tests, 3 E2E, lint, typecheck y build                     | El CI trabaja dentro de la carpeta del MVP sin imponer Node a la landing.                              |
 | Despliegue       | ZIP manual y registro de versiones                | Build genera archivos con hash                                | No se debe mezclar `dist/` a ciegas con `public_html`.                                                 |
 | Caché            | Imágenes inmutables 1 año; JS 1 mes               | Service worker con actualización automática                   | `sw.js`, registro y manifest necesitan `no-cache`; Workbox y assets con hash sí pueden ser inmutables. |
 
@@ -102,7 +104,7 @@ la integración debe decidir una sola ubicación canónica para los assets compa
 
 ## Topologías posibles
 
-### A. Carpeta de código + origen separado — recomendada
+### A. Carpeta de código + origen separado — aprobada
 
 Estructura orientativa del repositorio:
 
@@ -112,14 +114,15 @@ humaya-web/
 ├── confirmado.html
 ├── assets/img/
 ├── .htaccess
-└── mvp/                    # React/Vite, nombre por confirmar
+    └── metodo-humaya/          # React/Vite
     ├── src/
     ├── public/
     ├── docs/
     └── package.json
 ```
 
-El build de `mvp/` se publica en un document root separado de SiteGround. Así el MVP puede conservar
+El build de `metodo-humaya/` se publica en el document root separado de
+`metodo.stayhumaya.com`. Así el MVP puede conservar
 sus rutas `/`, `/app` y `/staff` dentro de su propio origen; el service worker no toca la landing y la
 portada demo de Fase 6 puede existir sin reemplazar `stayhumaya.com/`.
 
@@ -129,9 +132,10 @@ Ventajas:
 - PWA y caché aisladas por origen;
 - despliegues independientes;
 - la landing continúa sin requerir Node;
-- CI puede usar `working-directory: mvp`.
+- CI puede usar `working-directory: metodo-humaya`.
 
-Pendiente: Anthony debe definir el subdominio o URL, el document root y quién realiza el despliegue.
+Decisión: el origen será `metodo.stayhumaya.com`. Falta crearlo en SiteGround, asignar su document
+root independiente, activar SSL y acordar quién ejecuta el despliegue manual.
 
 ### B. Mismo origen y rutas reservadas — posible, más compleja
 
@@ -151,32 +155,33 @@ inicial.
 ## Decisiones necesarias antes de desplegar
 
 - [x] Código fuente aislado en una carpeta propia del repositorio.
-- [ ] Confirmar origen separado —recomendado— o despliegue bajo el mismo origen.
-- [ ] Definir la URL del MVP y su document root en SiteGround.
+- [x] Origen separado aprobado.
+- [x] URL definida: `metodo.stayhumaya.com`.
+- [ ] Crear el subdominio, SSL y document root independiente en SiteGround.
 - [x] Permiso para trabajar en la rama `metodo-humaya`.
 - [ ] Confirmar quién revisa y fusiona en `main`.
-- [ ] Decidir si la portada demo vive en `/` del origen separado o se elimina.
-- [ ] Decidir si la app adopta Jost + Inter y el dorado oficial, manteniendo ajustes accesibles para
-      recepción.
+- [x] La portada demo vive en `/` del origen separado.
+- [x] La app conserva su dirección visual, fuentes y tokens actuales durante esta fase.
 - [ ] Confirmar si DE/FR siguen fuera de alcance para la app del huésped.
-- [ ] Elegir despliegue manual reproducible o automatización de SiteGround con secretos del repo.
-- [ ] Confirmar si `/dev/ui` debe existir en el despliegue público o limitarse a preview/desarrollo.
+- [x] El CI produce un artefacto reproducible; la carga a SiteGround continúa manual.
+- [x] `/dev/ui` se limita al desarrollo y responde con la pantalla de ruta inexistente en producción.
 - [ ] Verificar `stayhumaya.com` en un navegador normal y confirmar la versión de producción.
 
 ## Posición actual
 
 | Frente                           | Estado                                  |
 | -------------------------------- | --------------------------------------- |
-| MVP funcional                    | Listo: fases 0–5, 188 tests y build PWA |
+| MVP funcional                    | Listo: fases 0–5, 191 tests y build PWA |
 | Repositorio oficial identificado | Listo: clonado, limpio y auditado       |
 | Assets oficiales                 | Listo: coincidencia exacta confirmada   |
-| Estrategia de convivencia        | Código aislado; despliegue por decidir  |
+| Estrategia de convivencia        | `metodo.stayhumaya.com`, origen aislado |
 | Escritura en repo oficial        | Autorizada en `metodo-humaya`           |
 | Integración de código            | Copiada en `metodo-humaya/`             |
-| CI oficial                       | Publicado y verificado en verde         |
-| Playwright                       | No iniciado                             |
-| Despliegue del MVP               | No configurado                          |
+| CI oficial                       | Checks y E2E preparados; falta PR final |
+| Playwright                       | 3 recorridos pasan localmente           |
+| Despliegue del MVP               | Artefacto listo; SiteGround pendiente   |
 | Validación PWA física            | Pendiente del origen HTTPS definitivo   |
 
-El siguiente paso es abrir/revisar el pull request. Después se resuelven URL, document root y
-topología de despliegue antes de continuar con Playwright y la publicación de la PWA.
+El siguiente paso es abrir/revisar el pull request y confirmar su CI. Después se crean subdominio,
+SSL y document root en SiteGround, se carga el artefacto y se ejecutan la validación física de la PWA
+y el ensayo de la demo.

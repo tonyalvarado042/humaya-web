@@ -25,9 +25,10 @@ humaya-web/
 
 ## Método Humaya
 
-`metodo-humaya/` es una aplicación independiente dentro del mismo repositorio. Todavía no se
-despliega junto con la landing: su URL y document root en SiteGround deben definirse antes para aislar
-el service worker y evitar que su `index.html` reemplace el del sitio público.
+`metodo-humaya/` es una aplicación independiente dentro del mismo repositorio. Su destino es
+`https://metodo.stayhumaya.com`, con un document root separado en SiteGround para aislar el service
+worker y evitar que su `index.html` reemplace el del sitio público. El subdominio, SSL y document root
+todavía deben crearse antes de publicar el artefacto.
 
 Para correrla y verificarla:
 
@@ -38,10 +39,12 @@ npm --prefix metodo-humaya run lint
 npm --prefix metodo-humaya run typecheck
 npm --prefix metodo-humaya run test
 npm --prefix metodo-humaya run build
+npm --prefix metodo-humaya run e2e
 ```
 
 Las reglas completas están en `AGENTS.md`; la arquitectura y el estado del MVP, dentro de
-`metodo-humaya/`.
+`metodo-humaya/`. El workflow del MVP guarda `metodo-humaya-dist`, un artefacto desplegable que
+incluye el `.htaccess` propio del subdominio; no debe extraerse sobre `public_html` de la landing.
 
 ## Publicar un cambio
 

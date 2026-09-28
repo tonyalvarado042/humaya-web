@@ -1,8 +1,9 @@
 # Fase 6 — Traslado, pruebas E2E y entrega
 
-La fase está **en curso** en la rama `metodo-humaya`. El traslado seguro del código y la configuración
-de CI ya se ejecutaron; Playwright, hosting y despliegue continúan bloqueados hasta que Anthony
-apruebe la topología y defina URL y document root.
+La fase está **completa en código, pero abierta operativamente** en la rama `metodo-humaya`. La
+topología aprobada usa `metodo.stayhumaya.com` con un document root independiente. La portada, el
+paquete para Apache, Playwright y el CI están implementados; el despliegue, los dispositivos físicos
+y el ensayo de la demo continúan pendientes.
 
 ## Resultado esperado
 
@@ -23,9 +24,10 @@ El repositorio oficial ya fue clonado y auditado. La revisión completa está en
 - El hosting es SiteGround y el despliegue actual es manual mediante ZIP.
 - La landing usa HTML/CSS/JS sin build, cuatro idiomas y formularios reales conectados a Supabase.
 - No existen Node, CI, tests, manifest ni service worker en el repo oficial.
-- El service worker actual del MVP tiene alcance `/`; requiere aislamiento antes de desplegarse.
-- La topología recomendada es una carpeta de código propia y un origen/document root separado en
-  SiteGround. Anthony todavía debe aprobarla y definir la URL.
+- El manifest mantiene `start_url` y `scope` en `/app`; el service worker se aislará mediante el
+  subdominio independiente.
+- La topología aprobada es una carpeta de código propia y un origen/document root separado en
+  SiteGround: `metodo.stayhumaya.com`.
 
 ### Avance en la rama `metodo-humaya`
 
@@ -33,35 +35,39 @@ El repositorio oficial ya fue clonado y auditado. La revisión completa está en
 - [x] Contratos raíz y de la aplicación adaptados al repositorio mixto.
 - [x] Workflow de CI agregado con ejecución aislada en el workspace.
 - [x] Rama verificada, commiteada y publicada como `origin/metodo-humaya`.
-- [x] CI remoto pasa instalación, Prettier, lint, typecheck, 188 tests y build.
-- [ ] Topología de despliegue aprobada.
+- [x] CI remoto inicial pasa instalación, Prettier, lint, typecheck, 188 tests y build.
+- [x] Topología y URL de despliegue aprobadas: `metodo.stayhumaya.com`, document root separado.
+- [x] Portada, rutas de producción, `.htaccess`, Playwright y artefacto de CI implementados.
+- [x] 191 tests unitarios, build PWA y los 3 E2E pasan localmente.
+- [ ] CI del pull request final confirmado en verde.
 
 ## Condiciones para empezar
 
-No iniciar la integración hasta resolver los puntos todavía abiertos:
+La integración de código ya cuenta con estas decisiones y permisos:
 
 - [x] URL y clon del repositorio oficial disponibles.
 - [x] README, registro de despliegues, `.htaccess`, estructura e historial revisados. No existe un
       `AGENTS.md` oficial previo.
 - [x] Hosting identificado: SiteGround sobre Apache, actualmente con despliegue manual.
 - [x] Estructura identificada: landing estática productiva que debe conservarse.
-- [ ] Anthony aprueba origen separado —recomendado— o integración bajo el mismo origen.
-- [ ] URL HTTPS y document root del MVP definidos.
+- [x] Anthony aprueba el origen separado.
+- [x] URL definida: `metodo.stayhumaya.com`.
+- [ ] Subdominio, SSL y document root creados en SiteGround.
 - [x] Permiso confirmado para trabajar en la rama `metodo-humaya`.
 - [ ] Un Android con Chrome y un iPhone con Safari disponibles para la validación física.
-- [ ] Decisión sobre quién aprueba y fusiona el pull request.
+- [ ] Revisión y fusión del pull request por Anthony.
 
 Este plan no añade ni propone Vercel: se adapta a SiteGround y a la topología que apruebe Anthony.
 
 ## Alcance
 
 1. Trasladar el frontend sin perder la arquitectura ni las verificaciones actuales.
-2. Agregar una portada en `/` del origen separado con accesos a la app del huésped y a recepción. Si
-   se elige el mismo origen de la landing, esta portada se elimina del alcance.
+2. Agregar una portada en `/` de `metodo.stayhumaya.com` con accesos a la app del huésped y a
+   recepción.
 3. Instalar y configurar Playwright.
 4. Automatizar tres recorridos: entrevista, reserva de sauna y perfil desde Llegadas.
 5. Integrar los E2E al CI del repositorio oficial.
-6. Desplegar según la infraestructura elegida en ese repositorio.
+6. Desplegar el artefacto en el document root separado de `metodo.stayhumaya.com`.
 7. Validar la PWA instalada, standalone y sin conexión en Android y iPhone.
 8. Preparar y ensayar un guion de demo de cinco minutos.
 9. Actualizar la documentación y cerrar la entrega con evidencia.
@@ -122,8 +128,7 @@ Antes de seguir, repetir lint, typecheck, tests y build dentro del repositorio o
 
 ## 3. Portada en `/` del origen del MVP
 
-Si se aprueba el origen separado, reemplazar el redirect actual de `/` **de ese origen** por una
-portada breve y responsive con:
+El redirect anterior fue reemplazado por una portada breve y responsive con:
 
 - marca oficial de Humaya;
 - frase `Become More Human`;
@@ -134,8 +139,9 @@ portada breve y responsive con:
 La portada debe usar los tokens y componentes existentes, funcionar con teclado y tener objetivos
 táctiles de al menos 44 px. `/dev/ui` no se muestra como acceso principal.
 
-La raíz de `stayhumaya.com` sigue siendo la landing y no se modifica para cumplir este punto. Si se
-elige el mismo origen, eliminar esta portada del alcance y conservar el redirect interno de la SPA.
+La raíz de `stayhumaya.com` sigue siendo la landing y no se modifica para cumplir este punto. La
+fábrica de rutas excluye `/dev/ui` del build de producción y conserva esa ruta únicamente durante el
+desarrollo.
 
 Agregar pruebas de Testing Library que comprueben ambos enlaces, sus destinos y el idioma español de
 la portada cuando corresponda. Al entrar en `/app` se mantiene la lógica bilingüe existente; al
@@ -214,12 +220,16 @@ Recomendaciones:
 - no guardar credenciales ni variables sensibles en el workflow;
 - exigir el CI verde antes de fusionar.
 
+El trabajo `checks` publica `metodo-humaya-dist` durante 14 días e incluye archivos ocultos para no
+perder `.htaccess`. El trabajo `e2e` instala Chromium y publica reporte, capturas, video y trazas solo
+cuando hay una falla.
+
 ## 6. Despliegue en SiteGround y rutas
 
-Crear un paquete reproducible para el document root acordado en SiteGround. No mezclar el contenido
-de `dist/` con `public_html` ni reemplazar la landing. Antes de subir, verificar que el service worker
-solo pueda controlar el origen o alcance aprobado y que `navigateFallback` apunte al shell React, no
-al `index.html` de la landing.
+El workflow crea un paquete reproducible para el document root independiente de
+`metodo.stayhumaya.com`. No mezclar el contenido de `dist/` con `public_html` ni reemplazar la landing.
+El build mantiene `base: /`, el manifest limita instalación y arranque a `/app`, y el origen separado
+impide que el service worker interfiera con `stayhumaya.com`.
 
 Agregar reglas de caché específicas: `sw.js`, `registerSW.js` y `manifest.webmanifest` deben
 revalidarse; los bundles con hash pueden usar caché inmutable. Verificar en la URL HTTPS:
@@ -282,7 +292,7 @@ depender de un dispositivo específico.
 
 ## 9. Guion de demo de cinco minutos
 
-Crear `docs/DEMO.md` con tiempos aproximados:
+El recorrido está escrito en [`docs/DEMO.md`](DEMO.md) con estos tiempos aproximados:
 
 1. **0:00–0:40 — Portada y contexto.** Frontend con datos ficticios; dos áreas conectadas.
 2. **0:40–2:10 — Huésped.** Cambiar Valeria/Hannah, mostrar ES/EN, entrevista y consentimiento.
@@ -290,8 +300,8 @@ Crear `docs/DEMO.md` con tiempos aproximados:
 4. **3:10–4:30 — Recepción.** Llegadas, perfil, experiencias WOW y agenda de spa.
 5. **4:30–5:00 — PWA y siguiente etapa.** Instalación, offline y reemplazo futuro de mocks por API.
 
-Ensayar el recorrido sobre el despliegue real y fijar de antemano huésped, idioma, día y horario que
-se usarán para que la demo sea repetible.
+Falta ensayar el recorrido sobre el despliegue HTTPS real. El documento fija de antemano huésped,
+idioma, día y horario para que la demo sea repetible.
 
 ## 10. Cierre y entrega
 
@@ -308,24 +318,22 @@ npm run e2e
 
 Luego:
 
-- [ ] CI verde en el repositorio oficial.
+- [ ] CI del pull request final verde en el repositorio oficial.
 - [ ] Pull request revisado y fusionado según el proceso de Anthony.
 - [ ] Despliegue HTTPS verificado.
 - [ ] PWA validada en Android y iPhone con evidencia registrada.
 - [ ] Revisión responsive y accesible completada.
-- [ ] `docs/DEMO.md` creado y ensayado.
-- [ ] `docs/PLAN.md`, `docs/ESTADO.md` y `docs/FEEDBACK.md` actualizados.
+- [~] `docs/DEMO.md` creado; falta ensayarlo sobre HTTPS.
+- [x] `docs/PLAN.md`, `docs/ESTADO.md` y `docs/FEEDBACK.md` actualizados para la entrega de código.
 - [ ] URL, rama/commit entregado y limitaciones conocidas comunicadas.
 - [ ] Copia de origen conservada hasta confirmar que la entrega oficial funciona.
 
 La fase se considera terminada solo cuando todos esos puntos están resueltos. Un build local o un
 deploy exitoso por sí solos no sustituyen el CI, los E2E ni las pruebas físicas de la PWA.
 
-## Instrucción para el agente que la ejecute
+## Continuación operativa
 
-> Leé `AGENTS.md`, `ARCHITECTURE.md`, `docs/ESTADO.md`, `docs/REPO-OFICIAL.md` y este documento
-> completos. Confirmá primero que el clon sigue actualizado, que la topología y los permisos fueron
-> aprobados y que están disponibles la URL HTTPS y los dos dispositivos. Ejecutá la Fase 6 en el
-> orden definido acá, sin introducir Vercel ni reemplazar configuración existente a ciegas. Detenete
-> y documentá cualquier choque estructural antes de ampliar el alcance. No cierres la fase hasta que
-> CI, los tres E2E, el despliegue y la validación física pasen.
+> Después de aprobar y fusionar el pull request, crear `metodo.stayhumaya.com`, asignarle un document
+> root independiente y activar SSL. Descargar `metodo-humaya-dist`, extraerlo únicamente en ese
+> document root y ejecutar las listas de las secciones 6 a 9. No cerrar la fase hasta que las rutas
+> HTTPS, la validación física Android/iPhone y el ensayo de la demo pasen con evidencia.
