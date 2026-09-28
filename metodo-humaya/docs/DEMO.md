@@ -1,6 +1,6 @@
 # Demo del Método Humaya — recorrido de cinco minutos
 
-Estado: **guion escrito; pendiente de ensayo en `https://metodo.stayhumaya.com`**.
+Estado: **guion escrito; pendiente de ensayo en `https://experience.stayhumaya.com`**.
 
 Antes de empezar, abrir la portada en una ventana limpia, confirmar que el idioma de Hannah no quedó
 guardado en `localStorage` y elegir un horario libre de Sauna para Valeria. Todo lo mostrado usa datos

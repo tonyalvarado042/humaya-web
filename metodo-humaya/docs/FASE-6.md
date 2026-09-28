@@ -1,7 +1,7 @@
 # Fase 6 — Traslado, pruebas E2E y entrega
 
 La fase está **completa en código, pero abierta operativamente** en la rama `metodo-humaya`. La
-topología aprobada usa `metodo.stayhumaya.com` con un document root independiente. La portada, el
+topología aprobada usa `experience.stayhumaya.com` con un document root independiente. La portada, el
 paquete para Apache, Playwright y el CI están implementados; el despliegue, los dispositivos físicos
 y el ensayo de la demo continúan pendientes.
 
@@ -27,7 +27,7 @@ El repositorio oficial ya fue clonado y auditado. La revisión completa está en
 - El manifest mantiene `start_url` y `scope` en `/app`; el service worker se aislará mediante el
   subdominio independiente.
 - La topología aprobada es una carpeta de código propia y un origen/document root separado en
-  SiteGround: `metodo.stayhumaya.com`.
+  SiteGround: `experience.stayhumaya.com`.
 
 ### Avance en la rama `metodo-humaya`
 
@@ -36,7 +36,7 @@ El repositorio oficial ya fue clonado y auditado. La revisión completa está en
 - [x] Workflow de CI agregado con ejecución aislada en el workspace.
 - [x] Rama verificada, commiteada y publicada como `origin/metodo-humaya`.
 - [x] CI remoto inicial pasa instalación, Prettier, lint, typecheck, 188 tests y build.
-- [x] Topología y URL de despliegue aprobadas: `metodo.stayhumaya.com`, document root separado.
+- [x] Topología y URL de despliegue aprobadas: `experience.stayhumaya.com`, document root separado.
 - [x] Portada, rutas de producción, `.htaccess`, Playwright y artefacto de CI implementados.
 - [x] 191 tests unitarios, build PWA y los 3 E2E pasan localmente.
 - [x] Pull request #1 abierto; `checks` y `e2e` confirmados en verde.
@@ -51,7 +51,7 @@ La integración de código ya cuenta con estas decisiones y permisos:
 - [x] Hosting identificado: SiteGround sobre Apache, actualmente con despliegue manual.
 - [x] Estructura identificada: landing estática productiva que debe conservarse.
 - [x] Anthony aprueba el origen separado.
-- [x] URL definida: `metodo.stayhumaya.com`.
+- [x] URL definida: `experience.stayhumaya.com`.
 - [ ] Subdominio, SSL y document root creados en SiteGround.
 - [x] Permiso confirmado para trabajar en la rama `metodo-humaya`.
 - [ ] Un Android con Chrome y un iPhone con Safari disponibles para la validación física.
@@ -62,12 +62,12 @@ Este plan no añade ni propone Vercel: se adapta a SiteGround y a la topología 
 ## Alcance
 
 1. Trasladar el frontend sin perder la arquitectura ni las verificaciones actuales.
-2. Agregar una portada en `/` de `metodo.stayhumaya.com` con accesos a la app del huésped y a
+2. Agregar una portada en `/` de `experience.stayhumaya.com` con accesos a la app del huésped y a
    recepción.
 3. Instalar y configurar Playwright.
 4. Automatizar tres recorridos: entrevista, reserva de sauna y perfil desde Llegadas.
 5. Integrar los E2E al CI del repositorio oficial.
-6. Desplegar el artefacto en el document root separado de `metodo.stayhumaya.com`.
+6. Desplegar el artefacto en el document root separado de `experience.stayhumaya.com`.
 7. Validar la PWA instalada, standalone y sin conexión en Android y iPhone.
 8. Preparar y ensayar un guion de demo de cinco minutos.
 9. Actualizar la documentación y cerrar la entrega con evidencia.
@@ -227,7 +227,7 @@ cuando hay una falla.
 ## 6. Despliegue en SiteGround y rutas
 
 El workflow crea un paquete reproducible para el document root independiente de
-`metodo.stayhumaya.com`. No mezclar el contenido de `dist/` con `public_html` ni reemplazar la landing.
+`experience.stayhumaya.com`. No mezclar el contenido de `dist/` con `public_html` ni reemplazar la landing.
 El build mantiene `base: /`, el manifest limita instalación y arranque a `/app`, y el origen separado
 impide que el service worker interfiera con `stayhumaya.com`.
 
@@ -333,7 +333,7 @@ deploy exitoso por sí solos no sustituyen el CI, los E2E ni las pruebas física
 
 ## Continuación operativa
 
-> Después de aprobar y fusionar el pull request, crear `metodo.stayhumaya.com`, asignarle un document
+> Después de aprobar y fusionar el pull request, crear `experience.stayhumaya.com`, asignarle un document
 > root independiente y activar SSL. Descargar `metodo-humaya-dist`, extraerlo únicamente en ese
 > document root y ejecutar las listas de las secciones 6 a 9. No cerrar la fase hasta que las rutas
 > HTTPS, la validación física Android/iPhone y el ensayo de la demo pasen con evidencia.

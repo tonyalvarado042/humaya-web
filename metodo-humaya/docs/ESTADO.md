@@ -12,7 +12,7 @@ Decisiones tomadas sin confirmar con Anthony y espacio para su feedback una vez 
 Las 8 pantallas del MVP están construidas. La app del huésped ya funciona en español e inglés y el
 build genera una PWA. La Fase 5 está cerrada. En la rama `metodo-humaya`, la aplicación ya vive en
 esta carpeta dentro del repo oficial, mientras la landing productiva permanece intacta en la raíz.
-La rama `metodo-humaya` prepara el MVP para `metodo.stayhumaya.com`, con origen y document root
+La rama `metodo-humaya` prepara el MVP para `experience.stayhumaya.com`, con origen y document root
 separados de la landing. El PR #1 está abierto y su CI pasa. La Fase 6 sigue abierta por la creación
 del subdominio y SSL, el despliegue, la validación física y el ensayo de la demo.
 
@@ -42,7 +42,7 @@ landing productiva.
 - La definición de rutas es una fábrica comprobable. `/dev/ui` existe en desarrollo y cae en la
   pantalla de ruta inexistente en producción.
 - Vite conserva `base: /`; el manifest conserva `start_url` y `scope` en `/app`. El aislamiento del
-  service worker se resuelve con `metodo.stayhumaya.com`, no con prefijos adicionales.
+  service worker se resuelve con `experience.stayhumaya.com`, no con prefijos adicionales.
 - El build incluye un `.htaccess` propio con fallback SPA, HTTPS, caché inmutable para assets con hash
   y revalidación para HTML, manifest y service worker.
 - El workflow publica `metodo-humaya-dist` incluyendo archivos ocultos. Ese artefacto debe extraerse
@@ -63,7 +63,7 @@ landing productiva.
 
 ### Entrega pendiente
 
-- Crear DNS/subdominio, document root y SSL para `metodo.stayhumaya.com`.
+- Crear DNS/subdominio, document root y SSL para `experience.stayhumaya.com`.
 - Aprobar y fusionar el PR; descargar y cargar el artefacto sin tocar `public_html` de la landing.
 - Verificar rutas HTTPS, responsive final y PWA standalone/offline en Android y iPhone.
 - Ensayar sobre HTTPS el recorrido de cinco minutos escrito en [`docs/DEMO.md`](DEMO.md).
@@ -79,7 +79,7 @@ Estos puntos son bloqueantes para marcar la Fase 6 como cerrada.
   marca y registro de despliegues.
 - Marca, wordmark y `villa-02.jpg` coinciden exactamente con los tres archivos usados por el MVP.
 - La landing usa Jost + Inter y el dorado `#C8AD85`; el MVP usa Cormorant + Jost y un dorado cercano.
-- El service worker se aislará de la landing mediante `metodo.stayhumaya.com`; el manifest conserva
+- El service worker se aislará de la landing mediante `experience.stayhumaya.com`; el manifest conserva
   alcance y arranque en `/app`.
 - La topología aprobada mantiene el código del MVP en su carpeta y lo publica en un document root
   separado en SiteGround.
@@ -123,7 +123,7 @@ La fase queda **cerrada a nivel de implementación**. La validación física pas
   de 192, 512, maskable 512 y Apple Touch 180, además del favicon. El ícono maskable usa fondo opaco
   y conserva la marca dentro de la zona segura.
 - El build genera `manifest.webmanifest`, `registerSW.js`, `sw.js` y Workbox. No hay configuración de
-  Vercel. El destino es `metodo.stayhumaya.com`; crear y cargar su document root sigue pendiente.
+  Vercel. El destino es `experience.stayhumaya.com`; crear y cargar su document root sigue pendiente.
 
 ### Marca y fotografía oficiales
 

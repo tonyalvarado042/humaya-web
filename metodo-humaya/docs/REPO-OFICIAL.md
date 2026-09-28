@@ -11,7 +11,7 @@ en la rama `metodo-humaya`.
 - Se agregó CI con Node 22 y `working-directory: metodo-humaya`.
 - El build y el artefacto para Apache están preparados, pero no se desplegó ni se publicó el service
   worker.
-- La URL aprobada es `metodo.stayhumaya.com`; crear su subdominio, SSL y document root separado sigue
+- La URL aprobada es `experience.stayhumaya.com`; crear su subdominio, SSL y document root separado sigue
   pendiente. Producción continúa intacta.
 
 ## Conclusión ejecutiva
@@ -26,7 +26,7 @@ se registra con alcance `/`; si se publicara sin ajuste en el mismo origen, podr
 el sitio público.
 
 La decisión aprobada conserva intacta la landing y mantiene el código del MVP en una carpeta propia
-del repositorio. Su build se desplegará en `metodo.stayhumaya.com`, con un document root separado en
+del repositorio. Su build se desplegará en `experience.stayhumaya.com`, con un document root separado en
 SiteGround.
 
 ## Estado comprobado del repositorio
@@ -122,7 +122,7 @@ humaya-web/
 ```
 
 El build de `metodo-humaya/` se publica en el document root separado de
-`metodo.stayhumaya.com`. Así el MVP puede conservar
+`experience.stayhumaya.com`. Así el MVP puede conservar
 sus rutas `/`, `/app` y `/staff` dentro de su propio origen; el service worker no toca la landing y la
 portada demo de Fase 6 puede existir sin reemplazar `stayhumaya.com/`.
 
@@ -134,7 +134,7 @@ Ventajas:
 - la landing continúa sin requerir Node;
 - CI puede usar `working-directory: metodo-humaya`.
 
-Decisión: el origen será `metodo.stayhumaya.com`. Falta crearlo en SiteGround, asignar su document
+Decisión: el origen será `experience.stayhumaya.com`. Falta crearlo en SiteGround, asignar su document
 root independiente, activar SSL y acordar quién ejecuta el despliegue manual.
 
 ### B. Mismo origen y rutas reservadas — posible, más compleja
@@ -156,7 +156,7 @@ inicial.
 
 - [x] Código fuente aislado en una carpeta propia del repositorio.
 - [x] Origen separado aprobado.
-- [x] URL definida: `metodo.stayhumaya.com`.
+- [x] URL definida: `experience.stayhumaya.com`.
 - [ ] Crear el subdominio, SSL y document root independiente en SiteGround.
 - [x] Permiso para trabajar en la rama `metodo-humaya`.
 - [ ] Confirmar quién revisa y fusiona en `main`.
@@ -169,18 +169,18 @@ inicial.
 
 ## Posición actual
 
-| Frente                           | Estado                                  |
-| -------------------------------- | --------------------------------------- |
-| MVP funcional                    | Listo: fases 0–5, 191 tests y build PWA |
-| Repositorio oficial identificado | Listo: clonado, limpio y auditado       |
-| Assets oficiales                 | Listo: coincidencia exacta confirmada   |
-| Estrategia de convivencia        | `metodo.stayhumaya.com`, origen aislado |
-| Escritura en repo oficial        | Autorizada en `metodo-humaya`           |
-| Integración de código            | Copiada en `metodo-humaya/`             |
-| CI oficial                       | PR #1: checks y E2E en verde            |
-| Playwright                       | 3 recorridos pasan localmente           |
-| Despliegue del MVP               | Artefacto listo; SiteGround pendiente   |
-| Validación PWA física            | Pendiente del origen HTTPS definitivo   |
+| Frente                           | Estado                                      |
+| -------------------------------- | ------------------------------------------- |
+| MVP funcional                    | Listo: fases 0–5, 191 tests y build PWA     |
+| Repositorio oficial identificado | Listo: clonado, limpio y auditado           |
+| Assets oficiales                 | Listo: coincidencia exacta confirmada       |
+| Estrategia de convivencia        | `experience.stayhumaya.com`, origen aislado |
+| Escritura en repo oficial        | Autorizada en `metodo-humaya`               |
+| Integración de código            | Copiada en `metodo-humaya/`                 |
+| CI oficial                       | PR #1: checks y E2E en verde                |
+| Playwright                       | 3 recorridos pasan localmente               |
+| Despliegue del MVP               | Artefacto listo; SiteGround pendiente       |
+| Validación PWA física            | Pendiente del origen HTTPS definitivo       |
 
 El siguiente paso es abrir/revisar el pull request y confirmar su CI. Después se crean subdominio,
 SSL y document root en SiteGround, se carga el artefacto y se ejecutan la validación física de la PWA

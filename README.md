@@ -26,7 +26,7 @@ humaya-web/
 ## Método Humaya
 
 `metodo-humaya/` es una aplicación independiente dentro del mismo repositorio. Su destino es
-`https://metodo.stayhumaya.com`, con un document root separado en SiteGround para aislar el service
+`https://experience.stayhumaya.com`, con un document root separado en SiteGround para aislar el service
 worker y evitar que su `index.html` reemplace el del sitio público. El subdominio, SSL y document root
 todavía deben crearse antes de publicar el artefacto.
 

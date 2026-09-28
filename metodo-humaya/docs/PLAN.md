@@ -266,7 +266,7 @@ Prompt: "Prepará el proyecto para trasladarlo al repositorio de Anthony. Agreg�
 
 Runbook de ejecución: [`docs/FASE-6.md`](FASE-6.md). El repositorio oficial ya fue auditado; el
 diagnóstico está en [`docs/REPO-OFICIAL.md`](REPO-OFICIAL.md). El código ya vive aislado en la rama
-`metodo-humaya`. La topología aprobada usa `metodo.stayhumaya.com` y un document root independiente;
+`metodo-humaya`. La topología aprobada usa `experience.stayhumaya.com` y un document root independiente;
 no se despliega desde esta ejecución.
 
 - [~] Código y artefacto preparados sin reemplazar la landing; faltan PR, revisión, merge y hosting
@@ -280,7 +280,7 @@ no se despliega desde esta ejecución.
 - Pruebas: Vitest (servicios, lógica de entrevista, disponibilidad), Testing Library (Chip, SegmentedControl, SlotGrid con teclado), Playwright (3 flujos).
 - Accesibilidad: elementos nativos, `aria-current`, `aria-expanded`, `aria-live` en el chat, alertas con texto, revisión con axe al cerrar cada fase.
 - Privacidad (Ley 8968): consentimiento antes de preguntas sensibles con enlace a la política (texto lo provee Anthony); preguntas `sensitive` explican su uso y se pueden saltar; mocks solo con personas inventadas.
-- Entrega: el build está preparado para la raíz de `metodo.stayhumaya.com`, en un document root
+- Entrega: el build está preparado para la raíz de `experience.stayhumaya.com`, en un document root
   separado de la landing. El alta del subdominio, SSL y deploy manual siguen pendientes; mantener
   `VITE_USE_MOCKS=true` en la demo.
 
@@ -310,7 +310,7 @@ Mostrarle avances a Anthony al terminar la Fase 3.
 - [ ] Horarios y capacidad de sauna y cold plunge
 - [ ] Texto de la política de privacidad
 - [x] Repo `tonyalvarado042/humaya-web`, dominio `stayhumaya.com`, hosting SiteGround
-- [x] MVP en `metodo.stayhumaya.com`, con origen y document root separados de la landing
+- [x] MVP en `experience.stayhumaya.com`, con origen y document root separados de la landing
 - [x] Rama `metodo-humaya` creada y autorizada para integrar el código
 - [~] URL del MVP definida; faltan revisión/merge y ejecutar el despliegue manual en SiteGround
 
