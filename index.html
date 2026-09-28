@@ -6,8 +6,8 @@
 <title>HUMAYA · Costa Rica — Become More Human</title>
 <meta name="description" content="Diez villas al pie del Volcán Arenal, en La Fortuna, Costa Rica. Un lugar para llegar a ser quien fuiste creado para ser. Apertura noviembre 2026.">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.2.2">
-<meta name="humaya-desplegado" content="2026-08-27">
+<meta name="humaya-version" content="1.3.0">
+<meta name="humaya-desplegado" content="2026-09-26">
 <link rel="icon" href="assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/">
 
@@ -571,6 +571,11 @@ form{ display:grid; gap:clamp(16px,1.7vw,24px); }
   line-height:1.6;
 }
 .form-ok.bad{ color:#E0A08A; border-color:rgba(224,160,138,.4); margin-top:18px; }
+.form-ok p{ margin:0; }
+.whatsapp-action{ display:grid; gap:12px; margin-top:20px; }
+.whatsapp-action[hidden]{ display:none; }
+.whatsapp-action .btn{ width:100%; min-height:48px; }
+.whatsapp-help{ font-family:var(--body); font-size:12.5px; font-weight:300; letter-spacing:0; color:rgba(244,241,234,.58); }
 form.sent{ display:none; }
 form.sent + .form-ok{ display:block; }
 
@@ -931,10 +936,14 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
       </div>
 
       <div class="rv d2">
-        <form id="bookForm" novalidate>
+        <form id="bookForm" novalidate aria-label="Formulario de reservas" data-i18n-aria="form.label">
           <div class="f2">
-            <div class="field"><label data-i18n="form.name">Nombre</label><input type="text" name="nombre" required></div>
-            <div class="field"><label data-i18n="form.email">Email</label><input type="email" name="email" required></div>
+            <div class="field"><label for="bookingName" data-i18n="form.name">Nombre</label><input id="bookingName" type="text" name="nombre" required></div>
+            <div class="field"><label for="bookingEmail" data-i18n="form.email">Email</label><input id="bookingEmail" type="email" name="email" required></div>
+          </div>
+          <div class="field">
+            <label for="bookingPhone" data-i18n="form.phone">WhatsApp / teléfono</label>
+            <input id="bookingPhone" type="tel" name="telefono" autocomplete="tel" inputmode="tel" maxlength="30" placeholder="+506 0000 0000" required>
           </div>
           <div class="f2">
             <div class="field"><label data-i18n="form.in">Llegada</label><input type="date" name="llegada"></div>
@@ -960,7 +969,13 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
           <button type="submit" class="btn solid lg" style="justify-self:start"><span data-i18n="form.send">Enviar</span></button>
           <p class="form-note" data-i18n="form.note">Te escribimos en menos de 48 horas. Sin spam, sin listas raras.</p>
         </form>
-        <div class="form-ok" id="formOk" data-i18n="form.ok">Listo. Te escribimos pronto.</div>
+        <div class="form-ok" id="formOk" role="status" aria-live="polite">
+          <p id="formMessage" data-i18n="form.ok">Listo. Te escribimos pronto.</p>
+          <div class="whatsapp-action" id="whatsappAction" hidden>
+            <a class="btn solid lg" id="whatsappCta" target="_blank" rel="noopener noreferrer" data-i18n="form.whatsapp">Continuar por WhatsApp</a>
+            <p class="whatsapp-help" data-i18n="form.whatsappHelp">Se abrirá WhatsApp con un mensaje listo. Revisalo y presioná Enviar.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1065,10 +1080,10 @@ es:{
  "book.kicker":"Reservas","book.title":"Apertura <em>noviembre 2026.</em>",
  "book.p1":"Estamos abriendo la lista de las primeras reservas. Dejanos tus datos y te escribimos a vos primero, antes de que salga a la venta.",
  "book.where":"Dónde","book.contact":"Contacto","book.langs":"Te atendemos en","book.follow":"Seguinos",
- "form.name":"Nombre","form.email":"Email","form.in":"Llegada","form.out":"Salida",
+ "form.label":"Formulario de reservas","form.name":"Nombre","form.email":"Email","form.phone":"WhatsApp / teléfono","form.phoneBad":"Ese número no se ve válido. Usá 8 dígitos de Costa Rica o incluí el prefijo internacional.","form.in":"Llegada","form.out":"Salida",
  "form.guests":"Personas","form.more":"5 o más","form.lang":"Idioma preferido","form.msg":"Contanos algo",
- "form.send":"Enviar","form.note":"Te escribimos en menos de 48 horas. Sin spam, sin listas raras.",
- "form.ok":"Listo. Te escribimos pronto.",
+ "form.send":"Enviar","form.sending":"Enviando…","form.note":"Te escribimos en menos de 48 horas. Sin spam, sin listas raras.",
+ "form.ok":"Listo. Te escribimos pronto.","form.whatsapp":"Continuar por WhatsApp","form.whatsappHelp":"Se abrirá WhatsApp con un mensaje listo. Revisalo y presioná Enviar.",
  "foot.tag":"Un lugar para llegar a ser quien fuiste creado para ser. La Fortuna, Costa Rica.",
  "foot.nav":"Navegación","foot.contact":"Contacto"
 },
@@ -1120,10 +1135,10 @@ en:{
  "book.kicker":"Reservations","book.title":"Opening <em>November 2026.</em>",
  "book.p1":"We are opening the list for the first reservations. Leave us your details and we write to you first, before it goes on sale.",
  "book.where":"Where","book.contact":"Contact","book.langs":"We speak","book.follow":"Follow us",
- "form.name":"Name","form.email":"Email","form.in":"Arrival","form.out":"Departure",
+ "form.label":"Booking form","form.name":"Name","form.email":"Email","form.phone":"WhatsApp / phone","form.phoneBad":"That number doesn't look valid. Use 8 Costa Rican digits or include the international prefix.","form.in":"Arrival","form.out":"Departure",
  "form.guests":"Guests","form.more":"5 or more","form.lang":"Preferred language","form.msg":"Tell us something",
- "form.send":"Send","form.note":"We reply within 48 hours. No spam, no strange lists.",
- "form.ok":"Done. We will write to you soon.",
+ "form.send":"Send","form.sending":"Sending…","form.note":"We reply within 48 hours. No spam, no strange lists.",
+ "form.ok":"Done. We will write to you soon.","form.whatsapp":"Continue on WhatsApp","form.whatsappHelp":"WhatsApp will open with a ready-to-send message. Review it and press Send.",
  "foot.tag":"A place to become who you were created to be. La Fortuna, Costa Rica.",
  "foot.nav":"Navigation","foot.contact":"Contact"
 },
@@ -1175,10 +1190,10 @@ de:{
  "book.kicker":"Reservierungen","book.title":"Eröffnung <em>November 2026.</em>",
  "book.p1":"Wir öffnen die Liste für die ersten Reservierungen. Hinterlasse uns deine Daten und wir schreiben dir zuerst, bevor es in den Verkauf geht.",
  "book.where":"Wo","book.contact":"Kontakt","book.langs":"Wir sprechen","book.follow":"Folge uns",
- "form.name":"Name","form.email":"E-Mail","form.in":"Anreise","form.out":"Abreise",
+ "form.label":"Reservierungsformular","form.name":"Name","form.email":"E-Mail","form.phone":"WhatsApp / Telefon","form.phoneBad":"Diese Nummer scheint ungültig zu sein. Verwende 8 costa-ricanische Ziffern oder gib die internationale Vorwahl an.","form.in":"Anreise","form.out":"Abreise",
  "form.guests":"Personen","form.more":"5 oder mehr","form.lang":"Bevorzugte Sprache","form.msg":"Erzähl uns etwas",
- "form.send":"Senden","form.note":"Wir antworten innerhalb von 48 Stunden. Kein Spam, keine seltsamen Listen.",
- "form.ok":"Fertig. Wir melden uns bald.",
+ "form.send":"Senden","form.sending":"Wird gesendet…","form.note":"Wir antworten innerhalb von 48 Stunden. Kein Spam, keine seltsamen Listen.",
+ "form.ok":"Fertig. Wir melden uns bald.","form.whatsapp":"Auf WhatsApp fortfahren","form.whatsappHelp":"WhatsApp wird mit einer vorbereiteten Nachricht geöffnet. Prüfe sie und tippe auf Senden.",
  "foot.tag":"Ein Ort, um zu werden, wofür du geschaffen wurdest. La Fortuna, Costa Rica.",
  "foot.nav":"Navigation","foot.contact":"Kontakt"
 },
@@ -1230,10 +1245,10 @@ fr:{
  "book.kicker":"Réservations","book.title":"Ouverture <em>novembre 2026.</em>",
  "book.p1":"Nous ouvrons la liste des premières réservations. Laissez-nous vos coordonnées et nous vous écrivons en premier, avant la mise en vente.",
  "book.where":"Où","book.contact":"Contact","book.langs":"Nous parlons","book.follow":"Suivez-nous",
- "form.name":"Nom","form.email":"Email","form.in":"Arrivée","form.out":"Départ",
+ "form.label":"Formulaire de réservation","form.name":"Nom","form.email":"Email","form.phone":"WhatsApp / téléphone","form.phoneBad":"Ce numéro ne semble pas valide. Utilisez 8 chiffres costariciens ou ajoutez l'indicatif international.","form.in":"Arrivée","form.out":"Départ",
  "form.guests":"Personnes","form.more":"5 ou plus","form.lang":"Langue préférée","form.msg":"Dites-nous un mot",
- "form.send":"Envoyer","form.note":"Nous répondons sous 48 heures. Pas de spam, pas de listes étranges.",
- "form.ok":"C'est fait. Nous vous écrivons bientôt.",
+ "form.send":"Envoyer","form.sending":"Envoi…","form.note":"Nous répondons sous 48 heures. Pas de spam, pas de listes étranges.",
+ "form.ok":"C'est fait. Nous vous écrivons bientôt.","form.whatsapp":"Continuer sur WhatsApp","form.whatsappHelp":"WhatsApp s'ouvrira avec un message prêt à envoyer. Vérifiez-le puis appuyez sur Envoyer.",
  "foot.tag":"Un lieu pour devenir qui vous avez été créé pour être. La Fortuna, Costa Rica.",
  "foot.nav":"Navigation","foot.contact":"Contact"
 }
@@ -1252,6 +1267,10 @@ function applyLang(code){
   document.querySelectorAll("[data-i18n-ph]").forEach(el=>{
     const v = dict[el.dataset.i18nPh];
     if(v != null) el.setAttribute("placeholder", v);
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>{
+    const v = dict[el.dataset.i18nAria];
+    if(v != null) el.setAttribute("aria-label", v);
   });
   document.getElementById("langCur").textContent = LANGS[code];
   document.querySelectorAll("#langMenu button").forEach(b=>{
@@ -1381,56 +1400,112 @@ subForm.addEventListener("submit", async e=>{
    ============================================================ */
 const form   = document.getElementById("bookForm");
 const formOk = document.getElementById("formOk");
+const formMessage = document.getElementById("formMessage");
+const whatsappAction = document.getElementById("whatsappAction");
+const whatsappCta = document.getElementById("whatsappCta");
+const HUMAYA_WHATSAPP_NUMBER = "50664417187";
+const HUMAYA_WHATSAPP_MESSAGE = "Hola, quiero reservar en Humaya.";
+let bookingRequestId = null;
+let bookingPayloadSignature = null;
+let bookingSubmitting = false;
+
+function validBookingPhone(value){
+  const trimmed = value.trim();
+  const digits = trimmed.replace(/\D/g, "");
+  if(digits.length === 8) return true;
+  return trimmed.startsWith("+") && digits.length >= 8 && digits.length <= 15;
+}
+
+function bookingWhatsappUrl(){
+  return `https://wa.me/${HUMAYA_WHATSAPP_NUMBER}?text=${encodeURIComponent(HUMAYA_WHATSAPP_MESSAGE)}`;
+}
 
 form.addEventListener("submit", async e=>{
   e.preventDefault();
+  if(bookingSubmitting) return;
   const dict = I18N[document.documentElement.lang] || I18N.es;
+  formOk.style.display = "";
+  formOk.classList.remove("bad");
+  whatsappAction.hidden = true;
+  whatsappCta.removeAttribute("href");
 
   const req = form.querySelectorAll("[required]");
   let ok = true;
   req.forEach(f=>{
     const malo = !f.value.trim() ||
-      (f.type === "email" && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(f.value.trim()));
+      (f.type === "email" && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(f.value.trim())) ||
+      (f.name === "telefono" && !validBookingPhone(f.value));
     f.style.borderBottomColor = malo ? "#8a3a3a" : "";
+    f.setAttribute("aria-invalid", malo ? "true" : "false");
     if(malo){ ok = false; }
   });
-  if(!ok){ form.querySelector('[style*="8a3a3a"]')?.focus(); return; }
+  if(!ok){
+    const invalid = form.querySelector('[aria-invalid="true"]');
+    if(invalid?.name === "telefono"){
+      formMessage.dataset.i18n = "form.phoneBad";
+      formMessage.textContent = dict["form.phoneBad"];
+      formOk.classList.add("bad");
+      formOk.style.display = "block";
+    }
+    invalid?.focus();
+    return;
+  }
 
   const d = Object.fromEntries(new FormData(form));
+  const payload = {
+    name: d.nombre, email: d.email,
+    phone: d.telefono.trim(),
+    arrival: d.llegada || null, departure: d.salida || null,
+    guests: d.personas, message: d.mensaje || null,
+    lang: d.idioma || document.documentElement.lang,
+    source: "landing"
+  };
+  const signature = JSON.stringify(payload);
+  if(!bookingRequestId || bookingPayloadSignature !== signature){
+    bookingRequestId = crypto.randomUUID();
+    bookingPayloadSignature = signature;
+  }
+
   const btn = form.querySelector('button[type="submit"]');
   const label = btn.querySelector("span");
   const original = label.textContent;
-  btn.disabled = true; label.textContent = dict["sub.sending"];
+  bookingSubmitting = true;
+  form.setAttribute("aria-busy", "true");
+  btn.disabled = true; label.textContent = dict["form.sending"];
 
   try{
     const r = await fetch(SUPABASE_FN + "/book", {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({
-        name: d.nombre, email: d.email,
-        arrival: d.llegada || null, departure: d.salida || null,
-        guests: d.personas, message: d.mensaje || null,
-        lang: d.idioma || document.documentElement.lang,
-        source: "landing"
-      })
+      body: JSON.stringify({ ...payload, request_id: bookingRequestId })
     });
     const data = await r.json().catch(()=>({}));
 
     if(r.ok && data.ok){
-      formOk.textContent = dict["form.ok"];
+      bookingRequestId = null;
+      bookingPayloadSignature = null;
+      formMessage.dataset.i18n = "form.ok";
+      formMessage.textContent = dict["form.ok"];
       formOk.classList.remove("bad");
+      whatsappCta.href = bookingWhatsappUrl();
+      whatsappAction.hidden = false;
       form.classList.add("sent");
     } else {
-      formOk.textContent = dict[r.status === 429 ? "sub.rate" : "sub.err"];
+      const messageKey = r.status === 429 ? "sub.rate" : "sub.err";
+      formMessage.dataset.i18n = messageKey;
+      formMessage.textContent = dict[messageKey];
       formOk.classList.add("bad");
       formOk.style.display = "block";
     }
   }catch(err){
     console.error(err);
-    formOk.textContent = dict["sub.err"];
+    formMessage.dataset.i18n = "sub.err";
+    formMessage.textContent = dict["sub.err"];
     formOk.classList.add("bad");
     formOk.style.display = "block";
   }finally{
+    bookingSubmitting = false;
+    form.removeAttribute("aria-busy");
     btn.disabled = false; label.textContent = original;
   }
 });

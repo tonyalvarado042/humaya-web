@@ -92,13 +92,29 @@ Se guarda como `pending`, sale un correo con un enlace, y al hacer clic pasa a
 
 ### 2 · Solicitudes de reserva
 
-El formulario de abajo del sitio. Guarda la solicitud, **le avisa a Humaya** por
-correo y **le acusa recibo al huésped** en su idioma.
+El formulario de abajo del sitio. Guarda la solicitud, crea o actualiza el contacto
+en CRM Tony con la etiqueta `reserva-stayhumaya-2026`, **le avisa a Humaya** por
+correo y **le acusa recibo al huésped** en su idioma. Cuando todo eso termina bien,
+muestra un botón para que la persona continúe la conversación por WhatsApp; la
+landing no llama a Maze ni abre WhatsApp antes de confirmar el registro.
 
-| Pieza                    | Qué hace                                                 |
-| ------------------------ | -------------------------------------------------------- |
-| tabla `booking_requests` | nombre, email, fechas, personas, idioma, mensaje, estado |
-| función `book`           | `POST` → guarda + los dos correos                        |
+| Pieza                    | Qué hace                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| tabla `booking_requests` | nombre, email, WhatsApp, fechas, personas, idioma, mensaje, estado y vínculo al CRM |
+| función `book`           | `POST` → reserva + CRM atómicos; después intenta los dos correos                           |
+
+`book` acepta un `request_id` UUID opcional. La landing lo genera y lo reutiliza
+al reintentar el mismo contenido, para no duplicar reservas, notas ni correos. La
+función SQL que toca el CRM solo admite `service_role`: ninguna credencial privada
+llega al navegador ni vive en este repositorio. El contrato acepta `phone` como
+opcional para no romper una landing anterior durante el despliegue escalonado; el
+formulario actual sí lo exige y admite ocho dígitos de Costa Rica o formato
+internacional con `+`.
+
+El CTA de éxito construye en el navegador una URL pública hacia
+`wa.me/50664417187` con el mensaje exacto `Hola, quiero reservar en Humaya.`. La
+persona todavía debe presionar **Enviar** dentro de WhatsApp; Maze detectará ese
+mensaje por separado.
 
 Estados: `nueva` → `leida` → `contestada` (o `descartada`).
 
@@ -119,7 +135,8 @@ Orígenes permitidos: `stayhumaya.com`, `www.stayhumaya.com` y localhost.
 select email, lang, status, created_at, confirmed_at
 from public.subscribers order by created_at desc;
 
-select name, email, arrival, departure, guests, message, status, created_at
+select name, email, phone, arrival, departure, guests, message, status,
+       crm_contact_id, crm_synced_at, created_at
 from public.booking_requests where status = 'nueva' order by created_at desc;
 ```
 
