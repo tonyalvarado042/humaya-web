@@ -60,3 +60,7 @@ npx prettier --write "src/**/*.{ts,tsx,css}"
 
 La rama de integración es `metodo-humaya`. Conservá commits acotados y no mezcles cambios de la
 landing con cambios de la aplicación salvo que sea indispensable y quede explicado.
+
+**No crear commits ni ejecutar `git push` por iniciativa propia.** Para cualquier tarea futura, dejá
+los cambios verificados en el working tree y esperá una instrucción explícita del usuario antes de
+commitear o publicar la rama. Que una tarea esté terminada no implica autorización para commit o push.

@@ -96,6 +96,8 @@ Cosas que ya costaron tiempo descubrir. No las vuelvas a pagar.
 ## Reglas de trabajo
 
 - **Seguí la fase actual de `docs/PLAN.md`.** No adelantes fases sin que te lo pidan.
+- **No hagás commit ni push sin una instrucción explícita del usuario.** Terminá y verificá los
+  cambios, pero dejalos en el working tree hasta que el usuario autorice cada operación de Git.
 - **Proponé un plan antes de cambios grandes.** Cambios chicos: un commit por pantalla o componente.
 - **Tono de la copy**: español costarricense con voseo, cálido y breve ("Contanos", "Preparate"), como
   la landing. Cada pantalla tiene su `copy.ts`; ningún texto visible suelto en el JSX.
