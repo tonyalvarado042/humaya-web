@@ -7,6 +7,8 @@ import { ConciergePage } from '@/features/guest-app/concierge/ConciergePage';
 import { HomePage } from '@/features/guest-app/home/HomePage';
 import { InterviewPage } from '@/features/guest-app/interview/InterviewPage';
 import { GuestLayout } from '@/features/guest-app/layout/GuestLayout';
+import { MovePage } from '@/features/guest-app/move/MovePage';
+import { SessionPlayerPage } from '@/features/guest-app/move/SessionPlayerPage';
 import { VillaPage } from '@/features/guest-app/villa/VillaPage';
 import { ArrivalsPage } from '@/features/staff/arrivals/ArrivalsPage';
 import { GuestProfilePage } from '@/features/staff/guest-profile/GuestProfilePage';
@@ -35,6 +37,8 @@ export function createRoutes({
         { path: 'concierge', element: <ConciergePage /> },
         { path: 'villa', element: <VillaPage /> },
         { path: 'bookings', element: <BookingsPage /> },
+        { path: 'move', element: <MovePage /> },
+        { path: 'move/:sessionId', element: <SessionPlayerPage /> },
       ],
     },
     {

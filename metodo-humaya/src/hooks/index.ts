@@ -17,4 +17,5 @@ export { useBookSlot, useDaySchedule, useSpaSlots, useStayBookings } from './use
 export { useArrivals, useStay, useVillaStatus } from './useStays';
 export { useProtocolTips } from './useProtocol';
 export { useVillaInfo } from './useVilla';
+export { useWeeklyProgram, useWorkoutSession } from './useWorkout';
 export { usePendingWowCount, useUpdateWowStatus, useWowSuggestions, useWowsDueBy } from './useWow';

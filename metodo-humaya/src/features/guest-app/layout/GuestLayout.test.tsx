@@ -14,7 +14,7 @@ function nav() {
 }
 
 describe('barra inferior', () => {
-  it('ofrece las cinco pantallas', async () => {
+  it('ofrece las seis pantallas', async () => {
     renderRoutes(routes, { route: '/app' });
 
     const links = within(nav()).getAllByRole('link');
@@ -24,6 +24,7 @@ describe('barra inferior', () => {
       'Concierge',
       'Mi villa',
       'Reservas',
+      'Move',
     ]);
   });
 
@@ -56,6 +57,7 @@ describe('barra inferior', () => {
       ['Entrevista', '/app/interview'],
       ['Concierge', '/app/concierge'],
       ['Reservas', '/app/bookings'],
+      ['Move', '/app/move'],
     ] as const;
 
     for (const [label, path] of paths) {

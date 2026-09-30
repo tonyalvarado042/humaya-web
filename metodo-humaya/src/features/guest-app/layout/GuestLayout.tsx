@@ -1,4 +1,4 @@
-import { CalendarDays, House, MessageSquare, Sparkles, Tent } from 'lucide-react';
+import { CalendarDays, Dumbbell, House, MessageSquare, Sparkles, Tent } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/components/ui/cn';
@@ -24,6 +24,7 @@ function GuestShell() {
     { to: '/app/concierge', label: t('nav.concierge'), Icon: Sparkles, end: false },
     { to: '/app/villa', label: t('nav.villa'), Icon: Tent, end: false },
     { to: '/app/bookings', label: t('nav.bookings'), Icon: CalendarDays, end: false },
+    { to: '/app/move', label: t('nav.move'), Icon: Dumbbell, end: false },
   ];
 
   return (
