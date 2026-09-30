@@ -564,3 +564,49 @@ reales de `src/router.tsx` en jsdom; no se hizo una revisión visual en un naveg
 Revisar el pull request #1, cuyos trabajos de CI están verdes. Después, crear el subdominio, SSL y
 document root, cargar el artefacto de CI y completar la validación física de la PWA y el ensayo de la
 demo. No fusionar ni desplegar como parte de esta ejecución.
+
+## Pilar Move (Ascenso) — código preparado el 30 sep 2026
+
+Trabajo nuevo, fuera de las fases 0–6 de `docs/PLAN.md`: se integró el prototipo "Ascenso" (la app de
+entrenamiento guiado que Anthony armó con Alex) como el pilar **Move** dentro de Método Humaya, según
+decidió Anthony. Ver `docs/FEEDBACK.md` (puntos 22–25) para el detalle de las decisiones tomadas sin
+él.
+
+### Qué se construyó
+
+- `src/types/workout.ts`, `src/mocks/workout.ts`, `src/services/workout.ts`, `src/hooks/useWorkout.ts`
+  — la misma capa pantalla → hook → servicio → mock que el resto del MVP. `WEEKLY_PROGRAM` trae 3
+  sesiones de ejemplo (full body, upper strength, lower strength) bilingües, con "Coach Tony Alvarado".
+- `src/features/guest-app/move/MovePage.tsx` — lista semanal de sesiones, con duración estimada y
+  acceso al reproductor.
+- `src/features/guest-app/move/SessionPlayerPage.tsx` — el reproductor: intro de sesión (silenciable) →
+  intro de sección (ejercicios y repeticiones) → series de trabajo/descanso por ejercicio → video de
+  cierre al completar la tanda completa de cada ejercicio → enfriamiento → resumen con calificación.
+- `src/features/guest-app/move/player/` — los cuatro tratamientos de video del mockup (inmersivo, con
+  marco, burbuja, pantalla completa), elegibles en vivo desde el reproductor; "pantalla completa" queda
+  como estilo por defecto.
+- `public/videos/*.mp4` — los 5 clips de Alex, comprimidos con ffmpeg (~5.2 MB en total).
+- Nueva pestaña "Move" en la barra inferior del huésped (`GuestLayout.tsx`) y rutas `/app/move` y
+  `/app/move/:sessionId` en `src/router.tsx`.
+- Contenido bilingüe agregado a `src/i18n/es.json` y `src/i18n/en.json` bajo la clave `move`.
+- Tests nuevos: `MovePage.test.tsx`, `SessionPlayerPage.test.tsx`, y se actualizó
+  `GuestLayout.test.tsx` para las seis pestañas.
+
+### Decisiones seguidas al pie de la letra
+
+- Solo datos de ejemplo: no se tocó Supabase ni la base de datos del CRM Tony Alvarado.
+- No se hizo `git add`, `git commit` ni `git push`: todo queda en el working tree, a la espera de que
+  Anthony autorice cada operación de Git, como pide `AGENTS.md`.
+
+### Verificación hecha
+
+`npx prettier --write`, `npm run lint`, `npm run typecheck`, `npm run test` (197 de 197, incluye los
+tests nuevos) y `npm run build` pasan en limpio. No se ejecutó Playwright para este pilar (no hay
+recorrido E2E nuevo todavía) ni se hizo una revisión visual en un navegador real.
+
+### Próximo paso
+
+Mostrarle esto a Anthony (probar el reproductor completo, comparar los 4 estilos de video, confirmar el
+punto 24 de `docs/FEEDBACK.md`) antes de: escribir un recorrido de Playwright para Move, y — recién
+cuando él lo autorice — el primer commit de este trabajo y, más adelante, la conexión a tablas reales
+del CRM con nomenclatura clara (ej. `appejercicios_tabla`) en vez de mocks.

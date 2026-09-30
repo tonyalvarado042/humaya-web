@@ -9,4 +9,5 @@ export { resetMockState, state } from './state';
 export { STAYS, VILLA_NUMBERS } from './stays';
 export { daysFromToday, daysUntil, isToday, TODAY } from './today';
 export { villaInfo } from './villa';
+export { WEEKLY_PROGRAM } from './workout';
 export { SEED_WOWS } from './wow';

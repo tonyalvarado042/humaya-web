@@ -29,6 +29,9 @@ export const queryKeys = {
   villaInfo: (stayId: string) => ['villa-info', stayId] as const,
   protocolTips: (stayId: string) => ['protocol-tips', stayId] as const,
   conciergeMessages: () => ['concierge-messages'] as const,
+
+  weeklyProgram: () => ['weekly-program'] as const,
+  workoutSession: (sessionId: string) => ['workout-session', sessionId] as const,
 };
 
 /** Prefijos que hay que invalidar cuando cambia algo del spa. */
