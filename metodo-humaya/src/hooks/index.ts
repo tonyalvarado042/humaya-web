@@ -1,4 +1,11 @@
-export { useConciergeMessages, useConciergeSuggestions, useSendMessage } from './useConcierge';
+export {
+  useConciergeConversations,
+  useConciergeMessages,
+  useConciergeSuggestions,
+  useMarkConversationRead,
+  useSendMessage,
+  useSendStaffReply,
+} from './useConcierge';
 export {
   useAcceptPrivacy,
   useAlerts,

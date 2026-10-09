@@ -1,12 +1,18 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetMockState } from '@/mocks';
 import { routes } from '@/router';
+import { stubConciergeApi } from '@/test/conciergeApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 beforeEach(() => {
   resetMockState();
+  stubConciergeApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 /**
@@ -25,12 +31,12 @@ describe('sidebar de escritorio', () => {
     );
   });
 
-  it('ofrece los tres destinos y el enlace a la app del huésped', async () => {
+  it('ofrece los cuatro destinos y el enlace a la app del huésped', async () => {
     renderRoutes(routes, { route: '/staff' });
 
     const sidebar = await screen.findByRole('complementary');
-    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar']) {
-      expect(within(sidebar).getByRole('link', { name: label })).toBeInTheDocument();
+    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar', 'Concierge']) {
+      expect(within(sidebar).getByRole('link', { name: new RegExp(label) })).toBeInTheDocument();
     }
     expect(within(sidebar).getByRole('link', { name: 'Ver app del huésped' })).toHaveAttribute(
       'href',
@@ -61,6 +67,37 @@ describe('sidebar de escritorio', () => {
   });
 });
 
+describe('aviso del Concierge', () => {
+  it('muestra el total de mensajes sin leer en el nav', async () => {
+    const at = new Date().toISOString();
+    stubConciergeApi([
+      {
+        id: 'm-1',
+        stayId: 's-mendez-rojas',
+        guestName: 'Valeria',
+        from: 'guest',
+        text: '¿tienen helicóptero?',
+        escalated: true,
+        readAt: null,
+        at,
+      },
+    ]);
+    renderRoutes(routes, { route: '/staff' });
+
+    const sidebar = await screen.findByRole('complementary');
+    const link = within(sidebar).getByRole('link', { name: /Concierge/ });
+    expect(await within(link).findByText('1')).toBeInTheDocument();
+  });
+
+  it('no muestra nada cuando no hay mensajes sin leer', async () => {
+    renderRoutes(routes, { route: '/staff' });
+
+    const sidebar = await screen.findByRole('complementary');
+    const link = within(sidebar).getByRole('link', { name: 'Concierge' });
+    expect(link).toHaveTextContent('Concierge');
+  });
+});
+
 describe('menú deslizable', () => {
   it('arranca cerrado', async () => {
     renderRoutes(routes, { route: '/staff' });
@@ -75,8 +112,8 @@ describe('menú deslizable', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Abrir menú' }));
 
     const drawer = screen.getByRole('dialog', { name: 'Recepción' });
-    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar']) {
-      expect(within(drawer).getByRole('link', { name: label })).toBeInTheDocument();
+    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar', 'Concierge']) {
+      expect(within(drawer).getByRole('link', { name: new RegExp(label) })).toBeInTheDocument();
     }
   });
 

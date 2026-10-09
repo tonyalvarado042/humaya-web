@@ -1,52 +1,121 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { resetMockState } from '@/mocks';
-import { getMessages, getSuggestions, replyTo, sendMessage } from './concierge';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  getConversations,
+  getMessages,
+  getSuggestions,
+  markConversationRead,
+  sendMessage,
+  sendStaffReply,
+} from './concierge';
+
+const FN_URL = 'https://mlhhhwbgymobcxiklnoz.supabase.co/functions/v1/humaya-concierge';
+
+function jsonResponse(body: unknown) {
+  return new Response(JSON.stringify(body), { status: 200 });
+}
 
 beforeEach(() => {
-  resetMockState();
+  vi.stubGlobal('fetch', vi.fn());
 });
 
-describe('replyTo', () => {
-  it('responde por palabra clave', () => {
-    expect(replyTo('¿Cómo pongo el agua caliente?').es).toContain('calentador');
-    expect(replyTo('no encuentro el aire acondicionado').es).toContain('23 °C');
-  });
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
-  it('no depende de tildes ni de mayúsculas', () => {
-    expect(replyTo('AGUAS TERMALES')).toBe(replyTo('aguas termales'));
-    expect(replyTo('volcan')).toBe(replyTo('volcán'));
-  });
+describe('getMessages', () => {
+  it('pide el hilo de la estadía correcta', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(jsonResponse({ messages: [{ id: 'm-1', from: 'concierge' }] }));
 
-  it('cae en la respuesta genérica cuando no entiende', () => {
-    expect(replyTo('¿tienen helicóptero?').es).toContain('se lo paso al equipo');
+    const messages = await getMessages('s-mendez-rojas');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      `${FN_URL}?stay_id=s-mendez-rojas`,
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+      }),
+    );
+    expect(messages).toHaveLength(1);
   });
 });
 
 describe('sendMessage', () => {
-  it('arranca con el saludo del concierge', async () => {
-    const messages = await getMessages();
+  it('manda la acción send con la estadía, el nombre y el texto', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(jsonResponse({ messages: [] }));
 
-    expect(messages).toHaveLength(1);
-    expect(messages[0].from).toBe('concierge');
+    await sendMessage('s-mendez-rojas', 'Valeria', '¿Cómo pongo el agua caliente?');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      FN_URL,
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'send',
+          stay_id: 's-mendez-rojas',
+          guest_name: 'Valeria',
+          text: '¿Cómo pongo el agua caliente?',
+        }),
+      }),
+    );
   });
 
-  it('agrega el mensaje del huésped y la respuesta, en ese orden', async () => {
-    const messages = await sendMessage('¿Cómo pongo el agua caliente?');
+  it('lanza un error si la respuesta no es ok', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(new Response('{}', { status: 500 }));
 
-    expect(messages).toHaveLength(3);
-    expect(messages[1].from).toBe('guest');
-    expect(messages[2].from).toBe('concierge');
-    expect(messages[2].text).toContain('calentador');
+    await expect(sendMessage('s-mendez-rojas', 'Valeria', 'hola')).rejects.toThrow(
+      'concierge_http_500',
+    );
   });
+});
 
-  it('los identificadores no se repiten', async () => {
-    await sendMessage('luces');
-    await sendMessage('desayuno');
+describe('getConversations', () => {
+  it('pide el resumen para el staff', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(jsonResponse({ conversations: [] }));
 
-    const messages = await getMessages();
-    const ids = new Set(messages.map((message) => message.id));
+    await getConversations();
 
-    expect(ids.size).toBe(messages.length);
+    expect(fetchMock).toHaveBeenCalledWith(`${FN_URL}?staff=1`, expect.anything());
+  });
+});
+
+describe('sendStaffReply', () => {
+  it('manda la acción reply', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(jsonResponse({ messages: [] }));
+
+    await sendStaffReply('s-weber', 'Ya te confirmamos el horario.');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      FN_URL,
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'reply',
+          stay_id: 's-weber',
+          text: 'Ya te confirmamos el horario.',
+        }),
+      }),
+    );
+  });
+});
+
+describe('markConversationRead', () => {
+  it('manda la acción read', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(jsonResponse({ ok: true }));
+
+    await markConversationRead('s-weber');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      FN_URL,
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ action: 'read', stay_id: 's-weber' }),
+      }),
+    );
   });
 });
 
