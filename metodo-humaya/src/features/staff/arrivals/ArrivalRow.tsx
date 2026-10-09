@@ -1,5 +1,7 @@
+import { MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge, Tag } from '@/components/ui';
+import { useConciergeConversations } from '@/hooks';
 import { localizedText } from '@/i18n/localizedText';
 import type { Arrival } from '@/types';
 import { arrivalsCopy as copy } from './copy';
@@ -35,6 +37,27 @@ export function AlertTags({ alerts }: { alerts: Arrival['alerts'] }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+/** Aviso de que ese huésped le escribió al Concierge y sigue sin leerse. */
+export function ConciergeIndicator({ stayId }: { stayId: string }) {
+  const conversations = useConciergeConversations();
+  const conversation = (conversations.data ?? []).find((item) => item.stayId === stayId);
+
+  if (!conversation || conversation.unreadCount === 0) return null;
+
+  return (
+    <Link
+      to={`/staff/concierge/${stayId}`}
+      className="inline-flex items-center gap-1 no-underline"
+      title={copy.conciergeUnread(conversation.unreadCount)}
+    >
+      <Badge tone="warning">
+        <MessageCircle size={13} strokeWidth={2} aria-hidden="true" className="mr-1 inline" />
+        {conversation.unreadCount}
+      </Badge>
+    </Link>
   );
 }
 

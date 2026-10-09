@@ -1,14 +1,20 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetMockState } from '@/mocks';
 import { supportedGuestLanguage } from '@/i18n/localizedText';
 import { routes } from '@/router';
+import { stubConciergeApi } from '@/test/conciergeApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 beforeEach(() => {
   resetMockState();
   window.localStorage.clear();
+  stubConciergeApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 function guestNav() {

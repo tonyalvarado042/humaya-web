@@ -1,12 +1,18 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetMockState } from '@/mocks';
 import { routes } from '@/router';
+import { stubConciergeApi } from '@/test/conciergeApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 beforeEach(() => {
   resetMockState();
+  stubConciergeApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 /** La tabla de escritorio, para consultar filas sin toparse con las tarjetas. */
@@ -99,6 +105,30 @@ describe('las dos presentaciones', () => {
     // Tailwind decide cuál se ve; jsdom no calcula CSS.
     expect(screen.getAllByText('Valeria Méndez y Andrés Rojas')).toHaveLength(2);
     expect(screen.getAllByRole('link', { name: 'Ver perfil' })).toHaveLength(8);
+  });
+});
+
+describe('aviso del Concierge', () => {
+  it('muestra cuántos mensajes quedaron sin leer junto al nombre', async () => {
+    const at = new Date().toISOString();
+    stubConciergeApi([
+      {
+        id: 'm-1',
+        stayId: 's-mendez-rojas',
+        guestName: 'Valeria',
+        from: 'guest',
+        text: '¿tienen helicóptero?',
+        escalated: true,
+        readAt: null,
+        at,
+      },
+    ]);
+    renderRoutes(routes, { route: '/staff' });
+
+    const rows = within(await table()).getAllByRole('row');
+    const valeria = rows.find((row) => within(row).queryByText('Valeria Méndez y Andrés Rojas'));
+
+    expect(await within(valeria as HTMLElement).findByText('1')).toBeInTheDocument();
   });
 });
 

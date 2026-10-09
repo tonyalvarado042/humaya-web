@@ -16,7 +16,7 @@ import { getToday } from '@/services/clock';
 import type { ArrivalRange } from '@/types';
 import { longDate, timeLabel, villaName } from '../format';
 import { Screen, ScreenError, ScreenHeading, ScreenLoading } from '../layout/ScreenState';
-import { AlertTags, InterviewBadge, ProfileLink } from './ArrivalRow';
+import { AlertTags, ConciergeIndicator, InterviewBadge, ProfileLink } from './ArrivalRow';
 import { arrivalsCopy as copy } from './copy';
 import { PrepareToday } from './PrepareToday';
 import { VillaBoard } from './VillaBoard';
@@ -101,7 +101,10 @@ export function ArrivalsPage() {
                   {rows.map((arrival) => (
                     <TableRow key={arrival.stayId}>
                       <TableCell>
-                        <span className="font-medium">{arrival.guestName}</span>
+                        <span className="inline-flex items-center gap-2">
+                          <span className="font-medium">{arrival.guestName}</span>
+                          <ConciergeIndicator stayId={arrival.stayId} />
+                        </span>
                       </TableCell>
                       <TableCell>{villaName(arrival.villa)}</TableCell>
                       <TableCell>{timeLabel(arrival.checkIn)}</TableCell>
@@ -128,7 +131,10 @@ export function ArrivalsPage() {
                   <Card className="flex flex-col gap-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex min-w-0 flex-col gap-0.5">
-                        <span className="font-medium">{arrival.guestName}</span>
+                        <span className="inline-flex items-center gap-2">
+                          <span className="font-medium">{arrival.guestName}</span>
+                          <ConciergeIndicator stayId={arrival.stayId} />
+                        </span>
                         <span className="text-[13px] text-muted">
                           {villaName(arrival.villa)} · {timeLabel(arrival.checkIn)} ·{' '}
                           {copy.people(arrival.partySize)}

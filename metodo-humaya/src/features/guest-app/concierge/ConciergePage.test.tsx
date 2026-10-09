@@ -1,12 +1,18 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetMockState } from '@/mocks';
+import { stubConciergeApi } from '@/test/conciergeApiStub';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { ConciergePage } from './ConciergePage';
 
 beforeEach(() => {
   resetMockState();
+  stubConciergeApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 function thread() {
