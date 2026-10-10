@@ -30,6 +30,11 @@ describe('rutas base', () => {
     expect(await screen.findByRole('navigation', { name: 'Navegación principal' })).toBeVisible();
   });
 
+  it('monta el resumen "Mis datos" en /app/resumen', async () => {
+    renderAt('/app/resumen');
+    expect(await screen.findByRole('heading', { name: 'Mis datos' })).toBeVisible();
+  });
+
   it('muestra la portada con accesos a huésped y recepción', async () => {
     document.documentElement.lang = 'en';
     renderAt('/');

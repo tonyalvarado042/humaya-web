@@ -29,15 +29,15 @@ afterEach(() => {
 });
 
 describe('opciones del menú', () => {
-  it('lista las cinco opciones con su estado', async () => {
+  it('lista las seis opciones con su estado', async () => {
     stubAdminApi();
     renderRoutes(routes, { route: '/staff/admin' });
 
-    expect(await screen.findByRole('heading', { name: 'Entrevista' })).toBeInTheDocument();
-    for (const label of ['Concierge', 'Mi villa', 'Reservas', 'Move']) {
+    expect(await screen.findByRole('heading', { name: 'Mis datos' })).toBeInTheDocument();
+    for (const label of ['Entrevista', 'Concierge', 'Mi villa', 'Reservas', 'Move']) {
       expect(screen.getByRole('heading', { name: label })).toBeInTheDocument();
     }
-    expect(screen.getAllByText('Habilitada')).toHaveLength(5);
+    expect(screen.getAllByText('Habilitada')).toHaveLength(6);
   });
 
   it('deshabilitar una opción la saca de la lista del Home del huésped', async () => {

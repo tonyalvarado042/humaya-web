@@ -9,6 +9,7 @@ import { InterviewPage } from '@/features/guest-app/interview/InterviewPage';
 import { GuestLayout } from '@/features/guest-app/layout/GuestLayout';
 import { MovePage } from '@/features/guest-app/move/MovePage';
 import { SessionPlayerPage } from '@/features/guest-app/move/SessionPlayerPage';
+import { MyDataPage } from '@/features/guest-app/resumen/MyDataPage';
 import { VillaPage } from '@/features/guest-app/villa/VillaPage';
 import { AdminPage } from '@/features/staff/admin/AdminPage';
 import { ArrivalsPage } from '@/features/staff/arrivals/ArrivalsPage';
@@ -34,6 +35,7 @@ export function createRoutes({
       element: <GuestLayout />,
       children: [
         { index: true, element: <HomePage /> },
+        { path: 'resumen', element: <MyDataPage /> },
         { path: 'interview', element: <InterviewPage /> },
         { path: 'concierge', element: <ConciergePage /> },
         { path: 'villa', element: <VillaPage /> },

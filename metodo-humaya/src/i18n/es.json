@@ -3,6 +3,7 @@
   "nav": {
     "label": "Navegación principal",
     "home": "Inicio",
+    "resumen": "Mis datos",
     "interview": "Entrevista",
     "concierge": "Concierge",
     "villa": "Mi villa",
@@ -39,6 +40,24 @@
     "demoArrivalInDays_one": "{{name}} · llega en {{count}} día",
     "demoArrivalInDays_other": "{{name}} · llega en {{count}} días",
     "loading": "tu estadía"
+  },
+  "resumen": {
+    "eyebrow": "Tu estadía",
+    "title": "Mis datos",
+    "checkIn": "Llegada",
+    "checkOut": "Salida",
+    "checkInTime": "desde 3:00 p.m.",
+    "checkOutTime": "hasta 11:00 a.m.",
+    "people_one": "{{count}} persona",
+    "people_other": "{{count}} personas",
+    "interviewEyebrow": "Método Humaya",
+    "interviewTitle": "Tu entrevista",
+    "interviewProgress": "Llevás {{answered}} de {{total}} respuestas. Contanos un poco más y preparamos tu llegada a tu medida.",
+    "interviewComplete": "Ya está completa. Con lo que nos contaste estamos preparando cada detalle de tu estadía.",
+    "interviewCta": "Continuar entrevista",
+    "interviewCtaComplete": "Ver mis respuestas",
+    "progressValue": "{{answered}} de {{total}}",
+    "loading": "tus datos"
   },
   "interview": {
     "eyebrow": "Método Humaya",
