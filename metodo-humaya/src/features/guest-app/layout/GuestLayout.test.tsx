@@ -19,7 +19,7 @@ function nav() {
 }
 
 describe('barra inferior', () => {
-  it('ofrece las seis pantallas, las que vienen habilitadas desde admin', async () => {
+  it('ofrece las siete pantallas, las que vienen habilitadas desde admin', async () => {
     stubAdminApi();
     renderRoutes(routes, { route: '/app' });
 
@@ -27,6 +27,7 @@ describe('barra inferior', () => {
     const links = within(nav()).getAllByRole('link');
     expect(links.map((link) => link.textContent)).toEqual([
       'Inicio',
+      'Mis datos',
       'Entrevista',
       'Concierge',
       'Mi villa',

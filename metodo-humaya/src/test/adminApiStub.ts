@@ -24,8 +24,17 @@ export interface StubServicio {
   orden: number;
 }
 
-/** Las mismas 5 opciones sembradas en Supabase (ver docs/ESTADO.md). */
+/** Las mismas 6 opciones sembradas en Supabase (ver docs/ESTADO.md). */
 export const DEFAULT_OPCIONES: StubOpcion[] = [
+  {
+    id: 'op-resumen',
+    clave: 'resumen',
+    etiqueta: 'Mis datos',
+    descripcion: 'Tu estadía, tu entrevista y tus consejos para llegar.',
+    icono: 'user',
+    habilitada: true,
+    orden: 0,
+  },
   {
     id: 'op-interview',
     clave: 'interview',
