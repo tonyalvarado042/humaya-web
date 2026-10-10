@@ -2,6 +2,7 @@ import { createBrowserRouter, type RouteObject } from 'react-router-dom';
 import { Placeholder } from '@/components/Placeholder';
 import { DemoHomePage } from '@/features/demo-home/DemoHomePage';
 import { UiKitPage } from '@/features/dev/UiKitPage';
+import { EntradaPage } from '@/features/entrada/EntradaPage';
 import { BookingsPage } from '@/features/guest-app/bookings/BookingsPage';
 import { ConciergePage } from '@/features/guest-app/concierge/ConciergePage';
 import { HomePage } from '@/features/guest-app/home/HomePage';
@@ -27,6 +28,10 @@ export function createRoutes({
     {
       path: '/',
       element: <DemoHomePage />,
+    },
+    {
+      path: '/entrada',
+      element: <EntradaPage />,
     },
     {
       path: '/app',

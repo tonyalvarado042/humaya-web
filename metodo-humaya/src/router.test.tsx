@@ -31,6 +31,19 @@ describe('rutas base', () => {
     await waitFor(() => expect(document.documentElement.lang).toBe('es'));
   });
 
+  it('monta /entrada', () => {
+    renderAt('/entrada');
+    expect(screen.getByRole('heading', { name: 'Encontrá tu estadía' })).toBeInTheDocument();
+  });
+
+  it('la portada enlaza a /entrada', () => {
+    renderAt('/');
+    expect(screen.getByRole('link', { name: /Buscá tu estadía/ })).toHaveAttribute(
+      'href',
+      '/entrada',
+    );
+  });
+
   it('muestra recepción en /staff', () => {
     renderAt('/staff');
     expect(screen.getByText('Recepción')).toBeInTheDocument();
