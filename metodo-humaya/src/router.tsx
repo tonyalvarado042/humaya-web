@@ -10,6 +10,7 @@ import { GuestLayout } from '@/features/guest-app/layout/GuestLayout';
 import { MovePage } from '@/features/guest-app/move/MovePage';
 import { SessionPlayerPage } from '@/features/guest-app/move/SessionPlayerPage';
 import { VillaPage } from '@/features/guest-app/villa/VillaPage';
+import { AdminPage } from '@/features/staff/admin/AdminPage';
 import { ArrivalsPage } from '@/features/staff/arrivals/ArrivalsPage';
 import { GuestProfilePage } from '@/features/staff/guest-profile/GuestProfilePage';
 import { StaffLayout } from '@/features/staff/layout/StaffLayout';
@@ -51,6 +52,7 @@ export function createRoutes({
         { path: 'guests', element: <GuestProfilePage /> },
         { path: 'guests/:stayId', element: <GuestProfilePage /> },
         { path: 'spa', element: <SpaPage /> },
+        { path: 'admin', element: <AdminPage /> },
       ],
     },
     ...(includeDevUi

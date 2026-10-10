@@ -1,3 +1,12 @@
+export {
+  useAdminOpciones,
+  useAdminServicios,
+  useCrearServicio,
+  useReservarServicio,
+  useServicioSlots,
+  useToggleOpcion,
+  useToggleServicio,
+} from './useAdmin';
 export { useConciergeMessages, useConciergeSuggestions, useSendMessage } from './useConcierge';
 export {
   useAcceptPrivacy,

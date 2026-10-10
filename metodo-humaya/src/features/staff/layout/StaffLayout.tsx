@@ -10,6 +10,7 @@ import { StaffNav } from './StaffNav';
 function currentLabel(pathname: string): string {
   if (pathname.startsWith('/staff/guests')) return 'Huéspedes';
   if (pathname.startsWith('/staff/spa')) return 'Spa y bienestar';
+  if (pathname.startsWith('/staff/admin')) return 'Admin';
   return STAFF_NAV[0].label;
 }
 
