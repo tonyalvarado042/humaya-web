@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, EmptyState, SegmentedControl, SlotGrid } from '@/components/ui';
-import { useBookSlot, useGuestProfile, useSpaSlots } from '@/hooks';
+import {
+  useAdminServicios,
+  useBookSlot,
+  useGuestProfile,
+  useReservarServicio,
+  useServicioSlots,
+  useSpaSlots,
+} from '@/hooks';
 import { getToday } from '@/services/clock';
 import { intlLocale } from '@/i18n/localizedText';
 import type { SpaFacility } from '@/types';
@@ -10,6 +17,8 @@ import { Screen, ScreenError, ScreenHeading, ScreenLoading } from '../layout/Scr
 import { useGuestLanguage } from '../layout/useGuestLanguage';
 import { useCurrentStay } from '../layout/useCurrentStay';
 import { DayPicker } from './DayPicker';
+
+const SPA_VALUES = new Set(['sauna', 'cold_plunge']);
 
 /** Los días de la estadía que todavía se pueden reservar, desde hoy. */
 function bookableDays(checkIn: string, checkOut: string): string[] {
@@ -26,39 +35,67 @@ function bookableDays(checkIn: string, checkOut: string): string[] {
   return days;
 }
 
+/** "HH:MM" de un servicio a una hora ISO completa, para reusar timeLabel(). */
+function toIsoTime(day: string, hhmm: string): string {
+  return `${day}T${hhmm}:00-06:00`;
+}
+
+function servicioPrice(precioUsd: number | null, unidad: string, proveedor: string | null): string {
+  const price = precioUsd != null ? `$${precioUsd}/${unidad}` : '';
+  const withProveedor = proveedor ? `Con ${proveedor}.` : '';
+  return [withProveedor, price].filter(Boolean).join(' ');
+}
+
 export function BookingsPage() {
   const { stayId } = useCurrentStay();
   const { language } = useGuestLanguage();
   const { t } = useTranslation();
   const profile = useGuestProfile(stayId);
+  const servicios = useAdminServicios(true);
 
-  const [facility, setFacility] = useState<SpaFacility>('sauna');
+  const [value, setValue] = useState('sauna');
   const [day, setDay] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
-  const [confirmed, setConfirmed] = useState<string | null>(null);
+  const [confirmed, setConfirmed] = useState<{ label: string; time: string } | null>(null);
 
   const days = profile.data
     ? bookableDays(profile.data.stay.checkIn, profile.data.stay.checkOut)
     : [];
   const activeDay = day ?? days[0] ?? getToday();
 
-  const slots = useSpaSlots(facility, activeDay);
-  const bookSlot = useBookSlot(stayId);
-  const facilityOptions = [
-    { value: 'sauna' as const, label: t('bookings.sauna') },
-    { value: 'cold_plunge' as const, label: t('bookings.coldPlunge') },
-  ];
+  const isSpa = SPA_VALUES.has(value);
+  const spaFacility: SpaFacility = value === 'cold_plunge' ? 'cold_plunge' : 'sauna';
+  const activeServicio = (servicios.data ?? []).find((servicio) => servicio.id === value);
 
-  if (profile.isPending) {
+  const spaSlots = useSpaSlots(spaFacility, activeDay);
+  const bookSpaSlot = useBookSlot(stayId);
+
+  const servicioSlots = useServicioSlots(isSpa ? '' : value, activeDay);
+  const reservarServicio = useReservarServicio(isSpa ? '' : value, activeDay);
+
+  if (profile.isPending || servicios.isPending) {
     return <ScreenLoading label={t('bookings.loading')} />;
   }
 
-  if (profile.isError || !profile.data) {
-    return <ScreenError onRetry={() => void profile.refetch()} />;
+  if (profile.isError || servicios.isError || !profile.data || !servicios.data) {
+    return (
+      <ScreenError
+        onRetry={() => {
+          void profile.refetch();
+          void servicios.refetch();
+        }}
+      />
+    );
   }
 
-  function changeFacility(next: SpaFacility) {
-    setFacility(next);
+  const facilityOptions = [
+    { value: 'sauna', label: t('bookings.sauna') },
+    { value: 'cold_plunge', label: t('bookings.coldPlunge') },
+    ...servicios.data.map((servicio) => ({ value: servicio.id, label: servicio.nombre })),
+  ];
+
+  function changeValue(next: string) {
+    setValue(next);
     setSelected(null);
     setConfirmed(null);
   }
@@ -69,35 +106,88 @@ export function BookingsPage() {
     setConfirmed(null);
   }
 
+  const facilityName = value === 'cold_plunge' ? t('bookings.coldPlunge') : t('bookings.sauna');
+  const locale = intlLocale(language);
+  const guestName = profile.data.guest.fullName;
+
   function confirm() {
     if (!selected) return;
-    bookSlot.mutate(
-      { facility, start: selected },
-      {
-        onSuccess: () => {
-          setConfirmed(selected);
-          setSelected(null);
+    if (isSpa) {
+      bookSpaSlot.mutate(
+        { facility: spaFacility, start: selected },
+        {
+          onSuccess: () => {
+            setConfirmed({ label: facilityName, time: selected });
+            setSelected(null);
+          },
         },
-      },
-    );
+      );
+    } else if (activeServicio) {
+      reservarServicio.mutate(
+        { stayId, guestName, horaInicio: selected },
+        {
+          onSuccess: () => {
+            setConfirmed({ label: activeServicio.nombre, time: toIsoTime(activeDay, selected) });
+            setSelected(null);
+          },
+        },
+      );
+    }
   }
 
-  const facilityName = facility === 'sauna' ? t('bookings.sauna') : t('bookings.coldPlunge');
-  const locale = intlLocale(language);
+  const description = isSpa
+    ? value === 'cold_plunge'
+      ? t('bookings.coldPlungeInfo')
+      : t('bookings.saunaInfo')
+    : activeServicio
+      ? [
+          activeServicio.descripcion,
+          servicioPrice(
+            activeServicio.precioUsd,
+            activeServicio.unidadPrecio,
+            activeServicio.proveedor,
+          ),
+        ]
+          .filter(Boolean)
+          .join(' ')
+      : '';
+
+  const slotsQuery = isSpa ? spaSlots : servicioSlots;
+  const slotItems = isSpa
+    ? (spaSlots.data ?? []).map((slot) => ({
+        id: slot.start,
+        label: timeLabel(slot.start, locale),
+        taken: Boolean(slot.stayId),
+      }))
+    : (servicioSlots.data ?? []).map((slot) => ({
+        id: slot.start,
+        label: timeLabel(toIsoTime(activeDay, slot.start), locale),
+        taken: slot.taken,
+      }));
+
+  const selectedLabel = selected
+    ? isSpa
+      ? timeLabel(selected, locale)
+      : timeLabel(toIsoTime(activeDay, selected), locale)
+    : null;
+
+  const confirmTargetName = isSpa ? facilityName : (activeServicio?.nombre ?? '');
+  const mutationPending = isSpa ? bookSpaSlot.isPending : reservarServicio.isPending;
+  const mutationError = isSpa ? bookSpaSlot.isError : reservarServicio.isError;
 
   return (
     <Screen>
       <ScreenHeading
         eyebrow={t('bookings.eyebrow')}
         title={t('bookings.title')}
-        description={facility === 'sauna' ? t('bookings.saunaInfo') : t('bookings.coldPlungeInfo')}
+        description={description}
       />
 
       <SegmentedControl
         label={t('bookings.facilityLabel')}
         options={facilityOptions}
-        value={facility}
-        onChange={changeFacility}
+        value={value}
+        onChange={changeValue}
       />
 
       {days.length === 0 ? (
@@ -106,18 +196,14 @@ export function BookingsPage() {
         <DayPicker days={days} value={activeDay} onChange={changeDay} />
       )}
 
-      {slots.isPending ? <ScreenLoading label={t('bookings.loadingSlots')} lines={2} /> : null}
+      {slotsQuery.isPending ? <ScreenLoading label={t('bookings.loadingSlots')} lines={2} /> : null}
 
-      {slots.isError ? <ScreenError onRetry={() => void slots.refetch()} /> : null}
+      {slotsQuery.isError ? <ScreenError onRetry={() => void slotsQuery.refetch()} /> : null}
 
-      {slots.data ? (
+      {slotsQuery.data ? (
         <SlotGrid
-          label={t('bookings.slotsLabel', { facility: facilityName.toLowerCase() })}
-          slots={slots.data.map((slot) => ({
-            id: slot.start,
-            label: timeLabel(slot.start, locale),
-            taken: Boolean(slot.stayId),
-          }))}
+          label={t('bookings.slotsLabel', { facility: confirmTargetName.toLowerCase() })}
+          slots={slotItems}
           selectedId={selected}
           onSelect={setSelected}
           takenLabel={t('bookings.taken')}
@@ -131,7 +217,7 @@ export function BookingsPage() {
         </p>
       </Card>
 
-      {bookSlot.isError ? (
+      {mutationError ? (
         <p role="alert" className="m-0 text-sm text-on-alert">
           {t('bookings.bookingError')}
         </p>
@@ -143,10 +229,10 @@ export function BookingsPage() {
             <p className="m-0 text-xs text-muted">{t('bookings.confirmedLabel')}</p>
             <p className="m-0 text-[15px] font-medium">
               {t('bookings.confirmedSummary', {
-                facility: facilityName,
+                facility: confirmed.label,
                 weekday: dayParts(activeDay, locale).weekday,
                 day: dayParts(activeDay, locale).day,
-                time: timeLabel(confirmed, locale),
+                time: timeLabel(confirmed.time, locale),
               })}
             </p>
           </div>
@@ -155,9 +241,9 @@ export function BookingsPage() {
           </Button>
         </Card>
       ) : (
-        <Button size="lg" disabled={!selected || bookSlot.isPending} onClick={confirm}>
-          {selected
-            ? t('bookings.confirm', { facility: facilityName, time: timeLabel(selected, locale) })
+        <Button size="lg" disabled={!selected || mutationPending} onClick={confirm}>
+          {selectedLabel
+            ? t('bookings.confirm', { facility: confirmTargetName, time: selectedLabel })
             : t('bookings.pickSlot')}
         </Button>
       )}

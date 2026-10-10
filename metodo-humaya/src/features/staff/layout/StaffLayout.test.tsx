@@ -25,11 +25,11 @@ describe('sidebar de escritorio', () => {
     );
   });
 
-  it('ofrece los tres destinos y el enlace a la app del huésped', async () => {
+  it('ofrece los cuatro destinos y el enlace a la app del huésped', async () => {
     renderRoutes(routes, { route: '/staff' });
 
     const sidebar = await screen.findByRole('complementary');
-    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar']) {
+    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar', 'Admin']) {
       expect(within(sidebar).getByRole('link', { name: label })).toBeInTheDocument();
     }
     expect(within(sidebar).getByRole('link', { name: 'Ver app del huésped' })).toHaveAttribute(
@@ -75,7 +75,7 @@ describe('menú deslizable', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Abrir menú' }));
 
     const drawer = screen.getByRole('dialog', { name: 'Recepción' });
-    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar']) {
+    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar', 'Admin']) {
       expect(within(drawer).getByRole('link', { name: label })).toBeInTheDocument();
     }
   });

@@ -1,7 +1,9 @@
-import { CalendarDays, Dumbbell, House, MessageSquare, Sparkles, Tent } from 'lucide-react';
+import { House } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/components/ui/cn';
+import { useAdminOpciones } from '@/hooks';
+import { OPCION_ICONS } from '../icons';
 import { GuestLanguageProvider } from './GuestLanguageProvider';
 import { StayProvider } from './StayProvider';
 
@@ -18,13 +20,21 @@ export function GuestLayout() {
 
 function GuestShell() {
   const { t } = useTranslation();
+  // Inicio no se puede deshabilitar: las demás opciones salen de
+  // humaya_admin_opciones, la misma fuente que leen las fichas del Home.
+  const opciones = useAdminOpciones(true);
+
   const nav = [
     { to: '/app', label: t('nav.home'), Icon: House, end: true },
-    { to: '/app/interview', label: t('nav.interview'), Icon: MessageSquare, end: false },
-    { to: '/app/concierge', label: t('nav.concierge'), Icon: Sparkles, end: false },
-    { to: '/app/villa', label: t('nav.villa'), Icon: Tent, end: false },
-    { to: '/app/bookings', label: t('nav.bookings'), Icon: CalendarDays, end: false },
-    { to: '/app/move', label: t('nav.move'), Icon: Dumbbell, end: false },
+    ...(opciones.data ?? []).map((opcion) => ({
+      to: `/app/${opcion.clave}`,
+      // Las 5 opciones sembradas tienen su llave en nav.*, traducida; una
+      // opción nueva que agregue el admin cae a su etiqueta tal cual (en
+      // español, hasta que haya una forma de cargarla en los dos idiomas).
+      label: t(`nav.${opcion.clave}`, opcion.etiqueta),
+      Icon: (opcion.icono && OPCION_ICONS[opcion.icono]) || House,
+      end: false,
+    })),
   ];
 
   return (

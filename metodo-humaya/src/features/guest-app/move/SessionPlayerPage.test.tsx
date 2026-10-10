@@ -1,12 +1,18 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetMockState } from '@/mocks';
 import { routes } from '@/router';
+import { stubAdminApi } from '@/test/adminApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 beforeEach(() => {
   resetMockState();
+  stubAdminApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 describe('Reproductor de sesión (Move)', () => {

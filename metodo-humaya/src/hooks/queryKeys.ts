@@ -32,6 +32,11 @@ export const queryKeys = {
 
   weeklyProgram: () => ['weekly-program'] as const,
   workoutSession: (sessionId: string) => ['workout-session', sessionId] as const,
+
+  adminOpciones: (onlyEnabled: boolean) => ['admin-opciones', onlyEnabled] as const,
+  adminServicios: (onlyEnabled: boolean) => ['admin-servicios', onlyEnabled] as const,
+  servicioSlots: (servicioId: string, fecha: string) =>
+    ['servicio-slots', servicioId, fecha] as const,
 };
 
 /** Prefijos que hay que invalidar cuando cambia algo del spa. */

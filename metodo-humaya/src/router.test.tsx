@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRoutes, routes } from '@/router';
+import { stubAdminApi } from '@/test/adminApiStub';
 
 function renderAt(path: string, routeSet: RouteObject[] = routes) {
   const router = createMemoryRouter(routeSet, { initialEntries: [path] });
@@ -14,6 +15,14 @@ function renderAt(path: string, routeSet: RouteObject[] = routes) {
     </QueryClientProvider>,
   );
 }
+
+beforeEach(() => {
+  stubAdminApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe('rutas base', () => {
   it('monta la app del huésped en /app', async () => {

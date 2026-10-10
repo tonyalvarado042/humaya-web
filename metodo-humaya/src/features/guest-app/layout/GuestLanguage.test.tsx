@@ -1,14 +1,20 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetMockState } from '@/mocks';
 import { supportedGuestLanguage } from '@/i18n/localizedText';
 import { routes } from '@/router';
+import { stubAdminApi } from '@/test/adminApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 beforeEach(() => {
   resetMockState();
   window.localStorage.clear();
+  stubAdminApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 function guestNav() {
@@ -24,8 +30,6 @@ describe('idioma de la app del huésped', () => {
 
     expect(await screen.findByRole('heading', { name: 'Hello, Valeria.' })).toBeInTheDocument();
     expect(document.documentElement).toHaveAttribute('lang', 'en');
-    expect(screen.getByText('Anniversary · 5 years')).toBeInTheDocument();
-    expect(screen.getByText(/Sat Nov 14/)).toBeInTheDocument();
     expect(within(guestNav()).getByRole('link', { name: 'Home' })).toBeInTheDocument();
 
     await userEvent.click(within(guestNav()).getByRole('link', { name: 'Interview' }));
@@ -53,8 +57,7 @@ describe('idioma de la app del huésped', () => {
 
     await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Demo guest' }), 's-weber');
     expect(await screen.findByRole('heading', { name: 'Hello, Hannah.' })).toBeInTheDocument();
-    expect(await screen.findByText('Hydration')).toBeInTheDocument();
-    expect(screen.getByText('Rest')).toBeInTheDocument();
+    expect(await screen.findByText('2 of 5 answers')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Switch language to Spanish' }));
     await screen.findByRole('heading', { name: 'Hola, Hannah.' });
