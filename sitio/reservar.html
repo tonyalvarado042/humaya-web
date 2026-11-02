@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reservar · HUMAYA — La Fortuna, Costa Rica</title>
+<meta name="description" content="Reservá tu villa en HUMAYA: diez villas al pie del Volcán Arenal, en La Fortuna, Costa Rica. Elegí tus fechas y reservá en línea.">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="humaya-version" content="1.4.2">
+<meta name="humaya-pagina" content="reservar">
+<link rel="icon" href="assets/img/mark-gold.png">
+<link rel="canonical" href="https://stayhumaya.com/reservar.html">
+<meta name="robots" content="index,follow">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Reservar · HUMAYA">
+<meta property="og:description" content="Diez villas al pie del Volcán Arenal. Elegí tus fechas y reservá en línea.">
+<meta property="og:image" content="https://stayhumaya.com/assets/img/villa-wide.jpg">
+<meta property="og:url" content="https://stayhumaya.com/reservar.html">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!--
+  ⚠️ El motor de Cloudbeds va SIN type="text/plain".
+
+  El snippet que publica Cloudbeds lo trae, y es correcto PARA SITIOS CON
+  GESTOR DE CONSENTIMIENTO (Cookiebot, OneTrust, Termly): esos reescriben el
+  type a text/javascript cuando el visitante acepta. stayhumaya.com no tiene
+  ninguno — no hay banner de cookies en todo el sitio— así que dejarlo en
+  text/plain haría que el navegador NUNCA ejecute el script, y el motor no
+  cargaría. No daría error: quedaría un hueco en blanco, que es peor.
+
+  Si algún día se le pone banner de cookies al sitio, hay que volver a poner
+  type="text/plain" data-categories="essential" Y configurar el gestor, las
+  dos cosas.
+
+  El `nonce` y el `integrity` son los que publica Cloudbeds en su guía
+  (31 de octubre de 2026). Si cambian, el navegador bloquea el archivo por
+  integridad y el motor no carga: hay que copiarlos de nuevo de la guía.
+-->
+<script
+  data-entry="immersive"
+  src="https://static1.cloudbeds.com/booking-engine/latest/loader.js"
+  nonce="+imGC13HmyB6zTZ1eTnZMw=="
+  integrity="sha384-hd98w88pqnDT+lRLwyII/mRmbacols+VWYZF3HKdxnIlTYO+cF38GA1/I/+V8U4a"
+  crossorigin="anonymous"
+></script>
+
+<style>
+  :root{
+    --ink:#0A0A0A; --ink-2:#111110; --bone:#F4F1EA; --bone-2:#E7E2D6;
+    --gold:#C8AD85; --gold-deep:#9E855F; --line-soft:rgba(244,241,234,.12);
+    --display:'Jost','Futura','Century Gothic',system-ui,sans-serif;
+    --body:'Inter',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bone); color:var(--ink);
+    font-family:var(--body); font-weight:300; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* La barra de arriba es de HUMAYA, no de Cloudbeds: lo que el motor pinta
+     abajo es de ellos, pero quien reserva tiene que seguir sabiendo en qué
+     sitio está. */
+  .barra{
+    background:var(--ink); border-bottom:1px solid var(--line-soft);
+    padding:18px clamp(16px,4vw,44px);
+    display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  }
+  .barra a{color:var(--bone); text-decoration:none}
+  .marca{display:flex; align-items:center; gap:12px; margin-right:auto}
+  .marca img{height:26px; width:auto; display:block}
+  .volver{
+    font-family:var(--display); font-size:12.5px; font-weight:400;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--gold);
+    border:1px solid rgba(200,173,133,.4); border-radius:2px;
+    padding:10px 18px; transition:background .18s,color .18s;
+  }
+  .volver:hover{background:var(--gold); color:var(--ink)}
+
+  .intro{
+    max-width:760px; margin:0 auto; padding:clamp(34px,5vw,64px) clamp(16px,4vw,44px) clamp(18px,2vw,26px);
+    text-align:center;
+  }
+  .kicker{
+    font-family:var(--display); font-size:11.5px; font-weight:400;
+    letter-spacing:.34em; text-transform:uppercase; color:var(--gold-deep);
+    margin:0 0 16px;
+  }
+  .titulo{
+    font-family:var(--display); font-weight:200; letter-spacing:-.015em;
+    font-size:clamp(32px,5.4vw,54px); line-height:1.1; margin:0 0 18px;
+  }
+  .titulo em{font-style:normal; color:var(--gold-deep)}
+  .lede{font-size:clamp(15px,1.7vw,17.5px); line-height:1.75; margin:0; color:#4a4a44}
+
+  /* El motor necesita ancho de verdad: encajonarlo en una columna angosta le
+     rompe la grilla de habitaciones. */
+  /* 🔴 `position:relative` + `transform` es lo que mantiene el motor dentro
+     de este bloque. El componente monta su cabecera con `position:fixed;
+     top:0` y sin esto se pega arriba del todo, tapando la barra de HUMAYA.
+     Un elemento con transform es el bloque contenedor de sus descendientes
+     fixed. ⚠️ Un iframe no sirve: Cloudbeds detecta el marco y apaga el
+     motor. */
+  .motor{min-height:70vh; padding:0 0 60px; position:relative; transform:translateZ(0)}
+
+/* 🔴 LA CABECERA DEL MOTOR NO PUEDE SER `fixed`. NO QUITES ESTO.
+   El componente de Cloudbeds monta su propia cabecera (la barra azul con el
+   nombre, el globo y el USD) con `position:fixed; top:0`.
+
+   El `transform` de arriba la contiene **en Chrome y Firefox de escritorio**
+   —ahí un elemento transformado es el bloque contenedor de sus descendientes
+   fixed—, pero **en iOS no**: WebKit sigue pegando ese `fixed` a la pantalla.
+   Por eso Tony la veía «flotando» al bajar, desde el iPhone, aunque en el
+   escritorio se viera bien. Probar esto SOLO en escritorio no lo encuentra.
+
+   Acá se le quita el `fixed` y se acabó: la barra entra en el flujo, arriba
+   del motor, y baja con la página en todos lados. El bloque crece unos 98 px,
+   que es justo lo que la barra ocupa. */
+  .motor header{
+    position:relative !important;
+    top:auto !important; left:auto !important; right:auto !important;
+  }
+
+  .pie{
+    background:var(--ink); color:rgba(244,241,234,.55);
+    font-size:13px; line-height:1.8; text-align:center;
+    padding:30px clamp(16px,4vw,44px) 38px;
+  }
+  .pie a{color:var(--gold); text-decoration:none}
+  .pie a:hover{text-decoration:underline}
+
+  /* Mientras el motor no haya arrancado, esto es lo que se ve. Si el script
+     se cae, al menos queda un enlace que funciona en vez de un hueco. */
+  .mientras{
+    max-width:560px; margin:0 auto; padding:30px clamp(16px,4vw,44px) 10px;
+    text-align:center; font-size:15px; color:#6b6b63;
+  }
+  .mientras a{color:var(--gold-deep); font-weight:500}
+  cb-immersive-experience:not(:defined) + .mientras{display:block}
+  cb-immersive-experience:defined + .mientras{display:none}
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <a class="marca" href="/" aria-label="HUMAYA, ir al inicio">
+    <img src="assets/img/wordmark-white.png" alt="HUMAYA">
+  </a>
+  <a class="volver" href="/">Volver al sitio</a>
+</header>
+
+<section class="intro">
+  <p class="kicker">Reservas</p>
+  <h1 class="titulo">Elegí tus fechas y <em>reservá</em>.</h1>
+  <p class="lede">
+    Diez villas al pie del Volcán Arenal, en La Fortuna. Mirá la disponibilidad
+    real, el precio por noche y reservá en línea — sin esperar a que alguien te
+    conteste.
+  </p>
+</section>
+
+<main class="motor">
+  <!-- Modo estándar = el motor completo dentro de la página, sin iframe.
+       `property-code` sale del final del enlace del motor:
+       https://us2.cloudbeds.com/reservation/mSMI0w  →  mSMI0w
+       ⚠️ stayhumaya.com tiene que estar en «Dominios aprobados» del embed en
+       Cloudbeds, o el motor no responde: no es un iframe, hace llamadas desde
+       este dominio. -->
+  <cb-immersive-experience mode="standard" property-code="mSMI0w"></cb-immersive-experience>
+
+  <p class="mientras">
+    Cargando la disponibilidad…<br>
+    Si no aparece en unos segundos,
+    <a href="https://us2.cloudbeds.com/es/reservation/mSMI0w">reservá acá directamente</a>.
+  </p>
+</main>
+
+<footer class="pie">
+  HUMAYA · La Fortuna de San Carlos, Alajuela, Costa Rica<br>
+  <a href="mailto:reservations@stayhumaya.com">reservations@stayhumaya.com</a> ·
+  <a href="/">stayhumaya.com</a>
+</footer>
+
+</body>
+</html>

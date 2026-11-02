@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HUMAYA · Costa Rica — Become More Human</title>
-<meta name="description" content="Zehn freistehende Villen am Fuße des Vulkans Arenal, in La Fortuna, Costa Rica. Ein Ort, um zu werden, wofür du geschaffen wurdest. Eröffnung am 1. Dezember 2026.">
+<meta name="description" content="Zehn freistehende Villen am Fuße des Vulkans Arenal, in La Fortuna, Costa Rica. Ein Ort, um zu werden, wofür du geschaffen wurdest. Eröffnung am Dezember 2026.">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.3.1">
-<meta name="humaya-desplegado" content="2026-10-31">
+<meta name="humaya-version" content="1.6.1">
+<meta name="humaya-desplegado" content="2026-11-01">
 <link rel="icon" href="/assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/de/">
 <link rel="alternate" hreflang="es" href="https://stayhumaya.com/">
@@ -18,7 +18,7 @@
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="HUMAYA · Costa Rica — Become More Human">
-<meta property="og:description" content="Zehn Villen am Fuße des Vulkans Arenal, La Fortuna, Costa Rica. Eröffnung am 1. Dezember 2026.">
+<meta property="og:description" content="Zehn Villen am Fuße des Vulkans Arenal, La Fortuna, Costa Rica. Eröffnung am Dezember 2026.">
 <meta property="og:image" content="https://stayhumaya.com/assets/img/vol-hero.jpg">
 <meta property="og:image:width" content="1700">
 <meta property="og:image:height" content="949">
@@ -32,7 +32,7 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="HUMAYA · Costa Rica — Become More Human">
-<meta name="twitter:description" content="Zehn Villen am Fuße des Vulkans Arenal, La Fortuna, Costa Rica. Eröffnung am 1. Dezember 2026.">
+<meta name="twitter:description" content="Zehn Villen am Fuße des Vulkans Arenal, La Fortuna, Costa Rica. Eröffnung am Dezember 2026.">
 <meta name="twitter:image" content="https://stayhumaya.com/assets/img/vol-hero.jpg">
 <meta name="twitter:image:alt" content="Villas Humaya mit dem Vulkan Arenal im Hintergrund">
 
@@ -46,7 +46,7 @@
   "@type": "LodgingBusiness",
   "name": "HUMAYA Costa Rica",
   "alternateName": "Humaya",
-  "description": "Zehn freistehende Villen am Fuße des Vulkans Arenal, in La Fortuna de San Carlos, Costa Rica. Stufe 2 von Bike & Bed. Eröffnung am 1. Dezember 2026.",
+  "description": "Zehn freistehende Villen am Fuße des Vulkans Arenal, in La Fortuna de San Carlos, Costa Rica. Stufe 2 von Bike & Bed. Eröffnung am Dezember 2026.",
   "url": "https://stayhumaya.com/de/",
   "image": "https://stayhumaya.com/assets/img/vol-hero.jpg",
   "logo": "https://stayhumaya.com/assets/img/mark-gold.png",
@@ -71,6 +71,24 @@
   "availableLanguage": ["es", "en", "de", "fr"]
 }
 </script>
+<!--
+  ⚠️ El motor de Cloudbeds va SIN type="text/plain".
+  El snippet que publica Cloudbeds lo trae, y es correcto PARA SITIOS CON
+  GESTOR DE CONSENTIMIENTO (Cookiebot, OneTrust, Termly): esos reescriben el
+  type cuando el visitante acepta. Este sitio no tiene banner de cookies, así
+  que con text/plain el navegador NUNCA ejecutaría el script y el motor no
+  cargaría. No daría error: quedaría un hueco en blanco, que es peor.
+  El nonce y el integrity son los que publica Cloudbeds en su guía
+  (myfrontdesk.cloudbeds.com, artículo 32048321731739). Si los cambian, el
+  navegador bloquea el archivo por integridad: hay que copiarlos de nuevo.
+-->
+<script
+  data-entry="immersive"
+  src="https://static1.cloudbeds.com/booking-engine/latest/loader.js"
+  nonce="+imGC13HmyB6zTZ1eTnZMw=="
+  integrity="sha384-hd98w88pqnDT+lRLwyII/mRmbacols+VWYZF3HKdxnIlTYO+cF38GA1/I/+V8U4a"
+  crossorigin="anonymous"
+></script>
 
 <style>
 /* ============================================================
@@ -749,7 +767,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
           <button data-lang="fr" role="menuitem">Français</button>
         </div>
       </div>
-      <a href="#reservar" class="btn" id="navCta"><span data-i18n="nav.book">Buchen</span></a>
+      <a href="#reservar" class="btn" id="navCta" data-reservar><span data-i18n="nav.book">Buchen</span></a>
       <button class="burger" id="burger" aria-label="Menú"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -771,7 +789,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     <h1 class="hero-slogan">Become More Human</h1>
     <p class="hero-sub" data-i18n="hero.sub">Zehn Villen am Fuße des Vulkans Arenal. Ein Ort, um innezuhalten und zum Wesentlichen zurückzukehren.</p>
     <div class="hero-cta">
-      <a href="#reservar" class="btn solid lg"><span data-i18n="hero.cta1">Buchen</span></a>
+      <a href="#reservar" class="btn solid lg" data-reservar><span data-i18n="hero.cta1">Buchen</span></a>
       <a href="#villas" class="btn ghost lg"><span data-i18n="hero.cta2">Villen ansehen</span></a>
     </div>
   </div>
@@ -796,7 +814,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     <div class="stat-row">
       <div class="stat rv"><b>10</b><span data-i18n="stat.villas">Freistehende Villen</span></div>
       <div class="stat rv d1"><b>1</b><span data-i18n="stat.volcano">Vulkan im Blick</span></div>
-      <div class="stat rv d2"><b data-i18n="stat.openv">1. Dez. 2026</b><span data-i18n="stat.open">Eröffnung</span></div>
+      <div class="stat rv d2"><b data-i18n="stat.openv">Dec 2026</b><span data-i18n="stat.open">Eröffnung</span></div>
     </div>
   </div>
 </section>
@@ -807,11 +825,11 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     <div class="signup-inner">
       <p class="kicker center rv" data-i18n="sub.kicker">Warteliste</p>
       <h2 class="display rv d1" data-i18n="sub.title">Sei vor <em>allen anderen dabei.</em></h2>
-      <p class="lede rv d2" data-i18n="sub.p">Wir eröffnen am 1. Dezember 2026, und die ersten Reservierungen gehen zuerst an diese Liste. Hinterlasse deine E-Mail und du bist unter den Ersten, die es erfahren.</p>
+      <p class="lede rv d2" data-i18n="sub.p">Wir eröffnen im Dezember 2026, und die ersten Reservierungen gehen zuerst an diese Liste. Hinterlasse deine E-Mail und du bist unter den Ersten, die es erfahren.</p>
 
       <form class="signup-form rv d3" id="subForm" novalidate>
         <input type="email" id="subEmail" name="email" autocomplete="email" required
-               placeholder="du@email.com" data-i18n-ph="sub.ph" aria-label="Email">
+               placeholder="tu@correo.com" data-i18n-ph="sub.ph" aria-label="Email">
         <button type="submit" id="subBtn"><span data-i18n="sub.cta">Eintragen</span></button>
       </form>
 
@@ -948,7 +966,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     <div class="book-grid">
       <div>
         <p class="kicker rv" data-i18n="book.kicker">Reservierungen</p>
-        <h2 class="display rv d1" data-i18n="book.title">Eröffnung <em>1. Dezember 2026.</em></h2>
+        <h2 class="display rv d1" data-i18n="book.title">Eröffnung <em>Dezember 2026.</em></h2>
         <p class="lede rv d2" style="margin-top:clamp(20px,2.4vw,32px)" data-i18n="book.p1">Wir öffnen die Liste für die ersten Reservierungen. Hinterlasse uns deine Daten und wir schreiben dir zuerst, bevor es in den Verkauf geht.</p>
 
         <div style="margin-top:clamp(30px,3.6vw,48px)">
@@ -989,7 +1007,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
       </div>
 
       <div class="rv d2">
-        <form id="bookForm" novalidate aria-label="Reservierungsformular" data-i18n-aria="form.label">
+        <form id="bookForm" novalidate aria-label="Formulario de reservas" data-i18n-aria="form.label">
           <div class="f2">
             <div class="field"><label for="bookingName" data-i18n="form.name">Name</label><input id="bookingName" type="text" name="nombre" required></div>
             <div class="field"><label for="bookingEmail" data-i18n="form.email">E-Mail</label><input id="bookingEmail" type="email" name="email" required></div>
@@ -1024,8 +1042,17 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
         </form>
         <div class="form-ok" id="formOk" role="status" aria-live="polite">
           <p id="formMessage" data-i18n="form.ok">Fertig. Wir melden uns bald.</p>
+          <!-- ⚠️ Estos dos botones aparecen DESPUÉS de enviar, nunca al lado del
+               botón Enviar. Es la misma regla que se aprendió en Bike & Bed: si
+               el atajo está al lado, media gente se va por ahí sin dejar el
+               dato y el lead no queda en el CRM. Primero se guarda, después se
+               ofrece el atajo. -->
+          <div class="whatsapp-action" id="reservarAction" hidden>
+            <a class="btn solid lg" id="reservarCta" data-i18n="form.reservar">Verfügbarkeit ansehen und buchen</a>
+            <p class="whatsapp-help" data-i18n="form.reservarHelp">Öffnet den Kalender mit Ihren Daten bereits eingetragen.</p>
+          </div>
           <div class="whatsapp-action" id="whatsappAction" hidden>
-            <a class="btn solid lg" id="whatsappCta" target="_blank" rel="noopener noreferrer" data-i18n="form.whatsapp">Auf WhatsApp fortfahren</a>
+            <a class="btn ghost lg" id="whatsappCta" target="_blank" rel="noopener noreferrer" data-i18n="form.whatsapp">Auf WhatsApp fortfahren</a>
             <p class="whatsapp-help" data-i18n="form.whatsappHelp">WhatsApp wird mit einer vorbereiteten Nachricht geöffnet. Prüfe sie und tippe auf Senden.</p>
           </div>
         </div>
@@ -1064,7 +1091,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
         <a href="#villas" data-i18n="nav.villas">Villen</a>
         <a href="#experiencias" data-i18n="nav.exp">Erlebnisse</a>
         <a href="#lugar" data-i18n="nav.place">Der Ort</a>
-        <a href="#reservar" data-i18n="nav.book">Buchen</a>
+        <a href="#reservar" data-i18n="nav.book" data-reservar>Buchen</a>
       </div>
       <div class="foot-col">
         <h4 data-i18n="foot.contact">Kontakt</h4>
@@ -1093,9 +1120,9 @@ es:{
  "man.title":"Un lugar para llegar a ser <em>quien fuiste creado para ser.</em>",
  "man.p1":"Humaya no es un hotel más en La Fortuna. Es una pausa deliberada: arquitectura que desaparece dentro del bosque, silencio de verdad, y todo lo que el cuerpo y la cabeza necesitan para volver a arrancar.",
  "man.p2":"Al frente, el Volcán Arenal. Alrededor, el verde que solo existe aquí. Adentro, diez villas pensadas para una sola cosa: que te vayás distinto de como llegaste.",
- "stat.villas":"Villas independientes","stat.volcano":"Volcán al frente","stat.open":"Apertura","stat.openv":"1 Dic 2026",
+ "stat.villas":"Villas independientes","stat.volcano":"Volcán al frente","stat.open":"Apertura","stat.openv":"Dic 2026",
  "sub.kicker":"Lista de espera","sub.title":"Entrá antes <em>que todos.</em>",
- "sub.p":"Abrimos el 1 de diciembre de 2026 y las primeras reservas salen primero para esta lista. Dejá tu correo y sos de los primeros en saber.",
+ "sub.p":"Abrimos en diciembre de 2026 y las primeras reservas salen primero para esta lista. Dejá tu correo y sos de los primeros en saber.",
  "sub.ph":"tu@correo.com","sub.cta":"Quiero entrar","sub.sending":"Mandando…",
  "sub.note":"Te llega un correo para confirmar que sos vos. Un clic y quedás adentro. Te podés salir cuando querás.",
  "sub.ok":"Listo. Revisá tu correo y hacé clic en el enlace para confirmar.",
@@ -1130,13 +1157,15 @@ es:{
  "exp.c4t":"Cocina de origen","exp.c4p":"Producto de la zona, cocinado simple. Nada que no reconozcás.",
  "exp.c5t":"Recuperación","exp.c5p":"Yoga, estiramiento y descanso de verdad. El cuerpo también entrena descansando.",
  "exp.c6t":"Noches de volcán","exp.c6p":"Cielo abierto, fuego y nada más. La mejor parte del día.",
- "book.kicker":"Reservas","book.title":"Apertura <em>1 de diciembre de 2026.</em>",
+ "book.kicker":"Reservas","book.title":"Apertura <em>diciembre 2026.</em>",
  "book.p1":"Estamos abriendo la lista de las primeras reservas. Dejanos tus datos y te escribimos a vos primero, antes de que salga a la venta.",
  "book.where":"Dónde","book.contact":"Contacto","book.langs":"Te atendemos en","book.follow":"Seguinos",
  "form.label":"Formulario de reservas","form.name":"Nombre","form.email":"Email","form.phone":"WhatsApp / teléfono","form.phoneBad":"Ese número no se ve válido. Usá 8 dígitos de Costa Rica o incluí el prefijo internacional.","form.in":"Llegada","form.out":"Salida",
  "form.guests":"Personas","form.more":"5 o más","form.lang":"Idioma preferido","form.msg":"Contanos algo",
  "form.send":"Enviar","form.sending":"Enviando…","form.note":"Te escribimos en menos de 48 horas. Sin spam, sin listas raras.",
- "form.ok":"Listo. Te escribimos pronto.","form.whatsapp":"Continuar por WhatsApp","form.whatsappHelp":"Se abrirá WhatsApp con un mensaje listo. Revisalo y presioná Enviar.",
+ "form.ok":"Listo. Te escribimos pronto.","form.reservar":"Ver disponibilidad y reservar",
+"form.reservarHelp":"Te abre el calendario con tus fechas ya puestas.",
+"form.whatsapp":"Continuar por WhatsApp","form.whatsappHelp":"Se abrirá WhatsApp con un mensaje listo. Revisalo y presioná Enviar.",
  "foot.tag":"Un lugar para llegar a ser quien fuiste creado para ser. La Fortuna, Costa Rica.",
  "foot.nav":"Navegación","foot.contact":"Contacto"
 },
@@ -1148,9 +1177,9 @@ en:{
  "man.title":"A place to become <em>who you were created to be.</em>",
  "man.p1":"Humaya is not one more hotel in La Fortuna. It is a deliberate pause: architecture that disappears into the forest, real silence, and everything the body and the mind need to start again.",
  "man.p2":"In front of you, the Arenal Volcano. All around, a green that exists nowhere else. Inside, ten villas built for one thing only: that you leave different from how you arrived.",
- "stat.villas":"Standalone villas","stat.volcano":"Volcano in front","stat.open":"Opening","stat.openv":"Dec 1, 2026",
+ "stat.villas":"Standalone villas","stat.volcano":"Volcano in front","stat.open":"Opening","stat.openv":"Dec 2026",
  "sub.kicker":"Waiting list","sub.title":"Get in <em>before everyone.</em>",
- "sub.p":"We open on December 1, 2026 and the first reservations go to this list first. Leave your email and you are among the first to know.",
+ "sub.p":"We open in December 2026 and the first reservations go to this list first. Leave your email and you are among the first to know.",
  "sub.ph":"you@email.com","sub.cta":"Join the list","sub.sending":"Sending…",
  "sub.note":"You get an email to confirm it is really you. One click and you are in. You can leave whenever you want.",
  "sub.ok":"Done. Check your inbox and click the link to confirm.",
@@ -1185,13 +1214,15 @@ en:{
  "exp.c4t":"Kitchen of origin","exp.c4p":"Local produce, cooked simply. Nothing you cannot recognise.",
  "exp.c5t":"Recovery","exp.c5p":"Yoga, stretching and real rest. The body also trains while resting.",
  "exp.c6t":"Volcano nights","exp.c6p":"Open sky, fire and nothing else. The best part of the day.",
- "book.kicker":"Reservations","book.title":"Opening <em>December 1, 2026.</em>",
+ "book.kicker":"Reservations","book.title":"Opening <em>December 2026.</em>",
  "book.p1":"We are opening the list for the first reservations. Leave us your details and we write to you first, before it goes on sale.",
  "book.where":"Where","book.contact":"Contact","book.langs":"We speak","book.follow":"Follow us",
  "form.label":"Booking form","form.name":"Name","form.email":"Email","form.phone":"WhatsApp / phone","form.phoneBad":"That number doesn't look valid. Use 8 Costa Rican digits or include the international prefix.","form.in":"Arrival","form.out":"Departure",
  "form.guests":"Guests","form.more":"5 or more","form.lang":"Preferred language","form.msg":"Tell us something",
  "form.send":"Send","form.sending":"Sending…","form.note":"We reply within 48 hours. No spam, no strange lists.",
- "form.ok":"Done. We will write to you soon.","form.whatsapp":"Continue on WhatsApp","form.whatsappHelp":"WhatsApp will open with a ready-to-send message. Review it and press Send.",
+ "form.ok":"Done. We will write to you soon.","form.reservar":"See availability and book",
+"form.reservarHelp":"Opens the calendar with your dates already filled in.",
+"form.whatsapp":"Continue on WhatsApp","form.whatsappHelp":"WhatsApp will open with a ready-to-send message. Review it and press Send.",
  "foot.tag":"A place to become who you were created to be. La Fortuna, Costa Rica.",
  "foot.nav":"Navigation","foot.contact":"Contact"
 },
@@ -1203,9 +1234,9 @@ de:{
  "man.title":"Ein Ort, um zu werden, <em>wofür du geschaffen wurdest.</em>",
  "man.p1":"Humaya ist nicht noch ein Hotel in La Fortuna. Es ist eine bewusste Pause: Architektur, die im Wald verschwindet, echte Stille und alles, was Körper und Kopf brauchen, um neu zu beginnen.",
  "man.p2":"Vor dir der Vulkan Arenal. Ringsum ein Grün, das es nur hier gibt. Drinnen zehn Villen für eine einzige Sache: dass du anders gehst, als du gekommen bist.",
- "stat.villas":"Freistehende Villen","stat.volcano":"Vulkan im Blick","stat.open":"Eröffnung","stat.openv":"1. Dez. 2026",
+ "stat.villas":"Freistehende Villen","stat.volcano":"Vulkan im Blick","stat.open":"Eröffnung","stat.openv":"Dec 2026",
  "sub.kicker":"Warteliste","sub.title":"Sei vor <em>allen anderen dabei.</em>",
- "sub.p":"Wir eröffnen am 1. Dezember 2026, und die ersten Reservierungen gehen zuerst an diese Liste. Hinterlasse deine E-Mail und du bist unter den Ersten, die es erfahren.",
+ "sub.p":"Wir eröffnen im Dezember 2026, und die ersten Reservierungen gehen zuerst an diese Liste. Hinterlasse deine E-Mail und du bist unter den Ersten, die es erfahren.",
  "sub.ph":"du@email.com","sub.cta":"Eintragen","sub.sending":"Wird gesendet…",
  "sub.note":"Du bekommst eine E-Mail zur Bestätigung. Ein Klick und du bist dabei. Du kannst dich jederzeit wieder abmelden.",
  "sub.ok":"Fertig. Schau in dein Postfach und klicke auf den Link.",
@@ -1240,13 +1271,15 @@ de:{
  "exp.c4t":"Küche der Region","exp.c4p":"Regionale Produkte, einfach gekocht. Nichts, was du nicht erkennst.",
  "exp.c5t":"Regeneration","exp.c5p":"Yoga, Dehnen und echte Ruhe. Der Körper trainiert auch im Ruhen.",
  "exp.c6t":"Vulkannächte","exp.c6p":"Offener Himmel, Feuer und sonst nichts. Der beste Teil des Tages.",
- "book.kicker":"Reservierungen","book.title":"Eröffnung <em>1. Dezember 2026.</em>",
+ "book.kicker":"Reservierungen","book.title":"Eröffnung <em>Dezember 2026.</em>",
  "book.p1":"Wir öffnen die Liste für die ersten Reservierungen. Hinterlasse uns deine Daten und wir schreiben dir zuerst, bevor es in den Verkauf geht.",
  "book.where":"Wo","book.contact":"Kontakt","book.langs":"Wir sprechen","book.follow":"Folge uns",
  "form.label":"Reservierungsformular","form.name":"Name","form.email":"E-Mail","form.phone":"WhatsApp / Telefon","form.phoneBad":"Diese Nummer scheint ungültig zu sein. Verwende 8 costa-ricanische Ziffern oder gib die internationale Vorwahl an.","form.in":"Anreise","form.out":"Abreise",
  "form.guests":"Personen","form.more":"5 oder mehr","form.lang":"Bevorzugte Sprache","form.msg":"Erzähl uns etwas",
  "form.send":"Senden","form.sending":"Wird gesendet…","form.note":"Wir antworten innerhalb von 48 Stunden. Kein Spam, keine seltsamen Listen.",
- "form.ok":"Fertig. Wir melden uns bald.","form.whatsapp":"Auf WhatsApp fortfahren","form.whatsappHelp":"WhatsApp wird mit einer vorbereiteten Nachricht geöffnet. Prüfe sie und tippe auf Senden.",
+ "form.ok":"Fertig. Wir melden uns bald.","form.reservar":"Verfügbarkeit ansehen und buchen",
+"form.reservarHelp":"Öffnet den Kalender mit Ihren Daten bereits eingetragen.",
+"form.whatsapp":"Auf WhatsApp fortfahren","form.whatsappHelp":"WhatsApp wird mit einer vorbereiteten Nachricht geöffnet. Prüfe sie und tippe auf Senden.",
  "foot.tag":"Ein Ort, um zu werden, wofür du geschaffen wurdest. La Fortuna, Costa Rica.",
  "foot.nav":"Navigation","foot.contact":"Kontakt"
 },
@@ -1258,9 +1291,9 @@ fr:{
  "man.title":"Un lieu pour devenir <em>qui vous avez été créé pour être.</em>",
  "man.p1":"Humaya n'est pas un hôtel de plus à La Fortuna. C'est une pause délibérée : une architecture qui disparaît dans la forêt, un vrai silence, et tout ce dont le corps et la tête ont besoin pour repartir.",
  "man.p2":"Devant vous, le volcan Arenal. Autour, un vert qui n'existe qu'ici. À l'intérieur, dix villas pensées pour une seule chose : que vous repartiez autrement que vous êtes arrivé.",
- "stat.villas":"Villas indépendantes","stat.volcano":"Volcan en face","stat.open":"Ouverture","stat.openv":"1 déc. 2026",
+ "stat.villas":"Villas indépendantes","stat.volcano":"Volcan en face","stat.open":"Ouverture","stat.openv":"Dec 2026",
  "sub.kicker":"Liste d'attente","sub.title":"Entrez avant <em>tout le monde.</em>",
- "sub.p":"Nous ouvrons le 1er décembre 2026 et les premières réservations partent d'abord vers cette liste. Laissez votre email et vous serez parmi les premiers informés.",
+ "sub.p":"Nous ouvrons en décembre 2026 et les premières réservations partent d'abord vers cette liste. Laissez votre email et vous serez parmi les premiers informés.",
  "sub.ph":"vous@email.com","sub.cta":"Je m'inscris","sub.sending":"Envoi…",
  "sub.note":"Vous recevez un email pour confirmer que c'est bien vous. Un clic et vous y êtes. Vous pouvez vous désinscrire quand vous voulez.",
  "sub.ok":"C'est fait. Consultez votre boîte mail et cliquez sur le lien.",
@@ -1295,13 +1328,15 @@ fr:{
  "exp.c4t":"Cuisine du terroir","exp.c4p":"Produits de la région, cuisinés simplement. Rien que vous ne reconnaissiez.",
  "exp.c5t":"Récupération","exp.c5p":"Yoga, étirements et vrai repos. Le corps s'entraîne aussi en se reposant.",
  "exp.c6t":"Nuits du volcan","exp.c6p":"Ciel ouvert, feu et rien d'autre. Le meilleur moment de la journée.",
- "book.kicker":"Réservations","book.title":"Ouverture <em>1er décembre 2026.</em>",
+ "book.kicker":"Réservations","book.title":"Ouverture <em>décembre 2026.</em>",
  "book.p1":"Nous ouvrons la liste des premières réservations. Laissez-nous vos coordonnées et nous vous écrivons en premier, avant la mise en vente.",
  "book.where":"Où","book.contact":"Contact","book.langs":"Nous parlons","book.follow":"Suivez-nous",
  "form.label":"Formulaire de réservation","form.name":"Nom","form.email":"Email","form.phone":"WhatsApp / téléphone","form.phoneBad":"Ce numéro ne semble pas valide. Utilisez 8 chiffres costariciens ou ajoutez l'indicatif international.","form.in":"Arrivée","form.out":"Départ",
  "form.guests":"Personnes","form.more":"5 ou plus","form.lang":"Langue préférée","form.msg":"Dites-nous un mot",
  "form.send":"Envoyer","form.sending":"Envoi…","form.note":"Nous répondons sous 48 heures. Pas de spam, pas de listes étranges.",
- "form.ok":"C'est fait. Nous vous écrivons bientôt.","form.whatsapp":"Continuer sur WhatsApp","form.whatsappHelp":"WhatsApp s'ouvrira avec un message prêt à envoyer. Vérifiez-le puis appuyez sur Envoyer.",
+ "form.ok":"C'est fait. Nous vous écrivons bientôt.","form.reservar":"Voir les disponibilités et réserver",
+"form.reservarHelp":"Ouvre le calendrier avec vos dates déjà renseignées.",
+"form.whatsapp":"Continuer sur WhatsApp","form.whatsappHelp":"WhatsApp s'ouvrira avec un message prêt à envoyer. Vérifiez-le puis appuyez sur Envoyer.",
  "foot.tag":"Un lieu pour devenir qui vous avez été créé pour être. La Fortuna, Costa Rica.",
  "foot.nav":"Navigation","foot.contact":"Contact"
 }
@@ -1457,7 +1492,30 @@ const formOk = document.getElementById("formOk");
 const formMessage = document.getElementById("formMessage");
 const whatsappAction = document.getElementById("whatsappAction");
 const whatsappCta = document.getElementById("whatsappCta");
-const HUMAYA_WHATSAPP_NUMBER = "50664417187";
+const reservarAction = document.getElementById("reservarAction");
+const reservarCta = document.getElementById("reservarCta");
+
+/** El motor de reservas, con las fechas que la persona ACABA de escribir.
+ *
+ *  ⚠️ Por qué una página y no el panel lateral del botón de arriba: el
+ *  componente de Cloudbeds lee `checkin`, `checkout` y `adults` de la
+ *  dirección **solo al cargar**. Al panel, que ya está cargado, no hay cómo
+ *  pasarle las fechas después. `reservar.html` sí se abre de nuevo, así que
+ *  llega con el calendario puesto y la persona no vuelve a escribir nada.
+ *
+ *  ⚠️ `personas` NO es un número: el formulario guarda la etiqueta del idioma
+ *  («5 o más», «5 or more», «5 ou plus»). Se saca el número y si no se puede,
+ *  no se manda. */
+function urlDeReserva(p){
+  const u = new URL("reservar.html", location.href);
+  if(p.arrival)   u.searchParams.set("checkin",  p.arrival);
+  if(p.departure) u.searchParams.set("checkout", p.departure);
+  const n = /^(\d{1,2})/.exec(String(p.guests || "").trim());
+  if(n) u.searchParams.set("adults", n[1]);
+  u.searchParams.set("utm_source", "formulario-humaya");
+  return u.toString();
+}
+const HUMAYA_WHATSAPP_NUMBER = "50664446939";   // Tony, 1 de noviembre: es el de la tarjeta de Cloudbeds
 const HUMAYA_WHATSAPP_MESSAGE = "Hola, quiero reservar en Humaya.";
 let bookingRequestId = null;
 let bookingPayloadSignature = null;
@@ -1482,6 +1540,8 @@ form.addEventListener("submit", async e=>{
   formOk.classList.remove("bad");
   whatsappAction.hidden = true;
   whatsappCta.removeAttribute("href");
+  reservarAction.hidden = true;
+  reservarCta.removeAttribute("href");
 
   const req = form.querySelectorAll("[required]");
   let ok = true;
@@ -1541,6 +1601,8 @@ form.addEventListener("submit", async e=>{
       formMessage.dataset.i18n = "form.ok";
       formMessage.textContent = dict["form.ok"];
       formOk.classList.remove("bad");
+      reservarCta.href = urlDeReserva(payload);
+      reservarAction.hidden = false;
       whatsappCta.href = bookingWhatsappUrl();
       whatsappAction.hidden = false;
       form.classList.add("sent");
@@ -1563,6 +1625,45 @@ form.addEventListener("submit", async e=>{
     btn.disabled = false; label.textContent = original;
   }
 });
+</script>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     EL MOTOR DE RESERVAS, EN PANEL LATERAL
+
+     Tony, 31 de octubre: «es mejor que lo dejes como estaba antes y que en
+     el botón Book hagamos la integración con Cloudbeds, la ventana pop-up
+     que sale hacia la derecha» — el motor metido DENTRO de la página
+     rompía el diseño del sitio.
+
+     Cloudbeds da `<cb-book-now-button>`, que pinta SU PROPIO botón («Book
+     Now», azul, con su tipografía). Ese botón no puede verse: el de la
+     página es el dorado de HUMAYA. Así que el suyo vive acá escondido y
+     nosotros se lo clickeamos.
+
+     ⚠️ Si el motor no cargó —script bloqueado, sin red, dominio sacado de
+     «Dominios aprobados»— NO se hace preventDefault, así que el enlace hace
+     lo de siempre y baja al formulario. Un botón que no hace nada sería
+     peor que uno que hace lo de antes.
+     ───────────────────────────────────────────────────────────────────── -->
+<div id="cbLanzador" aria-hidden="true"
+     style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">
+  <cb-book-now-button property-code="mSMI0w"></cb-book-now-button>
+</div>
+<script>
+(function(){
+  function elBotonDeCloudbeds(){
+    var caja = document.getElementById('cbLanzador');
+    return caja ? caja.querySelector('.cb-book-now-button') : null;
+  }
+  document.querySelectorAll('[data-reservar]').forEach(function(a){
+    a.addEventListener('click', function(ev){
+      var b = elBotonDeCloudbeds();
+      if (!b) return;            // sin motor: que baje al formulario
+      ev.preventDefault();
+      b.click();
+    });
+  });
+})();
 </script>
 </body>
 </html>
