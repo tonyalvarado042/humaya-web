@@ -6,6 +6,12 @@ humaya-v*.zip
 # Esta propuesta todavía no la aprueba Tony — no se publica.
 propuesta-humaya-lista-de-espera/
 
-# Capturas de trabajo, no son del sitio.
+# Artefactos de trabajo, no parte del sitio.
 preview-humaya.jpg
 sitio-vivo.jpg
+.vite/
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store

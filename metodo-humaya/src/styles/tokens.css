@@ -1,0 +1,171 @@
+@import 'tailwindcss';
+
+/* Fuentes de marca. Jost variable para el texto, Cormorant Garamond para los títulos
+   (el italic 500 lo usa la cita del perfil del huésped en recepción). */
+@import '@fontsource-variable/jost';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/cormorant-garamond/500-italic.css';
+
+/*
+ * Tokens de marca de Humaya.
+ *
+ * Los dos temas usan los mismos nombres semánticos: guest (oscuro) en /app y
+ * staff (claro) en /staff. El tema se activa con data-theme en el contenedor
+ * del área, no en <html>, para poder mostrar los dos en paralelo en /dev/ui.
+ *
+ * Regla de ARCHITECTURE.md: ningún color hex suelto fuera de este archivo.
+ */
+
+@layer base {
+  [data-theme='guest'] {
+    --bg: #0a0a0a;
+    --surface: #151412;
+    --surface-sunken: #111010;
+    --surface-raised: #1e1c19;
+
+    --line: #26231f;
+    --line-soft: #1e1c19;
+    --line-strong: #3a352e;
+
+    --text: #f2ede4;
+    --muted: #a39b8e;
+    --muted-soft: #8c8479;
+    --disabled: #6a635a;
+
+    --gold: #c8a565;
+    --gold-bright: #e3c58a;
+    --gold-dim: #7a6541;
+    --gold-track: #2a2723;
+    --on-gold: #0a0a0a;
+
+    --gold-on-ink: #e3c58a;
+    --nav: #0e0d0c;
+    --ink: #151412;
+    --on-ink: #f2ede4;
+    --ink-muted: #a39b8e;
+
+    --celebration: #2a2418;
+    --on-celebration: #e3c58a;
+  }
+
+  [data-theme='staff'] {
+    --bg: #f4f0e8;
+    --surface: #ffffff;
+    --surface-sunken: #fbf9f4;
+    --surface-raised: #ffffff;
+
+    --line: #e2dbcd;
+    --line-soft: #efeae0;
+    --line-strong: #d3cab8;
+
+    --text: #1a1814;
+    --muted: #6b6358;
+    --muted-soft: #736a5c;
+    --disabled: #8c8478;
+
+    --gold: #87672e;
+    --gold-bright: #6e5321;
+    --gold-dim: #c8a565;
+    --gold-track: #eae6df;
+    --on-gold: #1a1814;
+
+    --gold-on-ink: #e3c58a;
+    --nav: #0a0a0a;
+    --ink: #1a1814;
+    --on-ink: #f4f0e8;
+    --ink-muted: #c9c0b1;
+
+    --celebration: #efe3c8;
+    --on-celebration: #6e5321;
+  }
+
+  /* Tonos de estado: iguales en los dos temas salvo celebration, que arriba
+     se redefine para que se lea sobre el fondo oscuro de la app del huésped. */
+  [data-theme] {
+    --alert: #fbe2d8;
+    --on-alert: #9a3412;
+    --info: #e3eaf1;
+    --on-info: #2f4a66;
+    --success: #e2ecdc;
+    --on-success: #2f5b2a;
+    --warning: #f3e6cc;
+    --on-warning: #7a5516;
+    --neutral: #eae6df;
+    --on-neutral: #57504a;
+  }
+}
+
+@theme inline {
+  /* `inline` hace que bg-surface emita var(--surface) y se resuelva por ámbito,
+     así una misma clase sirve en los dos temas. */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-raised: var(--surface-raised);
+
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-line-strong: var(--line-strong);
+
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-muted-soft: var(--muted-soft);
+  --color-disabled: var(--disabled);
+
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-gold-dim: var(--gold-dim);
+  --color-gold-track: var(--gold-track);
+  --color-on-gold: var(--on-gold);
+
+  --color-gold-on-ink: var(--gold-on-ink);
+  --color-nav: var(--nav);
+  --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
+  --color-ink-muted: var(--ink-muted);
+
+  --color-alert: var(--alert);
+  --color-on-alert: var(--on-alert);
+  --color-celebration: var(--celebration);
+  --color-on-celebration: var(--on-celebration);
+  --color-info: var(--info);
+  --color-on-info: var(--on-info);
+  --color-success: var(--success);
+  --color-on-success: var(--on-success);
+  --color-warning: var(--warning);
+  --color-on-warning: var(--on-warning);
+  --color-neutral: var(--neutral);
+  --color-on-neutral: var(--on-neutral);
+
+  --font-sans: 'Jost Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Cormorant Garamond', ui-serif, Georgia, serif;
+
+  --radius-card: 14px;
+  --radius-bubble: 18px;
+  --radius-tag: 6px;
+  --radius-pill: 999px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    margin: 0;
+  }
+
+  /* Foco visible en todo el proyecto, una sola vez. */
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+}
+
+@utility text-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}

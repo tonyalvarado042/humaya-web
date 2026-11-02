@@ -10,13 +10,13 @@ Cuatro idiomas, cada uno con su propia URL real: **ES** (`/`) · **EN**
 depende de que el buscador ejecute JS) y su propio `hreflang`. Eslogan fijo
 en inglés: *Become more human*.
 
-| | |
-|---|---|
-| **En línea** | <https://stayhumaya.com> |
-| **Hospedaje** | SiteGround · IP `34.174.253.132` |
-| **Dominio** | GoDaddy, delegado a `ns1.siteground.net` / `ns2.siteground.net` |
-| **Repo** | <https://github.com/tonyalvarado042/humaya-web> |
-| **Redes** | [@stayhumaya](https://instagram.com/stayhumaya) en Instagram y Facebook |
+|               |                                                                         |
+| ------------- | ----------------------------------------------------------------------- |
+| **En línea**  | <https://stayhumaya.com>                                                |
+| **Hospedaje** | SiteGround · IP `34.174.253.132`                                        |
+| **Dominio**   | GoDaddy, delegado a `ns1.siteground.net` / `ns2.siteground.net`         |
+| **Repo**      | <https://github.com/tonyalvarado042/humaya-web>                         |
+| **Redes**     | [@stayhumaya](https://instagram.com/stayhumaya) en Instagram y Facebook |
 
 ```
 humaya-web/
@@ -28,13 +28,37 @@ humaya-web/
 ├── robots.txt
 ├── sitemap.xml
 ├── llms.txt            ← para que los motores de IA citen datos correctos
-└── assets/img/         ← logos e imágenes (compartidas por los 4 idiomas)
-    └── _extra/         ← fotos de la brand board que no se usan
+├── assets/img/         ← logos e imágenes (compartidas por los 4 idiomas)
+│   └── _extra/         ← fotos de la brand board que no se usan
+└── metodo-humaya/      ← app del huésped, recepción y PWA (React/Vite)
 ```
 
 > Las 4 páginas comparten el mismo CSS y el mismo motor de traducciones
 > (`I18N` dentro del `<script>`) — un texto que cambia, cambia en los 4
 > archivos. Ver [[humaya-sitio-web]] en el cerebro para cómo se generaron.
+
+## Método Humaya
+
+`metodo-humaya/` es una aplicación independiente dentro del mismo repositorio. Su destino es
+`https://experience.stayhumaya.com`, con un document root separado para aislar el service
+worker y evitar que su `index.html` reemplace el del sitio público. El subdominio y su SSL
+todavía deben crearse.
+
+Para correrla y verificarla:
+
+```bash
+npm --prefix metodo-humaya install
+npm --prefix metodo-humaya run dev
+npm --prefix metodo-humaya run lint
+npm --prefix metodo-humaya run typecheck
+npm --prefix metodo-humaya run test
+npm --prefix metodo-humaya run build
+npm --prefix metodo-humaya run e2e
+```
+
+Las reglas completas están en `AGENTS.md`; la arquitectura y el estado del MVP, dentro de
+`metodo-humaya/`. El workflow del MVP guarda `metodo-humaya-dist`, un artefacto desplegable;
+no debe extraerse sobre el document root de la landing.
 
 ## Publicar un cambio
 
@@ -75,21 +99,37 @@ Proyecto **`mlhhhwbgymobcxiklnoz`** · `https://mlhhhwbgymobcxiklnoz.supabase.co
 Se guarda como `pending`, sale un correo con un enlace, y al hacer clic pasa a
 `confirmed`. Así la lista queda limpia para migrar a Mailchimp cuando se quiera.
 
-| Pieza | Qué hace |
-|---|---|
-| tabla `subscribers` | email, idioma, origen, estado, token, IP, fechas |
-| función `subscribe` | `POST` → guarda en `pending` y manda el correo |
-| función `confirm` | `GET ?token=…` → marca `confirmed`, página con la marca |
+| Pieza               | Qué hace                                                |
+| ------------------- | ------------------------------------------------------- |
+| tabla `subscribers` | email, idioma, origen, estado, token, IP, fechas        |
+| función `subscribe` | `POST` → guarda en `pending` y manda el correo          |
+| función `confirm`   | `GET ?token=…` → marca `confirmed`, página con la marca |
 
 ### 2 · Solicitudes de reserva
 
-El formulario de abajo del sitio. Guarda la solicitud, **le avisa a Humaya** por
-correo y **le acusa recibo al huésped** en su idioma.
+El formulario de abajo del sitio. Guarda la solicitud, crea o actualiza el contacto
+en CRM Tony con la etiqueta `reserva-stayhumaya-2026`, **le avisa a Humaya** por
+correo y **le acusa recibo al huésped** en su idioma. Cuando todo eso termina bien,
+muestra un botón para que la persona continúe la conversación por WhatsApp; la
+landing no llama a Maze ni abre WhatsApp antes de confirmar el registro.
 
-| Pieza | Qué hace |
-|---|---|
-| tabla `booking_requests` | nombre, email, fechas, personas, idioma, mensaje, estado |
-| función `book` | `POST` → guarda + los dos correos |
+| Pieza                    | Qué hace                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| tabla `booking_requests` | nombre, email, WhatsApp, fechas, personas, idioma, mensaje, estado y vínculo al CRM |
+| función `book`           | `POST` → reserva + CRM atómicos; después intenta los dos correos                           |
+
+`book` acepta un `request_id` UUID opcional. La landing lo genera y lo reutiliza
+al reintentar el mismo contenido, para no duplicar reservas, notas ni correos. La
+función SQL que toca el CRM solo admite `service_role`: ninguna credencial privada
+llega al navegador ni vive en este repositorio. El contrato acepta `phone` como
+opcional para no romper una landing anterior durante el despliegue escalonado; el
+formulario actual sí lo exige y admite ocho dígitos de Costa Rica o formato
+internacional con `+`.
+
+El CTA de éxito construye en el navegador una URL pública hacia
+`wa.me/50664417187` con el mensaje exacto `Hola, quiero reservar en Humaya.`. La
+persona todavía debe presionar **Enviar** dentro de WhatsApp; Maze detectará ese
+mensaje por separado.
 
 Estados: `nueva` → `leida` → `contestada` (o `descartada`).
 
@@ -110,7 +150,8 @@ Orígenes permitidos: `stayhumaya.com`, `www.stayhumaya.com` y localhost.
 select email, lang, status, created_at, confirmed_at
 from public.subscribers order by created_at desc;
 
-select name, email, arrival, departure, guests, message, status, created_at
+select name, email, phone, arrival, departure, guests, message, status,
+       crm_contact_id, crm_synced_at, created_at
 from public.booking_requests where status = 'nueva' order by created_at desc;
 ```
 
