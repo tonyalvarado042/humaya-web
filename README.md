@@ -20,18 +20,22 @@ en inglés: *Become more human*.
 
 ```
 humaya-web/
-├── index.html          ← versión en español (HTML + CSS + JS en un solo archivo)
-├── en/index.html       ← misma página, en inglés
-├── de/index.html       ← misma página, en alemán
-├── fr/index.html       ← misma página, en francés
-├── .htaccess           ← HTTPS, quitar www, gzip, caché
-├── robots.txt
-├── sitemap.xml
-├── llms.txt            ← para que los motores de IA citen datos correctos
-├── assets/img/         ← logos e imágenes (compartidas por los 4 idiomas)
-│   └── _extra/         ← fotos de la brand board que no se usan
-└── metodo-humaya/      ← app del huésped, recepción y PWA (React/Vite)
+├── sitio/              ← EL SITIO PÚBLICO (esto es lo que publica Cloudflare Pages)
+│   ├── index.html          ← español, en /
+│   ├── en/ de/ fr/         ← un index.html por idioma, con su hreflang
+│   ├── confirmado.html     ← a donde cae el enlace del correo de confirmación
+│   ├── _headers            ← caché y cabeceras (reemplaza al .htaccess)
+│   ├── _redirects          ← quitar el www (reemplaza al .htaccess)
+│   ├── .htaccess           ← solo sirve si se vuelve a SiteGround; Pages lo ignora
+│   ├── robots.txt · sitemap.xml · llms.txt
+│   └── assets/img/         ← logos e imágenes, compartidas por los 4 idiomas
+│       └── _extra/         ← fotos de la brand board que no se usan
+└── metodo-humaya/      ← app del huésped, recepción y PWA (React/Vite) → Vercel
 ```
+
+> **Importante:** el sitio vive en `sitio/` precisamente para que Cloudflare
+> Pages publique **solo eso**. Si la landing estuviera en la raíz, Pages
+> serviría también el código fuente de `metodo-humaya/`.
 
 > Las 4 páginas comparten el mismo CSS y el mismo motor de traducciones
 > (`I18N` dentro del `<script>`) — un texto que cambia, cambia en los 4
@@ -62,15 +66,20 @@ no debe extraerse sobre el document root de la landing.
 
 ## Publicar un cambio
 
-**No hay despliegue automático.** El sitio se sube a mano:
+El sitio se despliega **desde este repo** con Cloudflare Pages: lo que entre a
+`main` dentro de `sitio/` se publica solo. Ya no hay que armar un ZIP ni entrar
+al File Manager de SiteGround.
 
-1. Empaquetar `index.html`, `en/`, `de/`, `fr/`, `.htaccess`, `assets/img/`,
-   `robots.txt`, `sitemap.xml` y `llms.txt` en un ZIP.
-2. SiteGround → **Site Tools → Site → File Manager** → `public_html`.
-3. Subir el ZIP, botón derecho → **Extract**, borrar el ZIP.
+```bash
+curl -s https://stayhumaya.com/ | grep humaya-version
+```
 
-> El `.htaccess` es un **archivo oculto**. Si no aparece después de extraer,
-> activá "Show hidden files" en el File Manager.
+Ese número tiene que ser el que se acaba de subir. **Si no lo es, no se subió** —
+y la tabla de `DESPLIEGUES.md` solo se anota después de que ese `curl` lo confirme.
+
+> ⚠️ Con deploy desde git, **todo lo que esté en `sitio/` queda público**. Nada de
+> borradores ni propuestas sin aprobar ahí adentro.
+
 
 ## Verlo local
 
