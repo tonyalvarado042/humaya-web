@@ -4,24 +4,73 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HUMAYA · Costa Rica — Become More Human</title>
-<meta name="description" content="Diez villas al pie del Volcán Arenal, en La Fortuna, Costa Rica. Un lugar para llegar a ser quien fuiste creado para ser. Apertura noviembre 2026.">
+<meta name="description" content="Diez villas al pie del Volcán Arenal, en La Fortuna, Costa Rica. Un lugar para llegar a ser quien fuiste creado para ser. Apertura 1 de diciembre de 2026.">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.2.2">
-<meta name="humaya-desplegado" content="2026-08-27">
-<link rel="icon" href="assets/img/mark-gold.png">
+<meta name="humaya-version" content="1.3.1">
+<meta name="humaya-desplegado" content="2026-10-31">
+<link rel="icon" href="/assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/">
+<link rel="alternate" hreflang="es" href="https://stayhumaya.com/">
+<link rel="alternate" hreflang="en" href="https://stayhumaya.com/en/">
+<link rel="alternate" hreflang="de" href="https://stayhumaya.com/de/">
+<link rel="alternate" hreflang="fr" href="https://stayhumaya.com/fr/">
+<link rel="alternate" hreflang="x-default" href="https://stayhumaya.com/">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="HUMAYA · Costa Rica — Become More Human">
-<meta property="og:description" content="Diez villas al pie del Volcán Arenal, La Fortuna, Costa Rica.">
+<meta property="og:description" content="Diez villas al pie del Volcán Arenal, La Fortuna, Costa Rica. Apertura 1 de diciembre de 2026.">
 <meta property="og:image" content="https://stayhumaya.com/assets/img/vol-hero.jpg">
+<meta property="og:image:width" content="1700">
+<meta property="og:image:height" content="949">
+<meta property="og:image:alt" content="Villas Humaya con el Volcán Arenal al fondo">
 <meta property="og:url" content="https://stayhumaya.com/">
 <meta property="og:site_name" content="HUMAYA Costa Rica">
+<meta property="og:locale" content="es_CR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="fr_FR">
+
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HUMAYA · Costa Rica — Become More Human">
+<meta name="twitter:description" content="Diez villas al pie del Volcán Arenal, La Fortuna, Costa Rica. Apertura 1 de diciembre de 2026.">
+<meta name="twitter:image" content="https://stayhumaya.com/assets/img/vol-hero.jpg">
+<meta name="twitter:image:alt" content="Villas Humaya con el Volcán Arenal al fondo">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LodgingBusiness",
+  "name": "HUMAYA Costa Rica",
+  "alternateName": "Humaya",
+  "description": "Diez villas independientes al pie del Volcán Arenal, en La Fortuna de San Carlos, Costa Rica. Etapa 2 de Bike & Bed. Apertura 1 de diciembre de 2026.",
+  "url": "https://stayhumaya.com/",
+  "image": "https://stayhumaya.com/assets/img/vol-hero.jpg",
+  "logo": "https://stayhumaya.com/assets/img/mark-gold.png",
+  "slogan": "Become More Human",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "La Fortuna de San Carlos",
+    "addressRegion": "Alajuela",
+    "addressCountry": "CR"
+  },
+  "numberOfRooms": 10,
+  "inLanguage": "es",
+  "sameAs": [
+    "https://instagram.com/stayhumaya",
+    "https://facebook.com/stayhumaya"
+  ],
+  "amenityFeature": [
+    { "@type": "LocationFeatureSpecification", "name": "Terraza privada" },
+    { "@type": "LocationFeatureSpecification", "name": "Cocina equipada" },
+    { "@type": "LocationFeatureSpecification", "name": "Vista al Volcán Arenal" }
+  ],
+  "availableLanguage": ["es", "en", "de", "fr"]
+}
+</script>
 
 <style>
 /* ============================================================
@@ -227,19 +276,17 @@ body.menu-open .burger span:nth-child(3){ transform:translateY(-7px) rotate(-45d
 .hero-bg{ position:absolute; inset:0; }
 .hero-bg figure{
   position:absolute; inset:0; margin:0; opacity:0;
-  animation:heroCycle 32s infinite var(--ease);
+  animation:heroCycle 24s infinite var(--ease);
 }
 .hero-bg figure:nth-child(1){ animation-delay:0s; }
 .hero-bg figure:nth-child(2){ animation-delay:8s; }
 .hero-bg figure:nth-child(3){ animation-delay:16s; }
-.hero-bg figure:nth-child(4){ animation-delay:24s; }
 .hero-bg img{
   width:100%; height:100%; object-fit:cover; object-position:center 58%;
-  transform:scale(1.06); animation:kenburns 32s infinite linear;
+  transform:scale(1.06); animation:kenburns 24s infinite linear;
 }
 .hero-bg figure:nth-child(2) img{ animation-delay:8s; }
 .hero-bg figure:nth-child(3) img{ animation-delay:16s; }
-.hero-bg figure:nth-child(4) img{ animation-delay:24s; }
 @keyframes heroCycle{
   0%{opacity:0} 3%{opacity:1} 22%{opacity:1} 27%{opacity:0} 100%{opacity:0}
 }
@@ -553,17 +600,24 @@ form{ display:grid; gap:clamp(16px,1.7vw,24px); }
   display:block; font-family:var(--display); font-size:10px; letter-spacing:.26em;
   text-transform:uppercase; color:rgba(244,241,234,.45); margin-bottom:9px;
 }
+/* El campo va MAS CLARO que el fondo que tiene detras, con borde de 2px.
+   Un campo mas oscuro que su fondo se lee como un hueco, no como algo donde
+   escribir: con `transparent` + borde al 12% no se veia donde empezaba.
+   `color-scheme:dark` es lo que hace que el calendario de las fechas y el
+   desplegable de personas salgan oscuros; sin eso Chrome los pinta claros. */
 .field input, .field select, .field textarea{
-  width:100%; background:transparent; border:0; border-bottom:1px solid var(--line-soft);
-  padding:11px 0; color:var(--bone); font-family:var(--body); font-size:15px; font-weight:300;
-  transition:border-color .4s;
+  width:100%; background:rgba(244,241,234,.07); border:2px solid rgba(244,241,234,.24);
+  padding:16px; color:var(--bone); font-family:var(--body); font-size:16px; font-weight:300;
+  color-scheme:dark; transition:border-color .35s, background .35s, box-shadow .35s;
 }
-.field textarea{ resize:vertical; min-height:88px; }
-.field select{ color:rgba(244,241,234,.85); }
+.field textarea{ resize:vertical; min-height:96px; }
 .field select option{ background:var(--ink-2); color:var(--bone); }
-.field input:focus, .field select:focus, .field textarea:focus{ outline:none; border-bottom-color:var(--gold); }
-.field input::placeholder, .field textarea::placeholder{ color:rgba(244,241,234,.28); }
-.field input[type="date"]::-webkit-calendar-picker-indicator{ filter:invert(.75) sepia(.4); cursor:pointer; }
+.field input:focus, .field select:focus, .field textarea:focus{
+  outline:none; border-color:var(--gold); background:rgba(244,241,234,.1);
+  box-shadow:0 0 0 3px rgba(200,173,133,.16);
+}
+.field input::placeholder, .field textarea::placeholder{ color:rgba(244,241,234,.55); }
+.field input[type="date"]::-webkit-calendar-picker-indicator{ opacity:.85; cursor:pointer; }
 .form-note{ font-size:12.5px; color:rgba(244,241,234,.42); line-height:1.7; margin:0; }
 .form-ok{
   display:none; border:1px solid var(--line); padding:clamp(22px,2.6vw,34px);
@@ -666,8 +720,8 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
 <header id="hdr">
   <div class="wrap">
     <a href="#top" class="brand" aria-label="Humaya Costa Rica">
-      <img class="mk" src="assets/img/mark-gold.png" alt="Humaya">
-      <img class="wm" src="assets/img/wordmark-white.png" alt="">
+      <img class="mk" src="/assets/img/mark-gold.png" alt="Humaya">
+      <img class="wm" src="/assets/img/wordmark-white.png" alt="">
     </a>
 
     <nav class="links mobile" id="navlinks">
@@ -699,15 +753,14 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
 <!-- ══════════════ HERO ══════════════ -->
 <section class="hero" id="top">
   <div class="hero-bg">
-    <figure><img src="assets/img/vol-hero.jpg" alt="Villas Humaya con el Volcán Arenal al fondo" fetchpriority="high"></figure>
-    <figure><img src="assets/img/hero.jpg" alt="Villa Humaya al atardecer" loading="lazy"></figure>
-    <figure><img src="assets/img/vol-aereo.jpg" alt="Humaya y el Volcán Arenal desde el aire" loading="lazy"></figure>
-    <figure><img src="assets/img/villa-05.jpg" alt="Villa Humaya" loading="lazy"></figure>
+    <figure><img src="/assets/img/vol-hero.jpg" alt="Villas Humaya con el Volcán Arenal al fondo" fetchpriority="high"></figure>
+    <figure><img src="/assets/img/hero.jpg" alt="Villa Humaya al atardecer" loading="lazy"></figure>
+    <figure><img src="/assets/img/villa-05.jpg" alt="Villa Humaya" loading="lazy"></figure>
   </div>
 
   <div class="hero-inner">
-    <img class="hero-mark" src="assets/img/mark-gold.png" alt="">
-    <img class="hero-word" src="assets/img/wordmark-white.png" alt="HUMAYA">
+    <img class="hero-mark" src="/assets/img/mark-gold.png" alt="">
+    <img class="hero-word" src="/assets/img/wordmark-white.png" alt="HUMAYA">
     <div class="hero-country">Costa Rica</div>
     <div class="hero-rule"></div>
     <h1 class="hero-slogan">Become More Human</h1>
@@ -738,7 +791,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     <div class="stat-row">
       <div class="stat rv"><b>10</b><span data-i18n="stat.villas">Villas independientes</span></div>
       <div class="stat rv d1"><b>1</b><span data-i18n="stat.volcano">Volcán al frente</span></div>
-      <div class="stat rv d2"><b data-i18n="stat.openv">Nov 2026</b><span data-i18n="stat.open">Apertura</span></div>
+      <div class="stat rv d2"><b data-i18n="stat.openv">1 Dic 2026</b><span data-i18n="stat.open">Apertura</span></div>
     </div>
   </div>
 </section>
@@ -749,7 +802,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     <div class="signup-inner">
       <p class="kicker center rv" data-i18n="sub.kicker">Lista de espera</p>
       <h2 class="display rv d1" data-i18n="sub.title">Entrá antes <em>que todos.</em></h2>
-      <p class="lede rv d2" data-i18n="sub.p">Abrimos en noviembre de 2026 y las primeras reservas salen primero para esta lista. Dejá tu correo y sos de los primeros en saber.</p>
+      <p class="lede rv d2" data-i18n="sub.p">Abrimos el 1 de diciembre de 2026 y las primeras reservas salen primero para esta lista. Dejá tu correo y sos de los primeros en saber.</p>
 
       <form class="signup-form rv d3" id="subForm" novalidate>
         <input type="email" id="subEmail" name="email" autocomplete="email" required
@@ -804,7 +857,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
   <div class="wrap">
     <div class="split">
       <div class="media tall rv">
-        <img src="assets/img/villa-02.jpg" alt="Villa Humaya con terraza" loading="lazy">
+        <img src="/assets/img/villa-02.jpg" alt="Villa Humaya con terraza" loading="lazy">
         <div class="media-tag" data-i18n="villa.tag1">Villa · exterior</div>
       </div>
       <div>
@@ -823,18 +876,18 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     </div>
 
     <div class="gal">
-      <div class="media rv"><img src="assets/img/int-living.jpg" alt="Sala de la villa" loading="lazy"><div class="media-tag" data-i18n="villa.tag2">Sala</div></div>
-      <div class="media rv d1"><img src="assets/img/int-bedroom.jpg" alt="Dormitorio de la villa" loading="lazy"><div class="media-tag" data-i18n="villa.tag3">Dormitorio</div></div>
-      <div class="media rv d2"><img src="assets/img/int-dining.jpg" alt="Comedor de la villa" loading="lazy"><div class="media-tag" data-i18n="villa.tag4">Comedor</div></div>
-      <div class="media rv d3"><img src="assets/img/villa-01.jpg" alt="Villa abierta al bosque" loading="lazy"><div class="media-tag" data-i18n="villa.tag5">Fachada</div></div>
-      <div class="media rv d4"><img src="assets/img/villa-04.jpg" alt="Villa Humaya" loading="lazy"><div class="media-tag" data-i18n="villa.tag6">Terraza</div></div>
+      <div class="media rv"><img src="/assets/img/int-living.jpg" alt="Sala de la villa" loading="lazy"><div class="media-tag" data-i18n="villa.tag2">Sala</div></div>
+      <div class="media rv d1"><img src="/assets/img/int-bedroom.jpg" alt="Dormitorio de la villa" loading="lazy"><div class="media-tag" data-i18n="villa.tag3">Dormitorio</div></div>
+      <div class="media rv d2"><img src="/assets/img/int-dining.jpg" alt="Comedor de la villa" loading="lazy"><div class="media-tag" data-i18n="villa.tag4">Comedor</div></div>
+      <div class="media rv d3"><img src="/assets/img/villa-01.jpg" alt="Villa abierta al bosque" loading="lazy"><div class="media-tag" data-i18n="villa.tag5">Fachada</div></div>
+      <div class="media rv d4"><img src="/assets/img/villa-04.jpg" alt="Villa Humaya" loading="lazy"><div class="media-tag" data-i18n="villa.tag6">Terraza</div></div>
     </div>
   </div>
 </section>
 
 <!-- ══════════════ EL LUGAR ══════════════ -->
 <section class="place" id="lugar">
-  <div class="place-bg"><img src="assets/img/vol-wide.jpg" alt="El Volcán Arenal desde La Fortuna" loading="lazy"></div>
+  <div class="place-bg"><img src="/assets/img/vol-wide.jpg" alt="El Volcán Arenal desde La Fortuna" loading="lazy"></div>
   <div class="wrap">
     <div class="place-card">
       <p class="kicker rv" data-i18n="place.kicker">Arenal · La Fortuna</p>
@@ -863,11 +916,11 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     <div class="exp-layout">
       <div class="exp-media">
         <div class="media rv">
-          <img src="assets/img/vol-arenal.jpg" alt="El Volcán Arenal" loading="lazy">
+          <img src="/assets/img/vol-arenal.jpg" alt="El Volcán Arenal" loading="lazy">
           <div class="media-tag">Volcán Arenal</div>
         </div>
         <div class="media rv d1">
-          <img src="assets/img/termales.jpg" alt="Aguas termales del Arenal" loading="lazy">
+          <img src="/assets/img/termales.jpg" alt="Aguas termales del Arenal" loading="lazy">
           <div class="media-tag" data-i18n="exp.tag2">Aguas termales</div>
         </div>
       </div>
@@ -890,7 +943,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     <div class="book-grid">
       <div>
         <p class="kicker rv" data-i18n="book.kicker">Reservas</p>
-        <h2 class="display rv d1" data-i18n="book.title">Apertura <em>noviembre 2026.</em></h2>
+        <h2 class="display rv d1" data-i18n="book.title">Apertura <em>1 de diciembre de 2026.</em></h2>
         <p class="lede rv d2" style="margin-top:clamp(20px,2.4vw,32px)" data-i18n="book.p1">Estamos abriendo la lista de las primeras reservas. Dejanos tus datos y te escribimos a vos primero, antes de que salga a la venta.</p>
 
         <div style="margin-top:clamp(30px,3.6vw,48px)">
@@ -901,7 +954,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
           <div class="contact-block rv d4">
             <h4 data-i18n="book.contact">Contacto</h4>
             <!-- TODO Tony: poner el correo y el WhatsApp reales -->
-            <p><a href="mailto:hola@stayhumaya.com">hola@stayhumaya.com</a></p>
+            <p><a href="mailto:reservations@stayhumaya.com">reservations@stayhumaya.com</a></p>
           </div>
           <div class="contact-block rv d5">
             <h4 data-i18n="book.follow">Seguinos</h4>
@@ -971,7 +1024,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
   <div class="wrap">
     <div class="foot-top">
       <div class="foot-brand">
-        <img src="assets/img/lockup-gold.png" alt="Humaya Costa Rica">
+        <img src="/assets/img/lockup-gold.png" alt="Humaya Costa Rica">
         <p data-i18n="foot.tag">Un lugar para llegar a ser quien fuiste creado para ser. La Fortuna, Costa Rica.</p>
         <div class="social foot-social">
           <a href="https://instagram.com/stayhumaya" target="_blank" rel="noopener noreferrer" aria-label="Instagram: @stayhumaya">
@@ -1001,7 +1054,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
       <div class="foot-col">
         <h4 data-i18n="foot.contact">Contacto</h4>
         <!-- TODO Tony: correo, WhatsApp y redes reales -->
-        <a href="mailto:hola@stayhumaya.com">hola@stayhumaya.com</a>
+        <a href="mailto:reservations@stayhumaya.com">reservations@stayhumaya.com</a>
         <p>La Fortuna, San Carlos<br>Alajuela · Costa Rica</p>
       </div>
     </div>
@@ -1025,9 +1078,9 @@ es:{
  "man.title":"Un lugar para llegar a ser <em>quien fuiste creado para ser.</em>",
  "man.p1":"Humaya no es un hotel más en La Fortuna. Es una pausa deliberada: arquitectura que desaparece dentro del bosque, silencio de verdad, y todo lo que el cuerpo y la cabeza necesitan para volver a arrancar.",
  "man.p2":"Al frente, el Volcán Arenal. Alrededor, el verde que solo existe aquí. Adentro, diez villas pensadas para una sola cosa: que te vayás distinto de como llegaste.",
- "stat.villas":"Villas independientes","stat.volcano":"Volcán al frente","stat.open":"Apertura","stat.openv":"Nov 2026",
+ "stat.villas":"Villas independientes","stat.volcano":"Volcán al frente","stat.open":"Apertura","stat.openv":"1 Dic 2026",
  "sub.kicker":"Lista de espera","sub.title":"Entrá antes <em>que todos.</em>",
- "sub.p":"Abrimos en noviembre de 2026 y las primeras reservas salen primero para esta lista. Dejá tu correo y sos de los primeros en saber.",
+ "sub.p":"Abrimos el 1 de diciembre de 2026 y las primeras reservas salen primero para esta lista. Dejá tu correo y sos de los primeros en saber.",
  "sub.ph":"tu@correo.com","sub.cta":"Quiero entrar","sub.sending":"Mandando…",
  "sub.note":"Te llega un correo para confirmar que sos vos. Un clic y quedás adentro. Te podés salir cuando querás.",
  "sub.ok":"Listo. Revisá tu correo y hacé clic en el enlace para confirmar.",
@@ -1062,7 +1115,7 @@ es:{
  "exp.c4t":"Cocina de origen","exp.c4p":"Producto de la zona, cocinado simple. Nada que no reconozcás.",
  "exp.c5t":"Recuperación","exp.c5p":"Yoga, estiramiento y descanso de verdad. El cuerpo también entrena descansando.",
  "exp.c6t":"Noches de volcán","exp.c6p":"Cielo abierto, fuego y nada más. La mejor parte del día.",
- "book.kicker":"Reservas","book.title":"Apertura <em>noviembre 2026.</em>",
+ "book.kicker":"Reservas","book.title":"Apertura <em>1 de diciembre de 2026.</em>",
  "book.p1":"Estamos abriendo la lista de las primeras reservas. Dejanos tus datos y te escribimos a vos primero, antes de que salga a la venta.",
  "book.where":"Dónde","book.contact":"Contacto","book.langs":"Te atendemos en","book.follow":"Seguinos",
  "form.name":"Nombre","form.email":"Email","form.in":"Llegada","form.out":"Salida",
@@ -1080,9 +1133,9 @@ en:{
  "man.title":"A place to become <em>who you were created to be.</em>",
  "man.p1":"Humaya is not one more hotel in La Fortuna. It is a deliberate pause: architecture that disappears into the forest, real silence, and everything the body and the mind need to start again.",
  "man.p2":"In front of you, the Arenal Volcano. All around, a green that exists nowhere else. Inside, ten villas built for one thing only: that you leave different from how you arrived.",
- "stat.villas":"Standalone villas","stat.volcano":"Volcano in front","stat.open":"Opening","stat.openv":"Nov 2026",
+ "stat.villas":"Standalone villas","stat.volcano":"Volcano in front","stat.open":"Opening","stat.openv":"Dec 1, 2026",
  "sub.kicker":"Waiting list","sub.title":"Get in <em>before everyone.</em>",
- "sub.p":"We open in November 2026 and the first reservations go to this list first. Leave your email and you are among the first to know.",
+ "sub.p":"We open on December 1, 2026 and the first reservations go to this list first. Leave your email and you are among the first to know.",
  "sub.ph":"you@email.com","sub.cta":"Join the list","sub.sending":"Sending…",
  "sub.note":"You get an email to confirm it is really you. One click and you are in. You can leave whenever you want.",
  "sub.ok":"Done. Check your inbox and click the link to confirm.",
@@ -1117,7 +1170,7 @@ en:{
  "exp.c4t":"Kitchen of origin","exp.c4p":"Local produce, cooked simply. Nothing you cannot recognise.",
  "exp.c5t":"Recovery","exp.c5p":"Yoga, stretching and real rest. The body also trains while resting.",
  "exp.c6t":"Volcano nights","exp.c6p":"Open sky, fire and nothing else. The best part of the day.",
- "book.kicker":"Reservations","book.title":"Opening <em>November 2026.</em>",
+ "book.kicker":"Reservations","book.title":"Opening <em>December 1, 2026.</em>",
  "book.p1":"We are opening the list for the first reservations. Leave us your details and we write to you first, before it goes on sale.",
  "book.where":"Where","book.contact":"Contact","book.langs":"We speak","book.follow":"Follow us",
  "form.name":"Name","form.email":"Email","form.in":"Arrival","form.out":"Departure",
@@ -1135,9 +1188,9 @@ de:{
  "man.title":"Ein Ort, um zu werden, <em>wofür du geschaffen wurdest.</em>",
  "man.p1":"Humaya ist nicht noch ein Hotel in La Fortuna. Es ist eine bewusste Pause: Architektur, die im Wald verschwindet, echte Stille und alles, was Körper und Kopf brauchen, um neu zu beginnen.",
  "man.p2":"Vor dir der Vulkan Arenal. Ringsum ein Grün, das es nur hier gibt. Drinnen zehn Villen für eine einzige Sache: dass du anders gehst, als du gekommen bist.",
- "stat.villas":"Freistehende Villen","stat.volcano":"Vulkan im Blick","stat.open":"Eröffnung","stat.openv":"Nov 2026",
+ "stat.villas":"Freistehende Villen","stat.volcano":"Vulkan im Blick","stat.open":"Eröffnung","stat.openv":"1. Dez. 2026",
  "sub.kicker":"Warteliste","sub.title":"Sei vor <em>allen anderen dabei.</em>",
- "sub.p":"Wir eröffnen im November 2026, und die ersten Reservierungen gehen zuerst an diese Liste. Hinterlasse deine E-Mail und du bist unter den Ersten, die es erfahren.",
+ "sub.p":"Wir eröffnen am 1. Dezember 2026, und die ersten Reservierungen gehen zuerst an diese Liste. Hinterlasse deine E-Mail und du bist unter den Ersten, die es erfahren.",
  "sub.ph":"du@email.com","sub.cta":"Eintragen","sub.sending":"Wird gesendet…",
  "sub.note":"Du bekommst eine E-Mail zur Bestätigung. Ein Klick und du bist dabei. Du kannst dich jederzeit wieder abmelden.",
  "sub.ok":"Fertig. Schau in dein Postfach und klicke auf den Link.",
@@ -1172,7 +1225,7 @@ de:{
  "exp.c4t":"Küche der Region","exp.c4p":"Regionale Produkte, einfach gekocht. Nichts, was du nicht erkennst.",
  "exp.c5t":"Regeneration","exp.c5p":"Yoga, Dehnen und echte Ruhe. Der Körper trainiert auch im Ruhen.",
  "exp.c6t":"Vulkannächte","exp.c6p":"Offener Himmel, Feuer und sonst nichts. Der beste Teil des Tages.",
- "book.kicker":"Reservierungen","book.title":"Eröffnung <em>November 2026.</em>",
+ "book.kicker":"Reservierungen","book.title":"Eröffnung <em>1. Dezember 2026.</em>",
  "book.p1":"Wir öffnen die Liste für die ersten Reservierungen. Hinterlasse uns deine Daten und wir schreiben dir zuerst, bevor es in den Verkauf geht.",
  "book.where":"Wo","book.contact":"Kontakt","book.langs":"Wir sprechen","book.follow":"Folge uns",
  "form.name":"Name","form.email":"E-Mail","form.in":"Anreise","form.out":"Abreise",
@@ -1190,9 +1243,9 @@ fr:{
  "man.title":"Un lieu pour devenir <em>qui vous avez été créé pour être.</em>",
  "man.p1":"Humaya n'est pas un hôtel de plus à La Fortuna. C'est une pause délibérée : une architecture qui disparaît dans la forêt, un vrai silence, et tout ce dont le corps et la tête ont besoin pour repartir.",
  "man.p2":"Devant vous, le volcan Arenal. Autour, un vert qui n'existe qu'ici. À l'intérieur, dix villas pensées pour une seule chose : que vous repartiez autrement que vous êtes arrivé.",
- "stat.villas":"Villas indépendantes","stat.volcano":"Volcan en face","stat.open":"Ouverture","stat.openv":"Nov 2026",
+ "stat.villas":"Villas indépendantes","stat.volcano":"Volcan en face","stat.open":"Ouverture","stat.openv":"1 déc. 2026",
  "sub.kicker":"Liste d'attente","sub.title":"Entrez avant <em>tout le monde.</em>",
- "sub.p":"Nous ouvrons en novembre 2026 et les premières réservations partent d'abord vers cette liste. Laissez votre email et vous serez parmi les premiers informés.",
+ "sub.p":"Nous ouvrons le 1er décembre 2026 et les premières réservations partent d'abord vers cette liste. Laissez votre email et vous serez parmi les premiers informés.",
  "sub.ph":"vous@email.com","sub.cta":"Je m'inscris","sub.sending":"Envoi…",
  "sub.note":"Vous recevez un email pour confirmer que c'est bien vous. Un clic et vous y êtes. Vous pouvez vous désinscrire quand vous voulez.",
  "sub.ok":"C'est fait. Consultez votre boîte mail et cliquez sur le lien.",
@@ -1227,7 +1280,7 @@ fr:{
  "exp.c4t":"Cuisine du terroir","exp.c4p":"Produits de la région, cuisinés simplement. Rien que vous ne reconnaissiez.",
  "exp.c5t":"Récupération","exp.c5p":"Yoga, étirements et vrai repos. Le corps s'entraîne aussi en se reposant.",
  "exp.c6t":"Nuits du volcan","exp.c6p":"Ciel ouvert, feu et rien d'autre. Le meilleur moment de la journée.",
- "book.kicker":"Réservations","book.title":"Ouverture <em>novembre 2026.</em>",
+ "book.kicker":"Réservations","book.title":"Ouverture <em>1er décembre 2026.</em>",
  "book.p1":"Nous ouvrons la liste des premières réservations. Laissez-nous vos coordonnées et nous vous écrivons en premier, avant la mise en vente.",
  "book.where":"Où","book.contact":"Contact","book.langs":"Nous parlons","book.follow":"Suivez-nous",
  "form.name":"Nom","form.email":"Email","form.in":"Arrivée","form.out":"Départ",
@@ -1257,19 +1310,16 @@ function applyLang(code){
   document.querySelectorAll("#langMenu button").forEach(b=>{
     b.setAttribute("aria-current", b.dataset.lang === code ? "true" : "false");
   });
-  try{ localStorage.setItem("humaya-lang", code); }catch(e){}
 }
 
-function initLang(){
-  let code = null;
-  try{ code = localStorage.getItem("humaya-lang"); }catch(e){}
-  if(!code){
-    const n = (navigator.language || "es").slice(0,2).toLowerCase();
-    code = I18N[n] ? n : "en";
-  }
-  applyLang(code);
-}
-initLang();
+/* Cada idioma vive en su propia URL real (/,/en/,/de/,/fr/) para que Google
+   y los motores de IA indexen cada versión por separado. PAGE_LANG es el
+   idioma de ESTA página — se renderiza siempre así, sin adivinar por el
+   navegador, para que lo que ve un buscador sea siempre lo mismo que se
+   indexó. */
+const PAGE_LANG = "es";
+const PAGE_PATH = { es:"/", en:"/en/", de:"/de/", fr:"/fr/" };
+applyLang(PAGE_LANG);
 
 /* selector de idioma */
 const lang = document.getElementById("lang");
@@ -1281,9 +1331,13 @@ langBtn.addEventListener("click", e=>{
 });
 document.querySelectorAll("#langMenu button").forEach(b=>{
   b.addEventListener("click", ()=>{
-    applyLang(b.dataset.lang);
-    lang.classList.remove("open");
-    langBtn.setAttribute("aria-expanded","false");
+    const code = b.dataset.lang;
+    if(code === PAGE_LANG){
+      lang.classList.remove("open");
+      langBtn.setAttribute("aria-expanded","false");
+      return;
+    }
+    location.href = PAGE_PATH[code] + location.hash;
   });
 });
 document.addEventListener("click", ()=>{

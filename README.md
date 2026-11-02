@@ -1,10 +1,14 @@
 # HUMAYA Costa Rica — landing
 
-Sitio de una sola página para **Humaya**, el hotel en La Fortuna, Arenal
-(Etapa 2 de Bike & Bed). Apertura noviembre 2026.
+Landing para **Humaya**, el hotel en La Fortuna, Arenal (Etapa 2 de Bike &
+Bed). Apertura 1 de diciembre de 2026.
 
 Negro · bone · oro `#C8AD85` (el tono exacto sacado del logo).
-Cuatro idiomas: **ES · EN · DE · FR**. Eslogan fijo en inglés: *Become more human*.
+Cuatro idiomas, cada uno con su propia URL real: **ES** (`/`) · **EN**
+(`/en/`) · **DE** (`/de/`) · **FR** (`/fr/`) — mismo contenido, mismo
+`index.html` base, con el texto ya traducido en el HTML de cada uno (no
+depende de que el buscador ejecute JS) y su propio `hreflang`. Eslogan fijo
+en inglés: *Become more human*.
 
 | | |
 |---|---|
@@ -16,17 +20,28 @@ Cuatro idiomas: **ES · EN · DE · FR**. Eslogan fijo en inglés: *Become more 
 
 ```
 humaya-web/
-├── index.html          ← todo el sitio (HTML + CSS + JS en un solo archivo)
+├── index.html          ← versión en español (HTML + CSS + JS en un solo archivo)
+├── en/index.html       ← misma página, en inglés
+├── de/index.html       ← misma página, en alemán
+├── fr/index.html       ← misma página, en francés
 ├── .htaccess           ← HTTPS, quitar www, gzip, caché
-└── assets/img/         ← logos e imágenes
+├── robots.txt
+├── sitemap.xml
+├── llms.txt            ← para que los motores de IA citen datos correctos
+└── assets/img/         ← logos e imágenes (compartidas por los 4 idiomas)
     └── _extra/         ← fotos de la brand board que no se usan
 ```
+
+> Las 4 páginas comparten el mismo CSS y el mismo motor de traducciones
+> (`I18N` dentro del `<script>`) — un texto que cambia, cambia en los 4
+> archivos. Ver [[humaya-sitio-web]] en el cerebro para cómo se generaron.
 
 ## Publicar un cambio
 
 **No hay despliegue automático.** El sitio se sube a mano:
 
-1. Empaquetar `index.html`, `.htaccess` y `assets/img/` en un ZIP.
+1. Empaquetar `index.html`, `en/`, `de/`, `fr/`, `.htaccess`, `assets/img/`,
+   `robots.txt`, `sitemap.xml` y `llms.txt` en un ZIP.
 2. SiteGround → **Site Tools → Site → File Manager** → `public_html`.
 3. Subir el ZIP, botón derecho → **Extract**, borrar el ZIP.
 
@@ -107,7 +122,7 @@ Supabase → Edge Functions → Secrets:
 | Secret | Qué es |
 |---|---|
 | `RESEND_API_KEY` | la llave de [resend.com](https://resend.com) |
-| `MAIL_FROM` | `HUMAYA <hola@stayhumaya.com>` |
+| `MAIL_FROM` | **ya no se lee.** El remitente vive en el codigo de `book` y `subscribe` como `HUMAYA <reservations@stayhumaya.com>`. Estaba cayendo a `hola@`, un buzon que no existe. |
 | `SITE_URL` | `https://stayhumaya.com` — a dónde vuelve el botón de confirmación |
 | `BOOKING_INBOX` | a dónde llegan las solicitudes de reserva |
 
@@ -122,14 +137,14 @@ se cambia el Secret y listo — no se toca código.
 1. **Renders reales.** Los que están son los de MODO Studio sacados de los PDF, más
    cinco imágenes **generadas con IA** para el volcán y las aguas termales
    (`vol-*.jpg`, `termales.jpg`). Hay que cambiarlas antes de la campaña grande.
-2. **El buzón `hola@stayhumaya.com`** — crearlo en SiteGround → E-mail → Cuentas.
+2. ~~**El buzón `hola@stayhumaya.com`**~~ — se abandonó. Todo pasa a `reservations@stayhumaya.com` (31 de octubre de 2026). Lo que sí hay que revisar: **uno de los buzones que recibe los avisos está lleno** y hace rebotar el aviso de reserva.
    Los MX ya están puestos. ⚠️ Los avisos de reserva ya se están mandando ahí, así
    que hasta que exista el buzón esos correos rebotan.
 3. **Las cuentas @stayhumaya** de Instagram y Facebook — los enlaces ya apuntan ahí.
 
 ## Datos que se usaron (y de dónde salen)
 
-- 10 villas, apertura noviembre 2026, La Fortuna de San Carlos → confirmados por Tony.
+- 10 villas, apertura 1 de diciembre de 2026, La Fortuna de San Carlos → confirmados por Tony.
 - Eslogan, los cinco pilares y "a place to become who you were created to be" → de
   la brand board.
 - **No hay precios, teléfonos, distancias ni metrajes**, porque no están confirmados.

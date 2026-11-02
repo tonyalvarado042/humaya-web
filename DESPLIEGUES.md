@@ -7,9 +7,18 @@ se puede comprobar sin entrar a ningún panel:
 curl -s https://stayhumaya.com/ | grep humaya-version
 ```
 
+> ⚠️ **31 de octubre de 2026 — esta tabla estaba mintiendo.** Decía que la 1.2.2
+> y la 1.3.0 estaban en línea. **No lo estaban:** el servidor tenía la 1.2.1 del
+> 27 de agosto. Las dos se anotaron sin que la subida llegara.
+>
+> **La regla de ahora en adelante:** una fila se anota en esta tabla **después** de
+> que el `curl` de arriba devuelva ese número desde el servidor. Nunca antes.
+
 | Versión | Fecha | Dónde | Qué cambió |
 |---|---|---|---|
-| **1.2.2** | 2026-08-27 | SiteGround | "Descubrí" estaba corrido 34 px a la derecha **en todas las pantallas** — la animación de entrada terminaba en `transform:none` y borraba el `translateX(-50%)` que lo centraba. Ahora se centra con `left/right`, sin depender del transform. Solo `index.html`. |
+| **1.3.1** | 2026-10-31 | *pendiente de subir* | **Los campos del formulario de reservas no se veían.** Estaban en `background:transparent` con un subrayado al 12 % de opacidad: sobre negro no se distinguía dónde empezaba el campo. Ahora van con fondo más claro que el fondo de atrás, borde de 2 px, letra de 16 px y halo de oro al enfocar — la receta que Tony ya había pedido en otros tres proyectos. Se agregó `color-scheme:dark`, que es lo que hace que el calendario de las fechas y el desplegable de personas salgan oscuros en vez de con el tema claro de Chrome. **Correo de contacto:** `hola@stayhumaya.com` → `reservations@stayhumaya.com` en los 4 idiomas (el buzón `hola@` nunca se creó). Incluye todo lo de la 1.3.0, que nunca llegó a subirse. |
+| 1.3.0 | 2026-10-17 | *nunca se subió* | Apertura: noviembre → **1 de diciembre de 2026** en los 4 idiomas (confirmado por Tony el 26 de setiembre). Se sacó la foto aérea del hero (las villas en semicírculo) a pedido de Tony — quedan 3 fotos rotando. **Paquete de SEO/GEO:** Schema.org (`LodgingBusiness`), Open Graph y Twitter Card completos, `robots.txt`, `sitemap.xml`, `llms.txt` (archivos nuevos en la raíz). **Cambio estructural:** cada idioma pasa a tener su propia URL real — `/en/`, `/de/`, `/fr/` (antes era una sola página que cambiaba de idioma con JS) — con su `hreflang`, su `<title>`/meta/Schema.org traducidos, y el texto ya horneado en el HTML de cada uno (no depende de que el buscador ejecute JS). El selector de idioma ahora navega entre esas URLs en vez de solo cambiar el texto en memoria. Subir `index.html`, `en/`, `de/`, `fr/`, `robots.txt`, `sitemap.xml`, `llms.txt` completos. |
+| 1.2.2 | 2026-08-27 | *nunca se subió* | "Descubrí" estaba corrido 34 px a la derecha **en todas las pantallas** — la animación de entrada terminaba en `transform:none` y borraba el `translateX(-50%)` que lo centraba. Ahora se centra con `left/right`, sin depender del transform. Solo `index.html`. |
 | 1.2.1 | 2026-08-27 | SiteGround | Separación entre los botones del hero y "Descubrí". En portátiles de ~760 px de alto quedaban a 13 px; ahora hay 88 px. Solo `index.html`. |
 | 1.2.0 | 2026-08-27 | SiteGround | Página `confirmado.html` con la marca: el enlace del correo ahora cae ahí. Supabase fuerza `text/plain` en las Edge Functions, así que la función solo redirige (303). Avisos de reserva pasan a `reservations@stayhumaya.com`. |
 | 1.1.0 | 2026-08-26 | SiteGround | El formulario de reservas ya guarda de verdad (tabla `booking_requests` + función `book`). Antes solo mostraba "gracias" y se perdía el dato. Se estampó la versión en el HTML. |
@@ -18,10 +27,13 @@ curl -s https://stayhumaya.com/ | grep humaya-version
 
 ## Cómo publicar
 
-1. Empaquetar `index.html`, `.htaccess` y `assets/img/`.
+1. Empaquetar `index.html`, `.htaccess`, `assets/img/`, `en/`, `de/`, `fr/`,
+   `robots.txt`, `sitemap.xml` y `llms.txt`.
 2. SiteGround → Site Tools → Site → File Manager → `public_html`.
 3. Subir el ZIP → Extract → borrar el ZIP.
-4. Comprobar: `curl -s https://stayhumaya.com/ | grep humaya-version`
+4. Comprobar: `curl -s https://stayhumaya.com/ | grep humaya-version` y que
+   `https://stayhumaya.com/en/`, `/de/`, `/fr/`, `/robots.txt`, `/sitemap.xml`
+   y `/llms.txt` respondan 200.
 5. Anotar la versión nueva en esta tabla.
 
 > Subir el ZIP **reemplaza** `index.html` y las imágenes que coincidan, pero **no

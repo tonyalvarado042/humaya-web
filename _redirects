@@ -1,0 +1,5 @@
+# HUMAYA · redirecciones para Cloudflare Pages
+# El salto de http a https lo hace Cloudflare con «Always Use HTTPS»;
+# aquí solo se quita el www, como hacía el .htaccess.
+
+https://www.stayhumaya.com/*  https://stayhumaya.com/:splat  301

@@ -1,7 +1,11 @@
-# artefactos de trabajo, no parte del sitio
-preview-humaya.jpg
+# Los ZIP eran para subir a mano a SiteGround. Con Cloudflare Pages el deploy
+# sale de este repo, así que ya no hacen falta y no deben pesar aquí.
+humaya-v*.zip
 
-# sistema
-Thumbs.db
-desktop.ini
-.DS_Store
+# ⚠️ OJO: con Pages, TODO lo que esté en este repo queda publicado en el sitio.
+# Esta propuesta todavía no la aprueba Tony — no se publica.
+propuesta-humaya-lista-de-espera/
+
+# Capturas de trabajo, no son del sitio.
+preview-humaya.jpg
+sitio-vivo.jpg

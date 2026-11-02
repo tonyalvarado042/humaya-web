@@ -1,0 +1,20 @@
+# HUMAYA · cabeceras para Cloudflare Pages
+# Traduce lo que hacía el .htaccess de Apache en SiteGround. Ojo: en Pages el
+# .htaccess NO se usa — este archivo y _redirects lo reemplazan.
+#
+# Lo que YA NO hay que configurar porque Cloudflare lo hace solo:
+#   · comprimir (Brotli y gzip automáticos)
+#   · forzar HTTPS (ajuste «Always Use HTTPS» de la zona)
+#   · servir index.html al entrar a una carpeta
+#   · no listar el contenido de las carpetas
+
+# Por defecto: higiene básica, y el HTML siempre fresco para que un cambio
+# del sitio se vea de inmediato.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cache-Control: no-cache, must-revalidate
+
+# Las fotos y los logos no cambian: un año en caché del navegador.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
