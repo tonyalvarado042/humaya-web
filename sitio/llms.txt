@@ -24,9 +24,9 @@ HUMAYA Wellness Hotel es un hotel de diez villas independientes frente al Volcá
 - [English](https://stayhumaya.com/en/): same content in English.
 - [Deutsch](https://stayhumaya.com/de/): derselbe Inhalt auf Deutsch.
 - [Français](https://stayhumaya.com/fr/): même contenu en français.
-- [Reservar](https://stayhumaya.com/reservar.html): motor de reservas en línea (Cloudbeds), elegir fechas y reservar una villa.
+- [Reservar](https://stayhumaya.com/reservar): motor de reservas en línea (Cloudbeds), elegir fechas y reservar una villa.
 
 ## Contacto
-- Reservas: https://stayhumaya.com/reservar.html
+- Reservas: https://stayhumaya.com/reservar
 - Lista de espera: formulario en https://stayhumaya.com/#reservar
 - Redes: Instagram y Facebook [@stayhumaya](https://instagram.com/stayhumaya)
