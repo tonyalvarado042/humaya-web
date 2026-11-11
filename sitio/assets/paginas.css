@@ -297,7 +297,11 @@ body.menu-open{ overflow:hidden; }
   .burger{ display:flex; }
   .links{
     display:flex; flex-direction:column; gap:0;
-    position:fixed; left:0; right:0; top:62px;
+    /* absolute dentro del header (que es fixed), no fixed: el header toma
+       backdrop-filter al bajar y eso lo convierte en el bloque contenedor
+       de cualquier hijo fixed, sacando el panel de la pantalla. Ademas
+       top:100% se acomoda solo a la altura real del header. 11/11/2026. */
+    position:absolute; left:0; right:0; top:100%;
     background:rgba(10,10,10,.97); border-bottom:1px solid var(--line-soft);
     -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
     padding:8px 0 16px;

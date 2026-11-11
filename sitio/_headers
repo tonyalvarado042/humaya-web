@@ -1,20 +1,7 @@
-# HUMAYA · cabeceras para Cloudflare Pages
-# Traduce lo que hacía el .htaccess de Apache en SiteGround. Ojo: en Pages el
-# .htaccess NO se usa — este archivo y _redirects lo reemplazan.
-#
-# Lo que YA NO hay que configurar porque Cloudflare lo hace solo:
-#   · comprimir (Brotli y gzip automáticos)
-#   · forzar HTTPS (ajuste «Always Use HTTPS» de la zona)
-#   · servir index.html al entrar a una carpeta
-#   · no listar el contenido de las carpetas
-
-# Por defecto: higiene básica, y el HTML siempre fresco para que un cambio
-# del sitio se vea de inmediato.
-/*
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: strict-origin-when-cross-origin
-  Cache-Control: no-cache, must-revalidate
-
-# Las fotos y los logos no cambian: un año en caché del navegador.
+# Cloudflare Pages entrega /assets/* con max-age de un ano e "immutable":
+# el navegador no vuelve a preguntar nunca. Eso dejo el arreglo del menu movil
+# invisible para quien ya habia entrado (11 de noviembre de 2026). El CSS ahora
+# lleva ?v= en el enlace, y ademas bajamos la caja a un dia con revalidacion
+# para que reemplazar una foto se vea el mismo dia y no el ano que viene.
 /assets/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=86400, must-revalidate

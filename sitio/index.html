@@ -7,7 +7,7 @@
 <meta name="description" content="HUMAYA Wellness Hotel: diez villas de bienestar al pie del Volcán Arenal, en La Fortuna, Costa Rica. Aguas termales, movimiento y descanso real. Apertura diciembre 2026.">
 <meta name="keywords" content="wellness hotel Costa Rica, hotel bienestar La Fortuna, wellness resort Volcán Arenal, retiro de bienestar Costa Rica">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.7.2">
+<meta name="humaya-version" content="1.7.3">
 <meta name="humaya-desplegado" content="2026-11-05">
 <link rel="icon" href="/assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/">
@@ -718,6 +718,11 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
     flex-direction:column; align-items:center; justify-content:center; gap:clamp(20px,4vh,36px);
     opacity:0; visibility:hidden; transition:opacity .45s var(--ease), visibility .45s;
   }
+  /* El header .solid lleva backdrop-filter, y un elemento con backdrop-filter
+     se vuelve el bloque contenedor de sus hijos position:fixed. Con la pagina
+     bajada eso encogia este overlay al alto del header y dejaba dos enlaces
+     arriba del borde de la pantalla. Lo reporto Tony el 11/11/2026. */
+  body.menu-open header{ -webkit-backdrop-filter:none; backdrop-filter:none; }
   body.menu-open nav.links.mobile{ opacity:1; visibility:visible; }
   nav.links.mobile a{ font-size:17px; letter-spacing:.22em; }
   .manifesto-grid, .split, .book-grid{ grid-template-columns:1fr; }
