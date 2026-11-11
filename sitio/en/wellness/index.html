@@ -6,7 +6,7 @@
 <title>Wellness · Cold plunge, sauna and recovery · Humaya Wellness Hotel</title>
 <meta name="description" content="Wellness at Humaya Wellness Hotel, at the foot of the Arenal Volcano: cold plunge, sauna, thermal pool, infrared light therapy and gym. A wellness hotel in La Fortuna, Costa Rica. Opening December 2026.">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.7.3">
+<meta name="humaya-version" content="1.7.4">
 <link rel="icon" href="/assets/img/mark-gold.png">
 
 <link rel="canonical" href="https://stayhumaya.com/en/wellness/">
@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/paginas.css?v=1.7.3">
+<link rel="stylesheet" href="/assets/paginas.css?v=1.7.4">
 
 <script type="application/ld+json">
 {
@@ -334,6 +334,7 @@ if (burger && navlinks) {
   navlinks.querySelectorAll("a").forEach(a => a.addEventListener("click", cerrarMenu));
   document.addEventListener("click", e => {
     if (!document.body.classList.contains("menu-open")) return;
+    if (e.target === navlinks) { cerrarMenu(); return; }   /* el fondo del menu */
     if (navlinks.contains(e.target) || burger.contains(e.target)) return;
     cerrarMenu();
   });

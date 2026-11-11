@@ -7,7 +7,7 @@
 <meta name="description" content="HUMAYA Wellness Hotel: zehn unabhängige Wellness-Villen am Fuße des Vulkans Arenal, La Fortuna, Costa Rica. Thermalquellen, Bewegung und echte Erholung. Eröffnung im Dezember 2026.">
 <meta name="keywords" content="Wellnesshotel Costa Rica, Wellness Resort Vulkan Arenal, Wellness Rückzugsort La Fortuna, Costa Rica Wellness Villen">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.7.3">
+<meta name="humaya-version" content="1.7.4">
 <meta name="humaya-desplegado" content="2026-11-05">
 <link rel="icon" href="/assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/de/">
@@ -723,6 +723,12 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
      bajada eso encogia este overlay al alto del header y dejaba dos enlaces
      arriba del borde de la pantalla. Lo reporto Tony el 11/11/2026. */
   body.menu-open header{ -webkit-backdrop-filter:none; backdrop-filter:none; }
+  /* El overlay es hijo del header, asi que su z-index:99 no compite contra el
+     header (z-index:100) sino contra sus hermanos de adentro, que son estaticos.
+     Sin esto el overlay tapa la hamburguesa y no queda forma de cerrar el menu
+     desde un telefono. Lo reporto Tony el 11/11/2026. */
+  body.menu-open .brand,
+  body.menu-open .nav-right{ position:relative; z-index:100; }
   body.menu-open nav.links.mobile{ opacity:1; visibility:visible; }
   nav.links.mobile a{ font-size:17px; letter-spacing:.22em; }
   .manifesto-grid, .split, .book-grid{ grid-template-columns:1fr; }
@@ -1454,6 +1460,7 @@ document.querySelectorAll("#navlinks a").forEach(a=>{
    Lo reportó Tony el 11 de noviembre de 2026. */
 document.addEventListener("click", (e)=>{
   if(!document.body.classList.contains("menu-open")) return;
+  if(e.target === navlinks){ cerrarMenu(); return; }   /* el fondo del menu */
   if(navlinks.contains(e.target) || burger.contains(e.target)) return;
   cerrarMenu();
 });
