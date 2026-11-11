@@ -7,7 +7,7 @@
 <meta name="description" content="HUMAYA Wellness Hotel: diez villas de bienestar al pie del Volcán Arenal, en La Fortuna, Costa Rica. Aguas termales, movimiento y descanso real. Apertura diciembre 2026.">
 <meta name="keywords" content="wellness hotel Costa Rica, hotel bienestar La Fortuna, wellness resort Volcán Arenal, retiro de bienestar Costa Rica">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.7.4">
+<meta name="humaya-version" content="1.7.5">
 <meta name="humaya-desplegado" content="2026-11-05">
 <link rel="icon" href="/assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/">
@@ -223,7 +223,8 @@ nav.links a{
   font-size:11.5px; letter-spacing:.2em; text-transform:uppercase;
   font-weight:400; color:rgba(244,241,234,.78);
   position:relative; padding-block:6px; transition:color .35s;
-}
+
+  white-space:nowrap; /* Bien-etre se partia por el guion y el menu se iba a dos lineas */}
 nav.links a::after{
   content:""; position:absolute; left:0; bottom:0; height:1px; width:0;
   background:var(--gold); transition:width .45s var(--ease);
@@ -771,8 +772,13 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
 
     <nav class="links mobile" id="navlinks">
       <a href="#villas" data-i18n="nav.villas">Villas</a>
-      <a href="#experiencias" data-i18n="nav.exp">Experiencias</a>
-      <a href="#lugar" data-i18n="nav.place">El lugar</a>
+      <!-- Los cuatro enlaces propios van sin data-i18n a proposito: cada idioma
+           vive en su propia URL y el selector navega a otra pagina, asi que
+           applyLang nunca tiene que reescribirlos. -->
+      <a href="/bienestar/">Bienestar</a>
+      <a href="/experiencia/">Experience</a>
+      <a href="/huerta/">La huerta</a>
+      <a href="/proposito/">Propósito</a>
       <a href="#reservar" data-i18n="nav.contact">Contacto</a>
     </nav>
 
