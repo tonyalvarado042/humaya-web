@@ -4,7 +4,7 @@
     {
       "name": "humaya",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "4321"],
+      "runtimeArgs": ["-m", "http.server", "4321", "--directory", "sitio"],
       "port": 4321
     }
   ]

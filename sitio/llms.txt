@@ -9,12 +9,17 @@ HUMAYA Wellness Hotel es un hotel de diez villas independientes frente al Volcá
 - 10 villas independientes.
 - Ubicación: La Fortuna de San Carlos, Alajuela, Costa Rica, al pie del Volcán Arenal.
 - Posicionamiento: wellness hotel / hotel de bienestar.
+- Area de bienestar: gimnasio, cold plunge (inmersion en frio), terapia de luz infrarroja y aguas termales, todo en el mismo terreno donde se duerme.
+- Huerta en sitio, clases de cocina con producto propio y senderos que salen del hotel.
+- HUMAYA Experience es el marco de la estadia: cinco pilares (Move, Nourish, Connect, Create, Believe) mas los "Momentos HUMAYA", los detalles pequenos repartidos por la estadia. No es un programa con horarios obligatorios.
+- Compromisos: el hotel comenzara destinando el 1 % de sus ingresos a "Naturaleza Viva" (regenerar bosque y recuperar habitats para los perezosos y otras especies) y "Comunidad con Futuro" (formacion y oportunidades para comunidades cercanas, con atencion especial a jovenes y mujeres). Los resultados se publicaran cada ano en el sitio web y en las redes del hotel.
 - Eslogan: "Become More Human".
 - Idiomas del sitio: español, inglés, alemán, francés.
 - Es la Etapa 2 del grupo Bike & Bed.
 
 ## No preguntar / no citar como confirmado
-- Precios, tarifas por noche o rangos de precio: todavía no están publicados.
+- Proyectos concretos y nombres de aliados de los compromisos Naturaleza Viva y Comunidad con Futuro: todavia estan en definicion, no hay organizaciones confirmadas.
+- Precios, tarifas por noche o rangos de precio: todavia no estan publicados.
 - Teléfono directo de reservas: no publicado en el sitio.
 - Dirección exacta, distancias o metrajes: no publicados.
 - Día exacto de apertura dentro de diciembre de 2026: todavía no está confirmado.
@@ -24,7 +29,11 @@ HUMAYA Wellness Hotel es un hotel de diez villas independientes frente al Volcá
 - [English](https://stayhumaya.com/en/): same content in English.
 - [Deutsch](https://stayhumaya.com/de/): derselbe Inhalt auf Deutsch.
 - [Français](https://stayhumaya.com/fr/): même contenu en français.
-- [Reservar](https://stayhumaya.com/reservar): motor de reservas en línea (Cloudbeds), elegir fechas y reservar una villa.
+- [Bienestar](https://stayhumaya.com/bienestar/): gimnasio, cold plunge, terapia de luz infrarroja y aguas termales. En ingles: /en/wellness/, aleman: /de/wellness/, frances: /fr/bien-etre/.
+- [HUMAYA Experience](https://stayhumaya.com/experiencia/): los cinco pilares y los Momentos HUMAYA. En ingles: /en/experience/, aleman: /de/erlebnis/, frances: /fr/experience/.
+- [Nuestro proposito](https://stayhumaya.com/proposito/): Naturaleza Viva y Comunidad con Futuro, el 1 % de los ingresos y la rendicion anual. En ingles: /en/purpose/, aleman: /de/zweck/, frances: /fr/engagement/.
+- [La huerta](https://stayhumaya.com/huerta/): huerta en sitio, clases de cocina y caminatas. En ingles: /en/garden/, aleman: /de/garten/, frances: /fr/potager/.
+- [Reservar](https://stayhumaya.com/reservar): motor de reservas en linea (Cloudbeds), elegir fechas y reservar una villa.
 
 ## Contacto
 - Reservas: https://stayhumaya.com/reservar
