@@ -266,3 +266,20 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft);
 @media (max-width:860px){
   .links{ display:none; }
 }
+
+/* galería de amenidades: una rejilla de fotos con su pie */
+.galeria{ display:grid; gap:1px; background:var(--line-soft); border:1px solid var(--line-soft); }
+@media (min-width:760px){ .galeria{ grid-template-columns:1fr 1fr; } }
+.galeria figure{ margin:0; position:relative; overflow:hidden; aspect-ratio:16/9; background:var(--ink); }
+.galeria img{ width:100%; height:100%; object-fit:cover; transition:transform 1.3s var(--ease); }
+.galeria figure:hover img{ transform:scale(1.045); }
+.galeria figcaption{
+  position:absolute; left:0; bottom:0; padding:10px 18px;
+  background:rgba(10,10,10,.74); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  font-family:var(--display); font-size:10px; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--bone);
+}
+.nota-fotos{
+  margin:clamp(14px,1.8vw,20px) 0 0; font-size:12.5px; line-height:1.7;
+  color:rgba(244,241,234,.42);
+}

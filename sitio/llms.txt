@@ -9,7 +9,7 @@ HUMAYA Wellness Hotel es un hotel de diez villas independientes frente al Volcá
 - 10 villas independientes.
 - Ubicación: La Fortuna de San Carlos, Alajuela, Costa Rica, al pie del Volcán Arenal.
 - Posicionamiento: wellness hotel / hotel de bienestar.
-- Area de bienestar: gimnasio, cold plunge (inmersion en frio), terapia de luz infrarroja y aguas termales, todo en el mismo terreno donde se duerme.
+- Area de bienestar: cold plunge (inmersion en frio), sauna, piscina termal, terapia de luz infrarroja y gimnasio, mas las aguas termales del Arenal. Todo en el mismo terreno donde se duerme: no hay que manejar a ningun lado.
 - Huerta en sitio, clases de cocina con producto propio y senderos que salen del hotel.
 - HUMAYA Experience es el marco de la estadia: cinco pilares (Move, Nourish, Connect, Create, Believe) mas los "Momentos HUMAYA", los detalles pequenos repartidos por la estadia. No es un programa con horarios obligatorios.
 - Compromisos: el hotel comenzara destinando el 1 % de sus ingresos a "Naturaleza Viva" (regenerar bosque y recuperar habitats para los perezosos y otras especies) y "Comunidad con Futuro" (formacion y oportunidades para comunidades cercanas, con atencion especial a jovenes y mujeres). Los resultados se publicaran cada ano en el sitio web y en las redes del hotel.
@@ -36,6 +36,7 @@ HUMAYA Wellness Hotel es un hotel de diez villas independientes frente al Volcá
 - [Reservar](https://stayhumaya.com/reservar): motor de reservas en linea (Cloudbeds), elegir fechas y reservar una villa.
 
 ## Contacto
+- Telefono y WhatsApp: +506 6444 6939
 - Reservas: https://stayhumaya.com/reservar
 - Lista de espera: formulario en https://stayhumaya.com/#reservar
 - Redes: Instagram y Facebook [@stayhumaya](https://instagram.com/stayhumaya)
