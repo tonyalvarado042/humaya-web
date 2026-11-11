@@ -38,6 +38,10 @@ export function DemoHomePage() {
         </nav>
 
         <p className="m-0 max-w-md text-xs leading-relaxed text-muted-soft">{copy.disclaimer}</p>
+
+        <Link to="/entrada" className="text-sm text-gold no-underline">
+          {copy.entradaCta}
+        </Link>
       </section>
     </main>
   );
