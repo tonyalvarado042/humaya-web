@@ -263,9 +263,7 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft);
   .duo-img img{ transition:none; }
 }
 
-@media (max-width:860px){
-  .links{ display:none; }
-}
+
 
 /* galería de amenidades: una rejilla de fotos con su pie */
 .galeria{ display:grid; gap:1px; background:var(--line-soft); border:1px solid var(--line-soft); }
@@ -282,4 +280,30 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft);
 .nota-fotos{
   margin:clamp(14px,1.8vw,20px) 0 0; font-size:12.5px; line-height:1.7;
   color:rgba(244,241,234,.42);
+}
+
+/* ---------- menú móvil ----------
+   Las páginas nuevas escondían los enlaces en móvil y no tenían hamburguesa:
+   desde un teléfono no se podía navegar a ninguna otra página. */
+.burger{ display:none; flex-direction:column; gap:5px; padding:9px 2px; }
+.burger span{ display:block; width:22px; height:1.5px; background:var(--bone);
+  transition:transform .35s var(--ease), opacity .25s var(--ease); }
+body.menu-open .burger span:nth-child(1){ transform:translateY(6.5px) rotate(45deg); }
+body.menu-open .burger span:nth-child(2){ opacity:0; }
+body.menu-open .burger span:nth-child(3){ transform:translateY(-6.5px) rotate(-45deg); }
+body.menu-open{ overflow:hidden; }
+
+@media (max-width:860px){
+  .burger{ display:flex; }
+  .links{
+    display:flex; flex-direction:column; gap:0;
+    position:fixed; left:0; right:0; top:62px;
+    background:rgba(10,10,10,.97); border-bottom:1px solid var(--line-soft);
+    -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
+    padding:8px 0 16px;
+    opacity:0; visibility:hidden; transform:translateY(-10px); pointer-events:none;
+    transition:opacity .3s var(--ease), transform .3s var(--ease), visibility .3s;
+  }
+  body.menu-open .links{ opacity:1; visibility:visible; transform:none; pointer-events:auto; }
+  .links a{ padding:15px var(--pad); font-size:12.5px; }
 }

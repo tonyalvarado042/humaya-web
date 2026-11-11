@@ -7,7 +7,7 @@
 <meta name="description" content="HUMAYA Wellness Hotel : dix villas bien-être indépendantes au pied du volcan Arenal, La Fortuna, Costa Rica. Sources chaudes, mouvement et vrai repos. Ouverture en décembre 2026.">
 <meta name="keywords" content="hôtel wellness Costa Rica, resort bien-être volcan Arenal, retraite bien-être La Fortuna, villas bien-être Costa Rica">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.6.2">
+<meta name="humaya-version" content="1.7.2">
 <meta name="humaya-desplegado" content="2026-11-05">
 <link rel="icon" href="/assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/fr/">
@@ -1429,10 +1429,31 @@ onScroll();
 
 /* menú móvil */
 const burger = document.getElementById("burger");
-burger.addEventListener("click", ()=> document.body.classList.toggle("menu-open"));
-document.querySelectorAll("#navlinks a").forEach(a=>{
-  a.addEventListener("click", ()=> document.body.classList.remove("menu-open"));
+const navlinks = document.getElementById("navlinks");
+const cerrarMenu = ()=> document.body.classList.remove("menu-open");
+
+burger.addEventListener("click", (e)=>{
+  e.stopPropagation();
+  document.body.classList.toggle("menu-open");
 });
+document.querySelectorAll("#navlinks a").forEach(a=>{
+  a.addEventListener("click", cerrarMenu);
+});
+
+/* Los CUATRO caminos de salida. Faltaban tres, y como el menú abierto pone
+   overflow:hidden en el body, la página quedaba congelada:
+     · tocar fuera  — lo que hace todo el mundo
+     · Escape
+     · rotar el teléfono: al pasar a ancho de escritorio desaparece la
+       hamburguesa y no quedaba forma de destrabarlo
+   Lo reportó Tony el 11 de noviembre de 2026. */
+document.addEventListener("click", (e)=>{
+  if(!document.body.classList.contains("menu-open")) return;
+  if(navlinks.contains(e.target) || burger.contains(e.target)) return;
+  cerrarMenu();
+});
+document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") cerrarMenu(); });
+addEventListener("resize", ()=>{ if(innerWidth > 980) cerrarMenu(); }, {passive:true});
 
 /* reveal al hacer scroll */
 const io = new IntersectionObserver((entries)=>{

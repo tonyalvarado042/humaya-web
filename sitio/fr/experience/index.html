@@ -6,7 +6,7 @@
 <title>HUMAYA Experience · Feel what makes you human · Humaya Wellness Hotel</title>
 <meta name="description" content="HUMAYA Experience : cinq piliers et les Momentos HUMAYA, les détails qui font que vous repartez mieux que vous n'êtes arrivé. Humaya Wellness Hotel, au pied du volcan Arenal, La Fortuna, Costa Rica.">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.7.0">
+<meta name="humaya-version" content="1.7.2">
 <link rel="icon" href="/assets/img/mark-gold.png">
 
 <link rel="canonical" href="https://stayhumaya.com/fr/experience/">
@@ -100,7 +100,7 @@
       <img class="mk" src="/assets/img/mark-gold.png" alt="Humaya">
       <img class="wm" src="/assets/img/wordmark-white.png" alt="">
     </a>
-    <nav class="links">
+    <nav class="links" id="navlinks">
       <a href="/fr/bien-etre/">Bien-être</a>
       <a href="/fr/experience/" aria-current="page">Experience</a>
       <a href="/proposito/">Engagement</a>
@@ -120,6 +120,7 @@
         </div>
       </div>
       <a href="/reservar" class="btn">Réserver</a>
+      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
 </header>
@@ -347,6 +348,28 @@ const io = new IntersectionObserver(es => {
   es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } });
 }, { threshold:.12, rootMargin:"0px 0px -8% 0px" });
 document.querySelectorAll(".rv").forEach(el => io.observe(el));
+
+/* menú móvil: los cuatro caminos de salida (botón, enlace, tocar fuera,
+   Escape y rotar el teléfono). Si falta alguno la página queda congelada,
+   porque el menú abierto pone overflow:hidden en el body. */
+const burger = document.getElementById("burger");
+const navlinks = document.getElementById("navlinks");
+const cerrarMenu = () => document.body.classList.remove("menu-open");
+if (burger && navlinks) {
+  burger.addEventListener("click", e => {
+    e.stopPropagation();
+    document.body.classList.toggle("menu-open");
+  });
+  navlinks.querySelectorAll("a").forEach(a => a.addEventListener("click", cerrarMenu));
+  document.addEventListener("click", e => {
+    if (!document.body.classList.contains("menu-open")) return;
+    if (navlinks.contains(e.target) || burger.contains(e.target)) return;
+    cerrarMenu();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarMenu(); });
+  addEventListener("resize", () => { if (innerWidth > 860) cerrarMenu(); }, { passive:true });
+}
+
 </script>
 </body>
 </html>
