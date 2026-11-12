@@ -108,6 +108,7 @@ header .wrap{ display:flex; align-items:center; justify-content:space-between; g
   display:flex; align-items:flex-end; overflow:hidden;
 }
 .top-bg{ position:absolute; inset:0; }
+.top-bg picture{ display:contents; }   /* para que el <img> siga siendo hijo directo */
 .top-bg img{ width:100%; height:100%; object-fit:cover; object-position:center 55%; }
 .top::after{
   content:""; position:absolute; inset:0; pointer-events:none;

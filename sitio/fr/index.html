@@ -7,7 +7,7 @@
 <meta name="description" content="HUMAYA Wellness Hotel : dix villas bien-être indépendantes au pied du volcan Arenal, La Fortuna, Costa Rica. Sources chaudes à proximité, mouvement et vrai repos. Ouverture en décembre 2026.">
 <meta name="keywords" content="hôtel wellness Costa Rica, resort bien-être volcan Arenal, retraite bien-être La Fortuna, villas bien-être Costa Rica">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.7.6">
+<meta name="humaya-version" content="1.7.7">
 <meta name="humaya-desplegado" content="2026-11-05">
 <link rel="icon" href="/assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/fr/">
@@ -305,22 +305,25 @@ body.menu-open .burger span:nth-child(3){ transform:translateY(-7px) rotate(-45d
 .hero-bg{ position:absolute; inset:0; }
 .hero-bg figure{
   position:absolute; inset:0; margin:0; opacity:0;
-  animation:heroCycle 24s infinite var(--ease);
+  animation:heroCycle 32s infinite var(--ease);
 }
 .hero-bg figure:nth-child(1){ animation-delay:0s; }
 .hero-bg figure:nth-child(2){ animation-delay:8s; }
 .hero-bg figure:nth-child(3){ animation-delay:16s; }
+.hero-bg figure:nth-child(4){ animation-delay:24s; }
 .hero-bg img{
   width:100%; height:100%; object-fit:cover; object-position:center 58%;
-  transform:scale(1.06); animation:kenburns 24s infinite linear;
+  transform:scale(1.06); animation:kenburns 32s infinite linear;
 }
 .hero-bg figure:nth-child(2) img{ animation-delay:8s; }
 .hero-bg figure:nth-child(3) img{ animation-delay:16s; }
+.hero-bg figure:nth-child(4) img{ animation-delay:24s; }
+.hero-bg picture{ display:contents; }
 @keyframes heroCycle{
-  0%{opacity:0} 3%{opacity:1} 22%{opacity:1} 27%{opacity:0} 100%{opacity:0}
+  0%{opacity:0} 2.25%{opacity:1} 16.5%{opacity:1} 20.25%{opacity:0} 100%{opacity:0}
 }
 @keyframes kenburns{
-  0%{transform:scale(1.04)} 27%{transform:scale(1.13)} 100%{transform:scale(1.13)}
+  0%{transform:scale(1.04)} 20.25%{transform:scale(1.13)} 100%{transform:scale(1.13)}
 }
 .hero::after{
   content:""; position:absolute; inset:0; pointer-events:none;
@@ -803,7 +806,11 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
 <!-- ══════════════ HERO ══════════════ -->
 <section class="hero" id="top">
   <div class="hero-bg">
-    <figure><img src="/assets/img/vol-hero.jpg" alt="Villas Humaya con el Volcán Arenal al fondo" fetchpriority="high"></figure>
+    <figure><picture>
+      <source media="(max-width:760px)" srcset="/assets/img/hero-villas-movil.jpg">
+      <img src="/assets/img/hero-villas.jpg" alt="Les villas de HUMAYA au coucher du soleil, avec le volcan Arenal en fond" fetchpriority="high">
+    </picture></figure>
+    <figure><img src="/assets/img/vol-hero.jpg" alt="Villas Humaya con el Volcán Arenal al fondo" loading="lazy"></figure>
     <figure><img src="/assets/img/hero.jpg" alt="Villa Humaya al atardecer" loading="lazy"></figure>
     <figure><img src="/assets/img/villa-05.jpg" alt="Villa Humaya" loading="lazy"></figure>
   </div>
