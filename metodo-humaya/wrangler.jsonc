@@ -1,0 +1,36 @@
+// Cómo se publica la app del huésped — experience.stayhumaya.com
+//
+// 15 de noviembre de 2026.
+//
+// ── POR QUÉ UN WORKER Y NO UN PROYECTO DE PAGES ─────────────────────────
+// La landing (stayhumaya.com) ya es un proyecto de Cloudflare Pages conectado
+// a ESTE MISMO repositorio, publicando `sitio/`. Al intentar crear un segundo
+// proyecto de Pages contra el mismo repo, Cloudflare lo marca «In use» y
+// deshabilita el botón: **Pages no deja dos proyectos sobre un repositorio.**
+// Comprobado en el panel, no supuesto.
+//
+// La salida es un Worker con assets estáticos, que sí acepta el repo
+// compartido. Hace lo mismo que Pages para un sitio estático: sirve archivos
+// desde un directorio, con dominio propio.
+//
+// ── POR QUÉ IMPORTA QUE SEA OTRO ORIGEN ─────────────────────────────────
+// `metodo-humaya/` es una PWA con service worker. Un service worker controla
+// TODO su origen. Si esta app se sirviera bajo stayhumaya.com, su service
+// worker podría quedarse mandando sobre la landing productiva — formularios
+// de reserva incluidos. En experience.stayhumaya.com no puede ni queriendo:
+// es otro origen.
+//
+// ── single-page-application ─────────────────────────────────────────────
+// La app usa React Router: /entrada, /app/interview y demás NO son archivos
+// en disco. Sin esta opción, entrar directo a cualquiera de esas direcciones
+// —que es justo lo que va a hacer un huésped desde un correo o un QR— daría
+// 404. Con ella, cualquier ruta desconocida sirve index.html y el router
+// resuelve del lado del navegador.
+{
+  "name": "humaya-experience",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
