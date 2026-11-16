@@ -1,6 +1,6 @@
 export type { AdminOpcion, Servicio, ServicioSlot } from './admin';
 export type { Locale, LocalizedText, Pillar } from './common';
-export type { ChatMessage } from './chat';
+export type { ChatMessage, ChatSender, ConciergeConversation } from './chat';
 export type {
   AlertKind,
   Companion,

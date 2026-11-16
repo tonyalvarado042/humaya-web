@@ -1,7 +1,8 @@
+import { MessageCircle } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { Card, EmptyState, Tag, Textarea } from '@/components/ui';
+import { Badge, Card, EmptyState, Tag, Textarea } from '@/components/ui';
 import { localizedText } from '@/i18n/localizedText';
-import { useGuestProfile, useSaveTeamNotes } from '@/hooks';
+import { useConciergeConversations, useGuestProfile, useSaveTeamNotes } from '@/hooks';
 import { initials, villaName } from '../format';
 import { Screen, ScreenLoading } from '../layout/ScreenState';
 import { profileCopy as copy } from './copy';
@@ -19,6 +20,8 @@ export function GuestProfilePage() {
   const { stayId } = useParams<{ stayId: string }>();
   const profile = useGuestProfile(stayId ?? '');
   const saveNotes = useSaveTeamNotes(stayId ?? '');
+  const conversations = useConciergeConversations();
+  const conversation = (conversations.data ?? []).find((item) => item.stayId === stayId);
 
   if (!stayId) {
     return (
@@ -90,6 +93,17 @@ export function GuestProfilePage() {
             </li>
           ))}
         </ul>
+      ) : null}
+
+      {conversation && conversation.unreadCount > 0 ? (
+        <Link
+          to={`/staff/concierge/${stayId}`}
+          className="flex items-center gap-2.5 rounded-card border border-line-strong bg-surface px-4 py-3 no-underline"
+        >
+          <MessageCircle size={18} strokeWidth={1.8} className="shrink-0 text-gold" />
+          <span className="text-sm font-medium text-text">{copy.conciergeUnread}</span>
+          <Badge tone="warning">{conversation.unreadCount}</Badge>
+        </Link>
       ) : null}
 
       <Card variant="ink" className="flex flex-col gap-1.5">

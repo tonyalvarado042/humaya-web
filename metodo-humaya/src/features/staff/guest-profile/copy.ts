@@ -6,6 +6,8 @@ export const profileCopy = {
       people === 1 ? 'persona' : 'personas'
     } · ${locale}`,
 
+  conciergeUnread: 'Le escribió al Concierge y todavía no se leyó',
+
   careTitle: 'Cómo quieren que los atendamos',
   methodTitle: 'Método Humaya',
   notesLabel: 'Notas del equipo',

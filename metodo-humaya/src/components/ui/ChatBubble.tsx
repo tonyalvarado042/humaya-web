@@ -1,16 +1,18 @@
 import { cn } from './cn';
 
 interface ChatBubbleProps {
-  from: 'concierge' | 'guest';
+  from: 'concierge' | 'guest' | 'staff';
   children: string;
 }
 
 /**
  * Mensaje del chat. El contenido se renderiza como texto plano a propósito:
  * ARCHITECTURE.md prohíbe dangerouslySetInnerHTML en los mensajes.
+ * "staff" y "concierge" comparten el mismo lado de la burbuja: las dos son
+ * "la otra parte" de la conversación, sea bot o una persona del equipo.
  */
 export function ChatBubble({ from, children }: ChatBubbleProps) {
-  const isConcierge = from === 'concierge';
+  const isConcierge = from !== 'guest';
 
   return (
     <p

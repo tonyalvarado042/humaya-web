@@ -97,8 +97,24 @@ export function stubAdminApi(
   let servicios = (initial.servicios ?? []).map((item) => ({ ...item }));
   const reservas = new Map<string, Set<string>>();
 
+  // El fetch que ya estuviera puesto. Si otra prueba encadena mas de un stub
+  // (la app del huesped toca admin Y concierge), cada uno atiende lo suyo y
+  // le pasa lo demas al anterior en vez de dejarlo sin atender.
+  const fetchPrevio = globalThis.fetch;
+
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = new URL(String(input));
+
+    // Solo lo propio. Si no es humaya-admin, se la pasamos al fetch que ya
+    // estuviera puesto: otra prueba puede encadenar varios stubs y cada
+    // uno tiene que reconocer su endpoint por la RUTA, no por los
+    // parametros (ver el comentario de fetchPrevio arriba).
+    if (!url.pathname.endsWith('/humaya-admin')) {
+      if (typeof fetchPrevio === 'function') {
+        return fetchPrevio(input, init);
+      }
+      return jsonResponse({ error: 'unhandled_in_test' }, 400);
+    }
 
     if (!init?.method || init.method === 'GET') {
       const que = url.searchParams.get('que');
@@ -190,6 +206,9 @@ export function stubAdminApi(
       return jsonResponse({ ok: true });
     }
 
+    if (typeof fetchPrevio === 'function') {
+      return fetchPrevio(input, init);
+    }
     return jsonResponse({ error: 'unhandled_in_test' }, 400);
   });
 

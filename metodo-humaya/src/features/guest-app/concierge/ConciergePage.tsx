@@ -2,18 +2,28 @@ import { Send, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChatBubble, Chip, IconButton, Input } from '@/components/ui';
-import { useConciergeMessages, useConciergeSuggestions, useSendMessage } from '@/hooks';
+import {
+  useConciergeMessages,
+  useConciergeSuggestions,
+  useGuestProfile,
+  useSendMessage,
+} from '@/hooks';
+import { GREETING } from '@/mocks';
 import { localizedText } from '@/i18n/localizedText';
 import { ScreenError, ScreenLoading } from '../layout/ScreenState';
+import { useCurrentStay } from '../layout/useCurrentStay';
 import { useGuestLanguage } from '../layout/useGuestLanguage';
 
 export function ConciergePage() {
   const [draft, setDraft] = useState('');
   const { t } = useTranslation();
   const { language } = useGuestLanguage();
-  const messages = useConciergeMessages();
+  const { stayId } = useCurrentStay();
+  const profile = useGuestProfile(stayId);
+  const messages = useConciergeMessages(stayId);
   const suggestions = useConciergeSuggestions();
-  const sendMessage = useSendMessage();
+  const guestName = profile.data?.guest.fullName ?? '';
+  const sendMessage = useSendMessage(stayId, guestName);
 
   function send(text: string) {
     const clean = text.trim();
@@ -22,13 +32,32 @@ export function ConciergePage() {
     setDraft('');
   }
 
-  if (messages.isPending) {
+  if (messages.isPending || profile.isPending) {
     return <ScreenLoading label={t('concierge.loading')} />;
   }
 
-  if (messages.isError || !messages.data) {
+  if (messages.isError || !messages.data || profile.isError || !profile.data) {
     return <ScreenError onRetry={() => void messages.refetch()} />;
   }
+
+  // El saludo es decorativo y no se guarda: el hilo real empieza con lo que
+  // el huésped escribe.
+  const thread =
+    messages.data.length === 0
+      ? [
+          {
+            id: 'm-greeting',
+            stayId,
+            guestName,
+            from: 'concierge' as const,
+            text: GREETING.es,
+            translations: GREETING,
+            escalated: false,
+            readAt: null,
+            at: '',
+          },
+        ]
+      : messages.data;
 
   return (
     <div className="flex flex-col">
@@ -55,7 +84,7 @@ export function ConciergePage() {
         aria-label={t('concierge.thread')}
         className="flex flex-col gap-3 px-5 py-4.5"
       >
-        {messages.data.map((message) => (
+        {thread.map((message) => (
           <ChatBubble key={message.id} from={message.from}>
             {message.translations ? localizedText(message.translations, language) : message.text}
           </ChatBubble>

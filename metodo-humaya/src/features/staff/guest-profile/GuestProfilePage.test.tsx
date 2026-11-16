@@ -1,15 +1,21 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetMockState } from '@/mocks';
 import { routes } from '@/router';
 import { getGuestProfile } from '@/services/guests';
+import { stubConciergeApi } from '@/test/conciergeApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 const VALERIA = '/staff/guests/s-mendez-rojas';
 
 beforeEach(() => {
   resetMockState();
+  stubConciergeApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 function wowPanel() {
@@ -131,6 +137,39 @@ describe('experiencias WOW', () => {
 
     const backPanel = await wowPanel();
     expect(within(backPanel).queryByText('Sugerida')).not.toBeInTheDocument();
+  });
+});
+
+describe('aviso del Concierge', () => {
+  it('enlaza a la conversación cuando hay mensajes sin leer', async () => {
+    const at = new Date().toISOString();
+    stubConciergeApi([
+      {
+        id: 'm-1',
+        stayId: 's-mendez-rojas',
+        guestName: 'Valeria',
+        from: 'guest',
+        text: '¿tienen helicóptero?',
+        escalated: true,
+        readAt: null,
+        at,
+      },
+    ]);
+    renderRoutes(routes, { route: VALERIA });
+
+    const link = await screen.findByRole('link', {
+      name: /Le escribió al Concierge y todavía no se leyó/,
+    });
+    expect(link).toHaveAttribute('href', '/staff/concierge/s-mendez-rojas');
+  });
+
+  it('no aparece cuando no hay mensajes sin leer', async () => {
+    renderRoutes(routes, { route: VALERIA });
+
+    await screen.findByRole('heading', { name: 'Valeria Méndez y Andrés Rojas' });
+    expect(
+      screen.queryByText('Le escribió al Concierge y todavía no se leyó'),
+    ).not.toBeInTheDocument();
   });
 });
 

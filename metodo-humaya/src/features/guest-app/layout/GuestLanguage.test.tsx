@@ -5,12 +5,14 @@ import { resetMockState } from '@/mocks';
 import { supportedGuestLanguage } from '@/i18n/localizedText';
 import { routes } from '@/router';
 import { stubAdminApi } from '@/test/adminApiStub';
+import { stubConciergeApi } from '@/test/conciergeApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 beforeEach(() => {
   resetMockState();
   window.localStorage.clear();
   stubAdminApi();
+  stubConciergeApi();
 });
 
 afterEach(() => {

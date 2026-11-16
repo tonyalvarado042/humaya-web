@@ -1,12 +1,18 @@
 import { screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetMockState } from '@/mocks';
 import { routes } from '@/router';
 import { bookSlot } from '@/services/spa';
+import { stubConciergeApi } from '@/test/conciergeApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 beforeEach(() => {
   resetMockState();
+  stubConciergeApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 function schedule() {

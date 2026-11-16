@@ -14,6 +14,8 @@ import { MyDataPage } from '@/features/guest-app/resumen/MyDataPage';
 import { VillaPage } from '@/features/guest-app/villa/VillaPage';
 import { AdminPage } from '@/features/staff/admin/AdminPage';
 import { ArrivalsPage } from '@/features/staff/arrivals/ArrivalsPage';
+import { ConciergeInboxPage } from '@/features/staff/concierge/ConciergeInboxPage';
+import { ConciergeThreadPage } from '@/features/staff/concierge/ConciergeThreadPage';
 import { GuestProfilePage } from '@/features/staff/guest-profile/GuestProfilePage';
 import { StaffLayout } from '@/features/staff/layout/StaffLayout';
 import { SpaPage } from '@/features/staff/spa/SpaPage';
@@ -59,6 +61,8 @@ export function createRoutes({
         { path: 'guests', element: <GuestProfilePage /> },
         { path: 'guests/:stayId', element: <GuestProfilePage /> },
         { path: 'spa', element: <SpaPage /> },
+        { path: 'concierge', element: <ConciergeInboxPage /> },
+        { path: 'concierge/:stayId', element: <ConciergeThreadPage /> },
         { path: 'admin', element: <AdminPage /> },
       ],
     },

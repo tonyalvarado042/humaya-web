@@ -23,6 +23,11 @@ export const arrivalsCopy = {
   seeProfile: 'Ver perfil',
   people: (count: number) => (count === 1 ? '1 persona' : `${count} personas`),
 
+  conciergeUnread: (count: number) =>
+    count === 1
+      ? '1 mensaje sin leer en el Concierge'
+      : `${count} mensajes sin leer en el Concierge`,
+
   interviewComplete: 'Completa',
   interviewPending: 'Pendiente',
   interviewInProgress: (answered: number, total: number) => `En curso · ${answered}/${total}`,
