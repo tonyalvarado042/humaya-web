@@ -33,7 +33,7 @@ export interface PillarSummary {
   text: string;
 }
 
-/** Un hito del Método Humaya en la línea de tiempo del perfil. */
+/** Un hito del HUMAYA Experience en la línea de tiempo del perfil. */
 export interface TimelineEvent {
   id: string;
   label: string;

@@ -1,4 +1,4 @@
-/** Los cinco pilares del Método Humaya. */
+/** Los cinco pilares del HUMAYA Experience. */
 export type Pillar = 'move' | 'nourish' | 'connect' | 'create' | 'believe';
 
 export type Locale = 'es' | 'en' | 'de' | 'fr';

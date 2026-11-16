@@ -14,6 +14,8 @@
  * se recuerda en el navegador.
  */
 
+import { MARCA } from '@/marca';
+
 export type Idioma = 'en' | 'es';
 
 export interface EntradaTextos {
@@ -47,7 +49,7 @@ export interface EntradaTextos {
 
 export const entradaCopy: Record<Idioma, EntradaTextos> = {
   en: {
-    eyebrow: 'The Humaya Method',
+    eyebrow: MARCA.experiencia,
     title: 'Find your stay',
     description: 'So we can get everything ready before you arrive. It takes a moment.',
     codigoLabel: 'Confirmation code or email',
@@ -66,7 +68,7 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     notFoundTitle: 'We couldn’t find it',
     notFoundBody:
       'Check the code and the last name — they have to be from the same booking. If it still doesn’t work, write to us and we’ll sort it out.',
-    contactEmail: 'reservations@stayhumaya.com',
+    contactEmail: MARCA.correo,
     contactWhatsapp: 'WhatsApp',
     whatsappHref: 'https://wa.me/50664417187?text=Hi%2C%20I%20can%27t%20find%20my%20reservation.',
     tryAgain: 'Try again',
@@ -74,7 +76,7 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     cambiarIdioma: 'Español',
   },
   es: {
-    eyebrow: 'Método Humaya',
+    eyebrow: MARCA.experiencia,
     title: 'Encontrá tu estadía',
     description: 'Para dejarte todo listo antes de que llegués. Es un momento.',
     codigoLabel: 'Código de confirmación o correo',
@@ -93,7 +95,7 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     notFoundTitle: 'No la encontramos',
     notFoundBody:
       'Revisá el código y el apellido — tienen que ser de la misma reserva. Si aun así no sale, escribinos y lo resolvemos.',
-    contactEmail: 'reservations@stayhumaya.com',
+    contactEmail: MARCA.correo,
     contactWhatsapp: 'WhatsApp',
     whatsappHref: 'https://wa.me/50664417187?text=Hola%2C%20no%20encuentro%20mi%20reserva.',
     tryAgain: 'Probar de nuevo',

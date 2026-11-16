@@ -81,7 +81,7 @@ export async function saveTeamNotes(stayId: string, notes: string): Promise<void
   state.teamNotes[stayId] = notes;
 }
 
-/** Los cuatro hitos del Método Humaya, derivados de la estadía y la entrevista. */
+/** Los cuatro hitos del HUMAYA Experience, derivados de la estadía y la entrevista. */
 export function timelineFor(stayId: string): TimelineEvent[] {
   const stay = STAYS.find((item) => item.id === stayId);
   if (!stay) return [];

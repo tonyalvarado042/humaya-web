@@ -50,7 +50,7 @@
     "checkOutTime": "hasta 11:00 a.m.",
     "people_one": "{{count}} persona",
     "people_other": "{{count}} personas",
-    "interviewEyebrow": "Método Humaya",
+    "interviewEyebrow": "{{experiencia}}",
     "interviewTitle": "Tu entrevista",
     "interviewProgress": "Llevás {{answered}} de {{total}} respuestas. Contanos un poco más y preparamos tu llegada a tu medida.",
     "interviewComplete": "Ya está completa. Con lo que nos contaste estamos preparando cada detalle de tu estadía.",
@@ -60,7 +60,7 @@
     "loading": "tus datos"
   },
   "interview": {
-    "eyebrow": "Método Humaya",
+    "eyebrow": "{{experiencia}}",
     "title": "Tu entrevista",
     "depthLabel": "Tipo de entrevista",
     "depthLight": "Light · 5 preguntas",
@@ -143,7 +143,7 @@
     "taken": "ocupado"
   },
   "move": {
-    "eyebrow": "Método Humaya · Move",
+    "eyebrow": "{{experiencia}} · Move",
     "title": "Tu entrenamiento",
     "subtitle": "Sesiones guiadas para esta semana, pensadas para tu estadía.",
     "coach": "Con {{name}}",

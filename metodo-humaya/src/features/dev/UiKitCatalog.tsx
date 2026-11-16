@@ -1,3 +1,4 @@
+import { MARCA } from '@/marca';
 import { Send } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
@@ -118,7 +119,7 @@ export function UiKitCatalog({ themeName }: UiKitCatalogProps) {
           <p className="m-0 text-sm text-muted">Tarjeta por defecto</p>
         </Card>
         <Card variant="accent" className="w-64">
-          <span className="text-eyebrow text-gold">Método Humaya</span>
+          <span className="text-eyebrow text-gold">{MARCA.experiencia}</span>
           <p className="m-0 mt-2 text-sm text-muted">Tarjeta destacada</p>
         </Card>
         <Card variant="ink" className="w-64">

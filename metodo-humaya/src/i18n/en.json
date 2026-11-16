@@ -50,7 +50,7 @@
     "checkOutTime": "by 11:00 a.m.",
     "people_one": "{{count}} guest",
     "people_other": "{{count}} guests",
-    "interviewEyebrow": "Humaya Method",
+    "interviewEyebrow": "{{experiencia}}",
     "interviewTitle": "Your interview",
     "interviewProgress": "You've answered {{answered}} of {{total}} questions. Tell us a little more so we can tailor your arrival.",
     "interviewComplete": "It's complete. We're using what you shared to prepare every detail of your stay.",
@@ -60,7 +60,7 @@
     "loading": "your data"
   },
   "interview": {
-    "eyebrow": "Humaya Method",
+    "eyebrow": "{{experiencia}}",
     "title": "Your interview",
     "depthLabel": "Interview type",
     "depthLight": "Light · 5 questions",
@@ -143,7 +143,7 @@
     "taken": "unavailable"
   },
   "move": {
-    "eyebrow": "Humaya Method · Move",
+    "eyebrow": "{{experiencia}} · Move",
     "title": "Your workout",
     "subtitle": "Guided sessions for this week, built around your stay.",
     "coach": "With {{name}}",

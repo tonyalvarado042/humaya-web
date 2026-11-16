@@ -1,4 +1,5 @@
 /** Textos de la pantalla Perfil del huésped. Desde la Fase 5 se mudan a src/i18n/. */
+import { MARCA } from '@/marca';
 export const profileCopy = {
   back: '← Llegadas',
   summary: (villa: string, nights: number, people: number, locale: string) =>
@@ -9,7 +10,7 @@ export const profileCopy = {
   conciergeUnread: 'Le escribió al Concierge y todavía no se leyó',
 
   careTitle: 'Cómo quieren que los atendamos',
-  methodTitle: 'Método Humaya',
+  methodTitle: MARCA.experiencia,
   notesLabel: 'Notas del equipo',
   notesPlaceholder: 'Ej.: llegaron cansados del vuelo, ofrecer la cena en la villa.',
   notesSaved: 'Notas guardadas',

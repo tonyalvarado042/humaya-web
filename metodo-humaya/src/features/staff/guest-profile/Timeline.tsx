@@ -3,7 +3,7 @@ import { cn } from '@/components/ui/cn';
 import type { TimelineEvent } from '@/types';
 import { profileCopy as copy } from './copy';
 
-/** La línea de tiempo del Método Humaya: antes, durante y después. */
+/** La línea de tiempo del HUMAYA Experience: antes, durante y después. */
 export function Timeline({ events }: { events: TimelineEvent[] }) {
   if (events.length === 0) return null;
 
