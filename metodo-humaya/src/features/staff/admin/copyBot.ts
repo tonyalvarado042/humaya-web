@@ -31,11 +31,31 @@ export const botCopy = {
 
   // Se dice POR QUÉ no se puede encender, en vez de dejar un botón que rebota.
   faltaLlave:
-    'Falta la llave de Anthropic. Mientras no esté, el bot no se puede encender y el Concierge sigue contestando «ya se lo paso al equipo», que es verdad. La llave se guarda en los secretos del proyecto en Supabase, nunca acá ni en el código.',
+    'Falta la llave de Anthropic. Mientras no esté, el bot no se puede encender y el Concierge sigue contestando «ya se lo paso al equipo», que es verdad. Pegála acá abajo.',
   llaveNoSirve:
-    'La llave de Anthropic est\u00e1 puesta pero el modelo la rechaza. Hay que reemplazarla en los secretos del proyecto en Supabase (Edge Functions \u2192 ANTHROPIC_API_KEY). Mientras tanto el bot no se enciende y el Concierge sigue pasando todo al equipo.',
+    'La llave de Anthropic est\u00e1 puesta pero el modelo la rechaza. Pegá una nueva acá abajo y volvé a tocar Probar. Mientras tanto el bot no se enciende y el Concierge sigue pasando todo al equipo.',
   faltanTemas:
     'Todavía no hay ningún tema encendido. Un bot sin datos inventa: por eso no se deja encender hasta que haya al menos uno.',
+
+  llaveTitulo: 'La llave de Anthropic',
+  llavePuesta: 'Puesta',
+  llaveNoPuesta: 'Sin poner',
+  llaveCuerpo:
+    'Pegá acá la llave de tu cuenta de Anthropic. Se guarda cifrada en la bóveda del servidor y no vuelve nunca a esta pantalla: de acá en adelante solo se ve si está puesta, cuándo y en qué termina. Después de guardarla, tocá Probar.',
+  llaveLabel: 'Llave de Anthropic',
+  llavePlaceholder: 'sk-ant-…',
+  llaveGuardada: 'Guardada. Tocá Probar para confirmar que sirve.',
+  guardarLlave: 'Guardar la llave',
+  llaveDetalle: (terminaEn: string | null, cuando: string | null) => {
+    const fin = terminaEn ? `termina en …${terminaEn}` : 'guardada';
+    if (!cuando) return `Hay una llave ${fin}.`;
+    const fecha = new Date(cuando).toLocaleDateString('es-CR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    return `Hay una llave ${fin}, puesta el ${fecha}.`;
+  },
 
   gastoTitulo: 'Gasto',
   esteMes: 'Este mes',

@@ -4,7 +4,9 @@ import {
   crearTema,
   editarTema,
   getEstadoBot,
+  getEstadoLlave,
   getTemas,
+  guardarLlave,
   guardarAjustesBot,
   type AjustesBot,
   type CambiosTema,
@@ -28,6 +30,26 @@ export function useEstadoBot() {
     queryFn: () => getEstadoBot(false),
     retry: false,
     refetchOnWindowFocus: false,
+  });
+}
+
+const LLAVE = ['concierge-llave'];
+
+export function useEstadoLlave() {
+  return useQuery({ queryKey: LLAVE, queryFn: getEstadoLlave, retry: false });
+}
+
+export function useGuardarLlave() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (valor: string) => guardarLlave(valor),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: LLAVE });
+      // El estado del bot cambia con la llave: si no se refresca, la pantalla
+      // seguiria diciendo «sin llave» con la llave ya puesta.
+      void queryClient.invalidateQueries({ queryKey: ESTADO });
+    },
   });
 }
 

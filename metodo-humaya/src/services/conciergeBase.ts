@@ -190,3 +190,56 @@ export async function guardarAjustesBot(ajustes: AjustesBot): Promise<void> {
   if (error) throw new Error(`bot_${error.code ?? 'error'}`);
   if (!data || data.length === 0) throw new Error('bot_sin_permiso');
 }
+
+/**
+ * La llave del modelo, puesta desde settings.
+ *
+ * ── POR QUE ACA Y NO EN EL PANEL DE SUPABASE ────────────────────────────
+ * Tony, 16 de noviembre de 2026: «dejalo todo en settings». Mandarlo al panel
+ * de Supabase a pegar una llave no es «todo en settings».
+ *
+ * ── POR QUE SE PUEDE HACER DESDE EL NAVEGADOR ───────────────────────────
+ * No se escribe en ninguna tabla: se llama a `cta_guardar_secreto`, que ya
+ * existia en el CRM y que guarda en la boveda cifrada. Esa funcion exige rol
+ * `administrador` y solo acepta llaves de una lista blanca, asi que el
+ * navegador no puede guardar cualquier cosa con cualquier nombre.
+ *
+ * ── LA LLAVE NO VUELVE NUNCA ────────────────────────────────────────────
+ * `cta_estado_secreto` devuelve si esta puesta, cuando, y los ULTIMOS CUATRO
+ * caracteres. Nada mas. No hay forma de leerla de vuelta desde la pantalla,
+ * que es justo lo que se quiere de una llave.
+ */
+export interface EstadoLlave {
+  puesta: boolean;
+  actualizadoEl: string | null;
+  terminaEn: string | null;
+}
+
+export async function getEstadoLlave(): Promise<EstadoLlave> {
+  const db = await cliente();
+  const { data, error } = await db.rpc('cta_estado_secreto', {
+    p_nombre: 'ANTHROPIC_API_KEY',
+  });
+  if (error) throw new Error(`llave_${error.code ?? 'error'}`);
+
+  const fila = (Array.isArray(data) ? data[0] : data) as
+    { puesta?: boolean; actualizado_el?: string | null; termina_en?: string | null } | undefined;
+
+  return {
+    puesta: fila?.puesta === true,
+    actualizadoEl: fila?.actualizado_el ?? null,
+    terminaEn: fila?.termina_en ?? null,
+  };
+}
+
+export async function guardarLlave(valor: string): Promise<void> {
+  const db = await cliente();
+  const { error } = await db.rpc('cta_guardar_secreto', {
+    p_nombre: 'ANTHROPIC_API_KEY',
+    p_valor: valor,
+  });
+  // El mensaje del servidor se pasa tal cual: dice si fue por permiso, por
+  // nombre no permitido o porque venia vacia. Un «no se pudo» generico manda
+  // a buscar el problema donde no esta.
+  if (error) throw new Error(error.message || 'llave_error');
+}

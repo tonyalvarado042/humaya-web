@@ -5,7 +5,9 @@ import {
   useCrearTema,
   useEditarTema,
   useEstadoBot,
+  useEstadoLlave,
   useGuardarAjustesBot,
+  useGuardarLlave,
   useProbarBot,
   useTemasBase,
 } from '@/hooks';
@@ -31,11 +33,16 @@ export function ConciergeBot() {
   const probar = useProbarBot();
   const guardar = useGuardarAjustesBot();
   const crear = useCrearTema();
+  const llave = useEstadoLlave();
+  const guardarLlaveNueva = useGuardarLlave();
 
   const [temaNuevo, setTemaNuevo] = useState('');
   const [contenidoNuevo, setContenidoNuevo] = useState('');
   const [sinTema, setSinTema] = useState(false);
   const [precioEntrada, setPrecioEntrada] = useState<string | null>(null);
+  // El campo arranca vacio SIEMPRE y nunca se siembra con lo guardado:
+  // una llave que vuelve al navegador deja de ser secreta.
+  const [llaveNueva, setLlaveNueva] = useState('');
   const [precioSalida, setPrecioSalida] = useState<string | null>(null);
 
   const datos = estado.data;
@@ -163,6 +170,66 @@ export function ConciergeBot() {
             </p>
           ) : null}
         </div>
+      </Card>
+
+      {/* ── La llave ───────────────────────────────────────────────────── */}
+      <Card>
+        <form
+          className="flex flex-col gap-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const limpia = llaveNueva.trim();
+            if (!limpia) return;
+            guardarLlaveNueva.mutate(limpia, { onSuccess: () => setLlaveNueva('') });
+          }}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="m-0 font-display text-lg font-medium">{copy.llaveTitulo}</h3>
+            {llave.data ? (
+              <Badge tone={llave.data.puesta ? 'success' : 'warning'}>
+                {llave.data.puesta ? copy.llavePuesta : copy.llaveNoPuesta}
+              </Badge>
+            ) : null}
+          </div>
+
+          <p className="m-0 text-sm leading-relaxed text-muted">{copy.llaveCuerpo}</p>
+
+          {llave.data?.puesta ? (
+            <p className="m-0 text-[13px] text-muted-soft">
+              {copy.llaveDetalle(llave.data.terminaEn, llave.data.actualizadoEl)}
+            </p>
+          ) : null}
+
+          <Input
+            label={copy.llaveLabel}
+            type="password"
+            autoComplete="off"
+            placeholder={copy.llavePlaceholder}
+            value={llaveNueva}
+            onChange={(event) => setLlaveNueva(event.target.value)}
+          />
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={guardarLlaveNueva.isPending || !llaveNueva.trim()}
+            >
+              {guardarLlaveNueva.isPending ? copy.guardando : copy.guardarLlave}
+            </Button>
+            {guardarLlaveNueva.isSuccess ? (
+              <span className="text-[13px] text-muted">{copy.llaveGuardada}</span>
+            ) : null}
+          </div>
+
+          {guardarLlaveNueva.isError ? (
+            <p role="alert" className="m-0 text-sm text-on-alert">
+              {guardarLlaveNueva.error instanceof Error
+                ? guardarLlaveNueva.error.message
+                : copy.soloAdmin}
+            </p>
+          ) : null}
+        </form>
       </Card>
 
       {/* ── Gasto ──────────────────────────────────────────────────────── */}

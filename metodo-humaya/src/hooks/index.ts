@@ -21,7 +21,9 @@ export {
   useCrearTema,
   useEditarTema,
   useEstadoBot,
+  useEstadoLlave,
   useGuardarAjustesBot,
+  useGuardarLlave,
   useProbarBot,
   useTemasBase,
 } from './useConciergeBase';
