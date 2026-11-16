@@ -323,11 +323,9 @@ function FilaServicio({
           <span className="text-[13px] text-muted">{servicio.descripcion}</span>
         ) : null}
         <span className="text-[13px] text-muted-soft">
-          {servicio.proveedor ? `${servicio.proveedor} \u00b7 ` : ''}
-          {servicio.precioUsd != null
-            ? `$${servicio.precioUsd}/${servicio.unidadPrecio} \u00b7 `
-            : ''}
-          {servicio.horaInicio}\u2013{servicio.horaFin}
+          {servicio.proveedor ? `${servicio.proveedor} · ` : ''}
+          {servicio.precioUsd != null ? `$${servicio.precioUsd}/${servicio.unidadPrecio} · ` : ''}
+          {servicio.horaInicio}–{servicio.horaFin}
         </span>
       </div>
       <div className="flex shrink-0 items-center gap-2">
