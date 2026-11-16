@@ -7,7 +7,7 @@
 <meta name="description" content="HUMAYA Wellness Hotel: zehn unabhängige Wellness-Villen am Fuße des Vulkans Arenal, La Fortuna, Costa Rica. Thermalquellen in der Nähe, Bewegung und echte Erholung. Eröffnung im Dezember 2026.">
 <meta name="keywords" content="Wellnesshotel Costa Rica, Wellness Resort Vulkan Arenal, Wellness Rückzugsort La Fortuna, Costa Rica Wellness Villen">
 <meta name="theme-color" content="#0A0A0A">
-<meta name="humaya-version" content="1.7.8">
+<meta name="humaya-version" content="1.7.9">
 <meta name="humaya-desplegado" content="2026-11-05">
 <link rel="icon" href="/assets/img/mark-gold.png">
 <link rel="canonical" href="https://stayhumaya.com/de/">
@@ -759,6 +759,10 @@ footer{ background:var(--ink-2); border-top:1px solid var(--line-soft); padding-
   .hero-cta .btn{ width:100%; }
 }
 </style>
+<!-- De donde viene esta visita. Se graba al ENTRAR, no al enviar el
+     formulario: en la segunda pagina el referrer ya seria el propio
+     sitio. Por eso va en las 20, no solo en las 4 con formulario. -->
+<script src="/assets/origen.js?v=1.7.9" defer></script>
 </head>
 
 <body>
@@ -1652,7 +1656,15 @@ form.addEventListener("submit", async e=>{
     const r = await fetch(SUPABASE_FN + "/book", {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ ...payload, request_id: bookingRequestId })
+      body: JSON.stringify({ ...payload, request_id: bookingRequestId,
+        /* Fuera de `payload` a proposito: payload alimenta la firma que
+           decide si se reusa el request_id, y el pais llega por fetch unos
+           milisegundos despues. Si entrara en la firma, un reintento veria
+           otra firma, pediria otro request_id y abriria una fila duplicada. */
+        origen: (window.humayaOrigen ? window.humayaOrigen() : null),
+        /* El mismo pais, tambien suelto: `origen` lo guarda la base, y este
+           es el que el correo de aviso puede mostrar sin desenterrarlo. */
+        pais: (window.humayaOrigen ? (window.humayaOrigen() || {}).pais : null) || undefined })
     });
     const data = await r.json().catch(()=>({}));
 

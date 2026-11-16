@@ -54,18 +54,23 @@ export const MARCA = {
   /**
    * ¿El dominio del personal ya existe de verdad?
    *
-   * Comprobado el 15 de noviembre de 2026: staff.stayhumaya.com NO resuelve
-   * todavía (`nslookup` → Non-existent domain). Falta agregarlo como dominio
-   * personalizado del Worker en Cloudflare, que es lo que crea el CNAME.
+   * **Sí, desde el 16 de noviembre de 2026.** Ese día se agregó
+   * staff.stayhumaya.com como dominio personalizado del Worker
+   * `humaya-experience` en Cloudflare, y se comprobó desde fuera:
    *
-   * Mientras eso no pase, mandar a alguien para allá sería mandarlo a un error
-   * del navegador. Así que la separación arranca APAGADA: /staff se sirve donde
-   * sea, pero siempre detrás de la puerta. Lo que protege los datos es la
-   * puerta, no el subdominio.
+   *   nslookup  → 104.21.5.31 / 172.67.132.218 (+ IPv6)
+   *   curl      → 200 text/html, sirviendo el mismo bundle
    *
-   * Para encenderla, cuando el dominio exista: VITE_DOMINIOS_SEPARADOS=true.
+   * El 15 de noviembre esto estaba APAGADO porque el nombre no resolvía:
+   * mandar a alguien para allá habría sido mandarlo a un error del navegador.
+   * Ahora resuelve, así que la separación va ENCENDIDA por defecto.
+   *
+   * Lo que protege los datos sigue siendo la puerta, no el subdominio: /staff
+   * exige cuenta y clave del CRM en cualquiera de los dos dominios.
+   *
+   * Para apagarla otra vez (si el dominio se cayera): VITE_DOMINIOS_SEPARADOS=false.
    */
-  dominiosSeparados: import.meta.env.VITE_DOMINIOS_SEPARADOS === 'true',
+  dominiosSeparados: import.meta.env.VITE_DOMINIOS_SEPARADOS !== 'false',
 } as const;
 
 /** Qué lado de la app sirve este dominio. */

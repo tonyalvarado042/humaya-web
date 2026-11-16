@@ -2,4 +2,11 @@ User-agent: *
 Allow: /
 Crawl-delay: 10
 
+# Las propuestas de viaje se mandan por enlace a una persona concreta.
+# No se anuncian, no están en el menú ni en el sitemap, y además cada una
+# lleva <meta name="robots" content="noindex, nofollow">. Esto es la segunda
+# cerradura, no la única: el enlace sigue siendo público para quien lo tenga.
+Disallow: /exp1
+Disallow: /exp2
+
 Sitemap: https://stayhumaya.com/sitemap.xml
