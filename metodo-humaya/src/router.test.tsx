@@ -47,7 +47,10 @@ describe('rutas base', () => {
 
   it('monta /entrada', () => {
     renderAt('/entrada');
-    expect(screen.getByRole('heading', { name: 'Encontrá tu estadía' })).toBeInTheDocument();
+    // Abre en inglés desde el 15 de noviembre: 53 de las 62 reservas reales
+    // entran por Airbnb, Expedia y Booking, casi todas de afuera. El español
+    // está a un toque, y eso se prueba en EntradaPage.test.tsx.
+    expect(screen.getByRole('heading', { name: 'Find your stay' })).toBeInTheDocument();
   });
 
   it('la portada enlaza a /entrada', () => {

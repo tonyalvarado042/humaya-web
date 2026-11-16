@@ -1,24 +1,103 @@
-/** Textos de /entrada. Español solo, como la portada del origen (DemoHomePage): no hay
- * estadía todavía acá, así que no hay de dónde sacar la preferencia de idioma del huésped. */
-export const entradaCopy = {
-  eyebrow: 'Método Humaya',
-  title: 'Encontrá tu estadía',
-  description: 'Escribí el correo con el que hiciste tu reserva y te confirmamos si ya la tenemos.',
-  emailLabel: 'Correo',
-  emailPlaceholder: 'tu@correo.com',
-  submit: 'Continuar',
-  submitting: 'Buscando…',
-  invalidEmail: 'Escribí un correo válido.',
-  foundTitle: (guestName: string) =>
-    guestName ? `¡Te encontramos, ${guestName}!` : '¡Te encontramos!',
-  foundBody: 'Ya tenemos tu reserva. Te vamos a escribir pronto para coordinar tu estadía.',
-  notFoundTitle: 'No encontramos tu reserva',
-  notFoundBody:
-    'Revisá que sea el mismo correo con el que reservaste. Si creés que es un error, escribinos y te ayudamos.',
-  contactEmail: 'reservations@stayhumaya.com',
-  contactWhatsapp: 'WhatsApp',
-  whatsappHref:
-    'https://wa.me/50664417187?text=Hola%2C%20no%20encontr%C3%A9%20mi%20reserva%20en%20la%20app.',
-  tryAgain: 'Probar con otro correo',
-  error: 'Algo falló de nuestro lado. Probá de nuevo en un momento.',
+/**
+ * Textos de /entrada, en los dos idiomas.
+ *
+ * ── POR QUÉ INGLÉS POR DEFECTO ──────────────────────────────────────────
+ * Tony, 15 de noviembre de 2026: «sí deben ir en inglés con opción a español».
+ * Y los datos lo respaldan: de las 62 reservas reales, 53 entraron por Airbnb,
+ * Expedia y Booking.com, casi todas de afuera. El huésped que reserva en el
+ * sitio en español es la minoría.
+ *
+ * ── POR QUÉ NO USA i18n ─────────────────────────────────────────────────
+ * El resto de la app traduce con react-i18next leyendo la preferencia de la
+ * estadía. Acá todavía no hay estadía —esa es justamente la pantalla que la
+ * encuentra—, así que no hay de dónde sacar la preferencia. Se elige a mano y
+ * se recuerda en el navegador.
+ */
+
+export type Idioma = 'en' | 'es';
+
+export interface EntradaTextos {
+  eyebrow: string;
+  title: string;
+  description: string;
+  /** El ejemplo cambia por idioma: un código de Airbnb no se lee igual en los dos. */
+  codigoLabel: string;
+  codigoHelp: string;
+  codigoPlaceholder: string;
+  apellidoLabel: string;
+  apellidoPlaceholder: string;
+  submit: string;
+  submitting: string;
+  faltaCodigo: string;
+  faltaApellido: string;
+  foundTitle: (quien: string) => string;
+  foundBody: string;
+  fechas: (entrada: string, salida: string) => string;
+  notFoundTitle: string;
+  notFoundBody: string;
+  contactEmail: string;
+  contactWhatsapp: string;
+  whatsappHref: string;
+  tryAgain: string;
+  error: string;
+  /** El botón que cambia de idioma dice el idioma AL QUE lleva, no el actual:
+   *  quien lo necesita no está leyendo el que está puesto. */
+  cambiarIdioma: string;
+}
+
+export const entradaCopy: Record<Idioma, EntradaTextos> = {
+  en: {
+    eyebrow: 'The Humaya Method',
+    title: 'Find your stay',
+    description: 'So we can get everything ready before you arrive. It takes a moment.',
+    codigoLabel: 'Confirmation code or email',
+    codigoHelp:
+      'The code your booking site gave you — Airbnb, Expedia, Booking.com — or the email you booked with.',
+    codigoPlaceholder: 'HMMS93AC2K',
+    apellidoLabel: 'Last name',
+    apellidoPlaceholder: 'Galloway',
+    submit: 'Continue',
+    submitting: 'Looking…',
+    faltaCodigo: 'Enter your confirmation code or the email you booked with.',
+    faltaApellido: 'Enter the last name on the booking.',
+    foundTitle: (quien) => (quien ? `Found you, ${quien}.` : 'Found you.'),
+    foundBody: 'We have your reservation. Let’s get your days ready.',
+    fechas: (entrada, salida) => `${entrada} → ${salida}`,
+    notFoundTitle: 'We couldn’t find it',
+    notFoundBody:
+      'Check the code and the last name — they have to be from the same booking. If it still doesn’t work, write to us and we’ll sort it out.',
+    contactEmail: 'reservations@stayhumaya.com',
+    contactWhatsapp: 'WhatsApp',
+    whatsappHref: 'https://wa.me/50664417187?text=Hi%2C%20I%20can%27t%20find%20my%20reservation.',
+    tryAgain: 'Try again',
+    error: 'Something broke on our side. Try again in a moment.',
+    cambiarIdioma: 'Español',
+  },
+  es: {
+    eyebrow: 'Método Humaya',
+    title: 'Encontrá tu estadía',
+    description: 'Para dejarte todo listo antes de que llegués. Es un momento.',
+    codigoLabel: 'Código de confirmación o correo',
+    codigoHelp:
+      'El código que te dio Airbnb, Expedia o Booking.com — o el correo con el que reservaste.',
+    codigoPlaceholder: 'HMMS93AC2K',
+    apellidoLabel: 'Apellido',
+    apellidoPlaceholder: 'Galloway',
+    submit: 'Continuar',
+    submitting: 'Buscando…',
+    faltaCodigo: 'Escribí tu código de confirmación o el correo con el que reservaste.',
+    faltaApellido: 'Escribí el apellido de la reserva.',
+    foundTitle: (quien) => (quien ? `¡Te encontramos, ${quien}!` : '¡Te encontramos!'),
+    foundBody: 'Ya tenemos tu reserva. Vamos a dejarte los días listos.',
+    fechas: (entrada, salida) => `${entrada} → ${salida}`,
+    notFoundTitle: 'No la encontramos',
+    notFoundBody:
+      'Revisá el código y el apellido — tienen que ser de la misma reserva. Si aun así no sale, escribinos y lo resolvemos.',
+    contactEmail: 'reservations@stayhumaya.com',
+    contactWhatsapp: 'WhatsApp',
+    whatsappHref: 'https://wa.me/50664417187?text=Hola%2C%20no%20encuentro%20mi%20reserva.',
+    tryAgain: 'Probar de nuevo',
+    error: 'Algo falló de nuestro lado. Probá de nuevo en un momento.',
+    cambiarIdioma: 'English',
+  },
 };

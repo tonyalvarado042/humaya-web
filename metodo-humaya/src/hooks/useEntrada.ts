@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
-import { checkReservation } from '@/services/entrada';
+import { checkReservation, type EntradaBusqueda } from '@/services/entrada';
 
 export function useCheckReservation() {
   return useMutation({
-    mutationFn: (email: string) => checkReservation(email),
+    mutationFn: (busqueda: EntradaBusqueda) => checkReservation(busqueda),
   });
 }
