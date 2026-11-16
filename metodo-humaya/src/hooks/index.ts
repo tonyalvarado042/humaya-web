@@ -4,6 +4,7 @@ export {
   useCrearServicio,
   useReservarServicio,
   useServicioSlots,
+  useEditarServicio,
   useToggleOpcion,
   useToggleServicio,
 } from './useAdmin';

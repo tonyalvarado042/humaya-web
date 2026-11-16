@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   crearServicio,
+  editarServicio,
   getOpciones,
   getServicios,
   getServicioSlots,
   reservarServicio,
   toggleOpcion,
   toggleServicio,
+  type CambiosServicio,
   type NuevoServicio,
 } from '@/services/admin';
 import { queryKeys } from './queryKeys';
@@ -43,6 +45,18 @@ export function useToggleServicio() {
   return useMutation({
     mutationFn: ({ id, habilitado }: { id: string; habilitado: boolean }) =>
       toggleServicio(id, habilitado),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin-servicios'] });
+    },
+  });
+}
+
+export function useEditarServicio() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, cambios }: { id: string; cambios: CambiosServicio }) =>
+      editarServicio(id, cambios),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin-servicios'] });
     },

@@ -114,6 +114,52 @@ export async function toggleServicio(id: string, habilitado: boolean): Promise<v
   });
 }
 
+/**
+ * Editar un servicio que ya existe.
+ *
+ * Esta NO pasa por la funcion, a diferencia de crear y habilitar: va directo
+ * a la tabla con la llave publicable, y quien decide si se puede es RLS. La
+ * politica `humaya_servicios_admin` exige rol `administrador`, igual que el
+ * interruptor del demo. Cambiar el precio o con quien es un servicio es de la
+ * misma clase que apagar el demo: lo hace un administrador, y lo hace cumplir
+ * la base de datos, no una comprobacion que se puede olvidar en el camino.
+ *
+ * Solo se mandan los campos que vienen: un `undefined` no pisa lo que hay.
+ */
+export interface CambiosServicio {
+  nombre?: string;
+  descripcion?: string | null;
+  proveedor?: string | null;
+  precioUsd?: number | null;
+  unidadPrecio?: string;
+  duracionMin?: number;
+  horaInicio?: string;
+  horaFin?: string;
+}
+
+export async function editarServicio(id: string, cambios: CambiosServicio): Promise<void> {
+  const { cliente } = await import('./sesion');
+  const db = await cliente();
+
+  const fila: Record<string, unknown> = { actualizado_en: new Date().toISOString() };
+  if (cambios.nombre !== undefined) fila.nombre = cambios.nombre;
+  if (cambios.descripcion !== undefined) fila.descripcion = cambios.descripcion;
+  if (cambios.proveedor !== undefined) fila.proveedor = cambios.proveedor;
+  if (cambios.precioUsd !== undefined) fila.precio_usd = cambios.precioUsd;
+  if (cambios.unidadPrecio !== undefined) fila.unidad_precio = cambios.unidadPrecio;
+  if (cambios.duracionMin !== undefined) fila.duracion_min = cambios.duracionMin;
+  if (cambios.horaInicio !== undefined) fila.hora_inicio = cambios.horaInicio;
+  if (cambios.horaFin !== undefined) fila.hora_fin = cambios.horaFin;
+
+  // `select()` despues del update no es decorativo: sin el, una fila que RLS
+  // no deja tocar devuelve exito con cero filas y la pantalla diria que
+  // guardo algo que no guardo. Con el, contamos lo que de verdad cambio.
+  const { data, error } = await db.from('humaya_servicios').update(fila).eq('id', id).select('id');
+
+  if (error) throw new Error(`servicio_${error.code ?? 'error'}`);
+  if (!data || data.length === 0) throw new Error('servicio_sin_permiso');
+}
+
 export interface NuevoServicio {
   nombre: string;
   descripcion?: string;
