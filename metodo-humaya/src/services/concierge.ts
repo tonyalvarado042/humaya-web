@@ -59,11 +59,28 @@ export async function getConversations(): Promise<ConciergeConversation[]> {
   return data.conversations;
 }
 
-export async function sendStaffReply(stayId: string, text: string): Promise<ChatMessage[]> {
+/**
+ * La respuesta de recepcion, en los dos idiomas.
+ *
+ * El ingles es opcional pero importa: 53 de 62 reservas reales entran por
+ * Airbnb, Expedia y Booking, asi que el huesped promedio lee en ingles. Sin
+ * `textEn`, el mensaje se guarda solo en espanol y la app se lo muestra en
+ * espanol a alguien que no lo lee.
+ */
+export async function sendStaffReply(
+  stayId: string,
+  text: string,
+  textEn?: string,
+): Promise<ChatMessage[]> {
   const data = await call<{ messages: ChatMessage[] }>(CONCIERGE_URL, {
     method: 'POST',
     headers: await cabeceraDeRecepcion(),
-    body: JSON.stringify({ action: 'reply', stay_id: stayId, text }),
+    body: JSON.stringify({
+      action: 'reply',
+      stay_id: stayId,
+      text,
+      text_en: textEn?.trim() || undefined,
+    }),
   });
   return data.messages;
 }

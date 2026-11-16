@@ -77,12 +77,53 @@ describe('Conversación de un huésped', () => {
     stubConciergeApi();
     renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
 
-    const field = await screen.findByLabelText('Tu respuesta');
+    const field = await screen.findByLabelText('Tu respuesta (español)');
     await userEvent.type(field, 'Ya te confirmamos el horario.');
     await userEvent.click(screen.getByRole('button', { name: 'Enviar' }));
 
-    expect(await screen.findByText('Ya te confirmamos el horario.')).toBeInTheDocument();
+    expect(await screen.findAllByText('Ya te confirmamos el horario.')).not.toHaveLength(0);
     expect(field).toHaveValue('');
+  });
+
+  it('avisa, antes de mandar, que sin inglés el huésped va a recibir español', async () => {
+    // 53 de 62 reservas reales entran por Airbnb, Expedia y Booking: el
+    // huésped promedio lee en inglés. Mandar solo español no es un detalle
+    // de estilo, es mandarle algo que no lee.
+    stubConciergeApi();
+    renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
+
+    const es = await screen.findByLabelText('Tu respuesta (español)');
+    await userEvent.type(es, 'Ya está reservado.');
+
+    expect(await screen.findByText(/va a recibir el texto en español/)).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText('La misma, en inglés'), "It's booked.");
+
+    expect(screen.queryByText(/va a recibir el texto en español/)).not.toBeInTheDocument();
+  });
+
+  it('manda los dos idiomas cuando se escriben los dos', async () => {
+    const { fetchMock } = stubConciergeApi();
+    renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
+
+    await userEvent.type(
+      await screen.findByLabelText('Tu respuesta (español)'),
+      'Ya está reservado.',
+    );
+    await userEvent.type(screen.getByLabelText('La misma, en inglés'), "It's booked.");
+    await userEvent.click(screen.getByRole('button', { name: 'Enviar' }));
+
+    const envio = fetchMock.mock.calls
+      .map(([, init]) => String((init as RequestInit | undefined)?.body ?? ''))
+      .find((body) => body.includes('"action":"reply"'));
+
+    expect(envio).toBeDefined();
+    expect(JSON.parse(envio!)).toEqual({
+      action: 'reply',
+      stay_id: 's-mendez-rojas',
+      text: 'Ya está reservado.',
+      text_en: "It's booked.",
+    });
   });
 
   it('una estadía que no existe muestra el estado vacío', async () => {

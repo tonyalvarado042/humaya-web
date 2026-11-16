@@ -18,7 +18,15 @@ export const conciergeThreadCopy = {
   guardadas: 'Respuestas guardadas',
   guardadasAyuda:
     'Tocá una y queda en el cuadro para que la leas y la ajustes antes de mandarla. Se editan en Admin.',
-  replyLabel: 'Tu respuesta',
+  replyLabel: 'Tu respuesta (español)',
+  replyLabelEn: 'La misma, en inglés',
+  replyPlaceholderEn: 'Write the same reply in English…',
+  vistaPrevia: 'Así le va a llegar',
+  siLeeEspanol: 'Si el huésped lee en español:',
+  siLeeIngles: 'Si lee en inglés:',
+  sinIngles:
+    'No escribiste la versión en inglés, así que un huésped que lee en inglés va a recibir el texto en español. La mayoría de las reservas entran por Airbnb, Expedia y Booking.',
+
   replyPlaceholder: 'Escribí la respuesta para el huésped…',
   send: 'Enviar',
   sending: 'Enviando…',

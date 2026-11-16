@@ -25,6 +25,7 @@ function messageAt(iso: string): string {
 export function ConciergeThreadPage() {
   const { stayId } = useParams<{ stayId: string }>();
   const [draft, setDraft] = useState('');
+  const [draftEn, setDraftEn] = useState('');
   const demoStay = DEMO_STAYS.find((stay) => stay.stayId === stayId);
   const messages = useConciergeMessages(stayId ?? '');
   const markRead = useMarkConversationRead(stayId ?? '');
@@ -57,8 +58,9 @@ export function ConciergeThreadPage() {
   function send() {
     const clean = draft.trim();
     if (!clean || sendReply.isPending) return;
-    sendReply.mutate(clean);
+    sendReply.mutate({ text: clean, textEn: draftEn.trim() || undefined });
     setDraft('');
+    setDraftEn('');
   }
 
   return (
@@ -121,7 +123,10 @@ export function ConciergeThreadPage() {
               <Chip
                 key={respuesta.id}
                 title={respuesta.texto}
-                onClick={() => setDraft(respuesta.texto)}
+                onClick={() => {
+                  setDraft(respuesta.texto);
+                  setDraftEn(respuesta.textoEn ?? '');
+                }}
               >
                 {respuesta.titulo}
               </Chip>
@@ -135,29 +140,58 @@ export function ConciergeThreadPage() {
       ) : null}
 
       <form
-        className="flex items-end gap-2"
+        className="flex flex-col gap-3"
         onSubmit={(event) => {
           event.preventDefault();
           send();
         }}
       >
-        <div className="flex-1">
-          <Input
-            label={copy.replyLabel}
-            hideLabel
-            placeholder={copy.replyPlaceholder}
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-          />
+        <Input
+          label={copy.replyLabel}
+          placeholder={copy.replyPlaceholder}
+          value={draft}
+          onChange={(event) => setDraft(event.target.value)}
+        />
+        <Input
+          label={copy.replyLabelEn}
+          placeholder={copy.replyPlaceholderEn}
+          value={draftEn}
+          onChange={(event) => setDraftEn(event.target.value)}
+        />
+
+        {/* Como le llega. 53 de 62 reservas entran por OTAs, asi que el
+            huesped promedio lee en ingles: si el campo en ingles esta vacio,
+            la pantalla lo dice ANTES de mandar, no despues. */}
+        {draft.trim() ? (
+          <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4">
+            <span className="text-xs uppercase tracking-[0.18em] text-muted-soft">
+              {copy.vistaPrevia}
+            </span>
+            <span className="text-[13px] text-muted">{copy.siLeeEspanol}</span>
+            <ChatBubble from="staff">{draft}</ChatBubble>
+            <span className="text-[13px] text-muted">{copy.siLeeIngles}</span>
+            <ChatBubble from="staff">{draftEn.trim() || draft}</ChatBubble>
+            {!draftEn.trim() ? (
+              <p role="status" className="m-0 text-[13px] text-on-alert">
+                {copy.sinIngles}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className="flex items-center gap-2">
+          <IconButton
+            type="submit"
+            aria-label={sendReply.isPending ? copy.sending : copy.send}
+            size="lg"
+            disabled={!draft.trim() || sendReply.isPending}
+          >
+            <Send size={20} strokeWidth={1.8} aria-hidden="true" />
+          </IconButton>
+          <span className="text-[13px] text-muted-soft">
+            {sendReply.isPending ? copy.sending : copy.send}
+          </span>
         </div>
-        <IconButton
-          type="submit"
-          aria-label={sendReply.isPending ? copy.sending : copy.send}
-          size="lg"
-          disabled={!draft.trim() || sendReply.isPending}
-        >
-          <Send size={20} strokeWidth={1.8} aria-hidden="true" />
-        </IconButton>
       </form>
     </Screen>
   );

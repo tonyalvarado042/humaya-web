@@ -51,7 +51,8 @@ export function useSendStaffReply(stayId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (text: string) => sendStaffReply(stayId, text),
+    mutationFn: ({ text, textEn }: { text: string; textEn?: string }) =>
+      sendStaffReply(stayId, text, textEn),
     onSuccess: (messages) => {
       queryClient.setQueryData(queryKeys.conciergeMessages(stayId), messages);
       void queryClient.invalidateQueries({ queryKey: queryKeys.conciergeConversations() });
