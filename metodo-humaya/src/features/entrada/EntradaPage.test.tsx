@@ -119,3 +119,24 @@ describe('Entrada', () => {
     );
   });
 });
+
+describe('el enlace que llega por correo', () => {
+  it('trae el código ya escrito, para que el huésped solo ponga su apellido', async () => {
+    // Los tres correos al huésped llevan un botón a /entrada?c=CODIGO. Si la
+    // página ignorara el parámetro, ese botón abriría un formulario vacío y
+    // habría que copiar el código a mano — lo contrario de lo que el correo
+    // promete. Este test es el que no deja que vuelva a pasar.
+    window.history.replaceState({}, '', '/entrada?c=HMJW3AJKN5');
+    renderPage();
+
+    expect(screen.getByLabelText('Confirmation code or email')).toHaveValue('HMJW3AJKN5');
+    expect(screen.getByLabelText('Last name')).toHaveValue('');
+  });
+
+  it('sin parámetro, el campo arranca vacío', () => {
+    window.history.replaceState({}, '', '/entrada');
+    renderPage();
+
+    expect(screen.getByLabelText('Confirmation code or email')).toHaveValue('');
+  });
+});

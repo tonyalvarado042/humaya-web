@@ -1,18 +1,23 @@
 import { Menu } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import type { Idioma } from '@/hooks/useIdiomaElegido';
+import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { HumayaLogo } from '@/components/HumayaLogo';
 import { Drawer } from '@/components/ui';
-import { STAFF_NAV, staffCopy as copy } from './nav';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { STAFF_NAV, staffCopy } from './nav';
 import { StaffNav } from './StaffNav';
 
-/** El título que muestra la barra superior en los anchos angostos. */
-function currentLabel(pathname: string): string {
-  if (pathname.startsWith('/staff/guests')) return 'Huéspedes';
-  if (pathname.startsWith('/staff/spa')) return 'Spa y bienestar';
-  if (pathname.startsWith('/staff/concierge')) return 'Concierge';
-  if (pathname.startsWith('/staff/admin')) return 'Admin';
-  return STAFF_NAV[0].label;
+/**
+ * El título que muestra la barra superior en los anchos angostos. Sale de la
+ * misma lista que el menú, así no hay dos lugares donde traducir lo mismo.
+ */
+function currentLabel(pathname: string, idioma: Idioma): string {
+  const destinos = STAFF_NAV[idioma];
+  const calza = destinos.find(
+    (destino) => destino.to !== '/staff' && pathname.startsWith(destino.to),
+  );
+  return calza?.label ?? destinos[0].label;
 }
 
 /**
@@ -22,10 +27,8 @@ function currentLabel(pathname: string): string {
 export function StaffLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    document.documentElement.lang = 'es';
-  }, []);
+  const [idioma] = useIdiomaRecepcion();
+  const copy = staffCopy[idioma];
 
   return (
     <div data-theme="staff" className="min-h-dvh bg-bg text-text">
@@ -52,7 +55,9 @@ export function StaffLayout() {
             </button>
             <HumayaLogo variant="mark" className="h-8 w-auto shrink-0" />
             <div className="flex min-w-0 flex-col">
-              <span className="truncate text-[13px] text-muted">{currentLabel(pathname)}</span>
+              <span className="truncate text-[13px] text-muted">
+                {currentLabel(pathname, idioma)}
+              </span>
             </div>
           </header>
 

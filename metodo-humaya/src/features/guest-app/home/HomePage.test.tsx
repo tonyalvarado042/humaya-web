@@ -98,6 +98,10 @@ describe('fichas de accesos', () => {
 
 describe('selector de huésped', () => {
   it('cambia de huésped sin recargar', async () => {
+    // Las dos estadías en español: lo que se prueba acá es que el selector
+    // cambia de huésped sin recargar, no en qué idioma saluda. Sin esto,
+    // Hannah saluda en su propio idioma y la aserción hablaría de traducción.
+    window.localStorage.setItem('humaya.guest-language:s-weber', 'es');
     renderWithProviders(<HomePage />, { stayId: VALERIA });
 
     await screen.findByRole('heading', { name: 'Hola, Valeria.' });

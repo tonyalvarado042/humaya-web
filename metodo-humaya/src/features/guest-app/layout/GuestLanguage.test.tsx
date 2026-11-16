@@ -93,15 +93,18 @@ describe('idioma de la app del huésped', () => {
     expect(screen.getByText('Hot water')).toBeInTheDocument();
   });
 
-  it('mantiene recepción en español después de usar la app en inglés', async () => {
+  it('el idioma del huésped no toca el de recepción', async () => {
     const { router } = renderRoutes(routes, { route: '/app' });
 
     await screen.findByRole('heading', { name: 'Hola, Valeria.' });
     await userEvent.click(screen.getByRole('button', { name: 'Cambiar idioma a inglés' }));
     await router.navigate('/staff');
 
-    expect(await screen.findByRole('heading', { name: 'Llegadas' })).toBeInTheDocument();
-    await waitFor(() => expect(document.documentElement).toHaveAttribute('lang', 'es'));
+    // Recepción tiene su propio idioma, y desde el 15 de noviembre abre en
+    // inglés: que el huésped haya puesto la app en inglés —o en español— no
+    // decide nada de este lado.
+    expect(await screen.findByRole('heading', { name: 'Bookings' })).toBeInTheDocument();
+    await waitFor(() => expect(document.documentElement).toHaveAttribute('lang', 'en'));
   });
 
   it('usa español como respaldo para preferencias alemana y francesa', () => {

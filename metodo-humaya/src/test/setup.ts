@@ -1,4 +1,5 @@
 import { configure } from '@testing-library/react';
+import { beforeEach, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import '@/i18n';
 
@@ -8,3 +9,39 @@ import '@/i18n';
  * queda corto y genera fallos intermitentes.
  */
 configure({ asyncUtilTimeout: 3000 });
+
+/**
+ * El SDK de Supabase se falsifica para toda la suite. La factory tiene que
+ * importar el stub adentro: `vi.mock` se iza sobre los imports del archivo, así
+ * que una variable del módulo todavía no existiría cuando corre.
+ *
+ * Lo que se falsifica es el SDK, no nuestro servicio de sesión: así el código
+ * que decide quién entra a recepción se ejecuta de verdad en los tests.
+ */
+vi.mock('@supabase/supabase-js', async () => {
+  const { clienteFalso } = await import('./supabaseStub');
+  return { createClient: () => clienteFalso() };
+});
+
+/**
+ * Cada test arranca con una sesión de recepción abierta.
+ *
+ * Las pantallas de recepción prueban la pantalla, no la puerta: si cada una
+ * tuviera que autenticarse primero, el test diría menos y tardaría más. La
+ * puerta tiene sus propios tests —Puerta.test.tsx— y ahí la sesión se cierra a
+ * propósito para comprobar que nadie entra sin ella.
+ */
+beforeEach(async () => {
+  // Navegador limpio en cada test. Varias pantallas recuerdan cosas acá —el
+  // idioma elegido, la estadía— y lo que guarda un test no debe decidir lo que
+  // ve el siguiente.
+  try {
+    window.localStorage.clear();
+  } catch {
+    // Sin almacenamiento no hay nada que limpiar.
+  }
+
+  const { resetSupabaseStub, stubSesionAbierta } = await import('./supabaseStub');
+  resetSupabaseStub();
+  stubSesionAbierta();
+});

@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/ui';
 import { useWowsDueBy } from '@/hooks';
 import { timeLabel, villaName } from '../format';
-import { arrivalsCopy as copy } from './copy';
+import { demoCopy as copy } from './copyDemo';
 
 /** Las experiencias WOW con hora límite hoy, ordenadas por cuándo vencen. */
 export function PrepareToday() {

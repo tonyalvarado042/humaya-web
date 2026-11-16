@@ -4,8 +4,28 @@
     {
       "name": "humaya",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "4321", "--directory", "sitio"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4321",
+        "--directory",
+        "sitio"
+      ],
       "port": 4321
+    },
+    {
+      "name": "humaya-experience",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "metodo-humaya",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5173"
+      ],
+      "port": 5173
     }
   ]
 }

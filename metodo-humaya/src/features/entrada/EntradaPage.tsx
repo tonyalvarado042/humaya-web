@@ -43,9 +43,28 @@ function fecha(iso: string | null | undefined, idioma: Idioma) {
  * No hay estadía todavía —esta es la pantalla que la encuentra—, así que vive
  * fuera de /app y no usa StayProvider ni i18n.
  */
+/**
+ * El código que viene en el enlace, si viene.
+ *
+ * Los tres correos al huésped llevan un botón a `/entrada?c=HMJW3AJKN5`. Sin
+ * esto, ese botón abría un formulario vacío y el huésped tenía que copiar el
+ * código a mano — justo lo contrario de lo que el correo le promete («toma
+ * diez segundos»). Un botón que se sabe que va a rebotar es peor que no
+ * ofrecerlo.
+ *
+ * Se lee una sola vez, al montar: después manda lo que la persona escriba.
+ */
+function codigoDelEnlace(): string {
+  try {
+    return new URLSearchParams(window.location.search).get('c')?.trim().slice(0, 40) ?? '';
+  } catch {
+    return '';
+  }
+}
+
 export function EntradaPage() {
   const [idioma, setIdioma] = useState<Idioma>(idiomaGuardado);
-  const [codigo, setCodigo] = useState('');
+  const [codigo, setCodigo] = useState(codigoDelEnlace);
   const [apellido, setApellido] = useState('');
   const [tocado, setTocado] = useState(false);
   const check = useCheckReservation();

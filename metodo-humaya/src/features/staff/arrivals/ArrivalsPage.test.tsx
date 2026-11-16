@@ -1,154 +1,210 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resetMockState } from '@/mocks';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { routes } from '@/router';
 import { stubConciergeApi } from '@/test/conciergeApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
+import { supabaseStub } from '@/test/supabaseStub';
 
-beforeEach(() => {
-  resetMockState();
-  stubConciergeApi();
-});
+/**
+ * Llegadas dejó los datos de ejemplo: ahora muestra las reservas de Cloudbeds.
+ *
+ * Las filas de abajo imitan lo que de verdad hay en `humaya_llegadas` el 15 de
+ * noviembre de 2026 —una confirmada con villa, una sin correo, una sin
+ * confirmar y una cancelada sin habitación asignada—, porque son justo los
+ * casos donde una pantalla descuidada inventa datos: un cero donde no hay
+ * gente, un guion donde debería decir "sin correo".
+ */
+const HOY = '2026-11-15';
 
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
+const FILAS = [
+  {
+    id: 'r-1',
+    reserva_id: '100',
+    huesped: 'Galloway',
+    email: 'g@ejemplo.com',
+    checkin: '2026-12-17',
+    checkout: '2026-12-21',
+    estado: 'confirmed',
+    fuente: 'Airbnb (API)',
+    confirmacion_ota: 'HMMS93AC2K',
+    villa: 'Villa 3',
+    personas: '4',
+  },
+  {
+    id: 'r-2',
+    reserva_id: '101',
+    huesped: 'Nakamura',
+    email: null,
+    checkin: '2026-12-19',
+    checkout: '2026-12-23',
+    estado: 'confirmed',
+    fuente: 'Airbnb (API)',
+    confirmacion_ota: 'HM2KX9PLQ4',
+    villa: 'Villa 7',
+    personas: '2',
+  },
+  {
+    id: 'r-3',
+    reserva_id: '102',
+    huesped: 'Pérez',
+    email: 'p@ejemplo.com',
+    checkin: '2026-12-26',
+    checkout: '2026-12-29',
+    estado: 'not_confirmed',
+    fuente: 'Website/Booking Engine',
+    confirmacion_ota: null,
+    villa: 'Villa 1',
+    personas: '3',
+  },
+  {
+    id: 'r-4',
+    reserva_id: '103',
+    huesped: 'Cancelada',
+    email: 'c@ejemplo.com',
+    checkin: '2026-12-20',
+    checkout: '2026-12-22',
+    estado: 'canceled',
+    fuente: 'Expedia',
+    confirmacion_ota: 'EXP-9',
+    villa: null,
+    personas: null,
+  },
+];
 
-/** La tabla de escritorio, para consultar filas sin toparse con las tarjetas. */
-function table() {
-  return screen.findByRole('table', { name: 'Llegadas del período' });
+function tabla() {
+  return screen.findByRole('table', { name: 'Bookings' });
 }
 
-describe('filtro de período', () => {
-  it('arranca en hoy, con las 4 llegadas del 14 de noviembre', async () => {
+beforeEach(() => {
+  stubConciergeApi();
+  supabaseStub.tablas.humaya_llegadas = [...FILAS];
+  // La pantalla mira "hoy" para decidir qué está por delante.
+  vi.setSystemTime(new Date(`${HOY}T12:00:00-06:00`));
+});
+
+describe('las reservas que se muestran', () => {
+  it('arranca en las próximas y deja fuera las canceladas', async () => {
     renderRoutes(routes, { route: '/staff' });
 
-    expect(await screen.findByRole('radio', { name: 'Hoy' })).toBeChecked();
-    // La fila del encabezado cuenta como una más.
-    expect(within(await table()).getAllByRole('row')).toHaveLength(5);
+    const filas = within(await tabla()).getAllByRole('row');
+    // 1 encabezado + 3 activas. La cancelada no está.
+    expect(filas).toHaveLength(4);
+    expect(within(await tabla()).getByText('Galloway')).toBeInTheDocument();
+    expect(within(await tabla()).queryByText('Cancelada')).not.toBeInTheDocument();
   });
 
-  it('cambiar a mañana cambia las filas', async () => {
+  it('"Todas" sí trae la cancelada, marcada como tal', async () => {
     renderRoutes(routes, { route: '/staff' });
+    await tabla();
 
-    await userEvent.click(await screen.findByRole('radio', { name: 'Mañana' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'All' }));
 
-    expect(await within(await table()).findByText('Sofía Arias')).toBeInTheDocument();
-    expect(
-      within(await table()).queryByText('Valeria Méndez y Andrés Rojas'),
-    ).not.toBeInTheDocument();
+    expect(await within(await tabla()).findByText('Cancelada')).toBeInTheDocument();
+    expect(within(await tabla()).getByText('Cancelled')).toBeInTheDocument();
   });
 
-  it('la semana trae las 9 llegadas', async () => {
+  it('"No email" deja solo a quien no tiene correo', async () => {
     renderRoutes(routes, { route: '/staff' });
+    await tabla();
 
-    await userEvent.click(await screen.findByRole('radio', { name: 'Esta semana' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'No email' }));
 
-    expect(await within(await table()).findByText('Hannah Weber')).toBeInTheDocument();
-    expect(within(await table()).getAllByRole('row')).toHaveLength(10);
+    const filas = within(await tabla()).getAllByRole('row');
+    expect(filas).toHaveLength(2);
+    expect(within(await tabla()).getByText('Nakamura')).toBeInTheDocument();
   });
 });
 
-describe('indicadores', () => {
-  it('muestra las cifras del día', async () => {
+describe('lo que no sabemos no se inventa', () => {
+  it('dice "No email" en vez de dejar el espacio vacío', async () => {
     renderRoutes(routes, { route: '/staff' });
 
-    expect(await screen.findByText('Llegadas hoy')).toBeInTheDocument();
-    expect(screen.getByText('Ocupación esta noche')).toBeInTheDocument();
-    expect(screen.getByText(/de 10/)).toBeInTheDocument();
-    expect(screen.getByText('Experiencias WOW por preparar')).toBeInTheDocument();
+    const fila = within(await tabla())
+      .getByText('Nakamura')
+      .closest('tr')!;
+    expect(within(fila).getByText('No email')).toBeInTheDocument();
+  });
+
+  it('una reserva sin habitación dice "Not assigned", no "Villa 0"', async () => {
+    renderRoutes(routes, { route: '/staff' });
+    await tabla();
+    await userEvent.click(screen.getByRole('radio', { name: 'All' }));
+
+    const fila = (await within(await tabla()).findByText('Cancelada')).closest('tr')!;
+    expect(within(fila).getByText('Not assigned')).toBeInTheDocument();
+    expect(within(fila).queryByText('0')).not.toBeInTheDocument();
+  });
+
+  it('muestra el código de confirmación que el huésped tiene en la mano', async () => {
+    renderRoutes(routes, { route: '/staff' });
+
+    const fila = within(await tabla())
+      .getByText('Galloway')
+      .closest('tr')!;
+    expect(within(fila).getByText('HMMS93AC2K')).toBeInTheDocument();
   });
 });
 
-describe('alertas', () => {
-  it('la alergia se lee como texto, no solo por el color', async () => {
+describe('los indicadores', () => {
+  it('cuenta reservas, personas y las que no tienen correo', async () => {
     renderRoutes(routes, { route: '/staff' });
+    await tabla();
 
-    expect(
-      await within(await table()).findByText('Andrés: alergia a frutos secos'),
-    ).toBeInTheDocument();
+    const cifra = (rotulo: string) =>
+      screen.getByText(rotulo).parentElement!.textContent!.replace(rotulo, '').trim();
+
+    expect(cifra('Upcoming bookings')).toBe('3');
+    // 4 + 2 + 3. La cancelada no suma, y su `personas` nulo no vale cero.
+    expect(cifra('Guests expected')).toBe('9');
+    expect(cifra('Without an email')).toBe('1');
+  });
+
+  it('nombra la primera llegada real', async () => {
+    renderRoutes(routes, { route: '/staff' });
+    await tabla();
+
+    const tarjeta = screen.getByText('First arrival').parentElement!;
+    expect(tarjeta).toHaveTextContent('Dec 17');
   });
 });
 
-describe('ir al perfil', () => {
-  it('cada llegada enlaza a su propia estadía', async () => {
+describe('el idioma de recepción', () => {
+  it('abre en inglés y el menú lo pasa a español', async () => {
     renderRoutes(routes, { route: '/staff' });
+    await tabla();
 
-    const rows = within(await table()).getAllByRole('row');
-    // Por el nombre exacto: la fila también dice "Valeria no toma alcohol".
-    const valeria = rows.find((row) => within(row).queryByText('Valeria Méndez y Andrés Rojas'));
+    expect(screen.getByRole('heading', { name: 'Bookings' })).toBeInTheDocument();
 
-    expect(
-      within(valeria as HTMLElement).getByRole('link', { name: 'Ver perfil' }),
-    ).toHaveAttribute('href', '/staff/guests/s-mendez-rojas');
-  });
+    await userEvent.click(screen.getAllByRole('button', { name: 'Español' })[0]);
 
-  it('abre el perfil correcto al hacer clic', async () => {
-    const { router } = renderRoutes(routes, { route: '/staff' });
-
-    const rows = within(await table()).getAllByRole('row');
-    const keller = rows.find((row) => within(row).queryByText(/Keller/)) as HTMLElement;
-    await userEvent.click(within(keller).getByRole('link', { name: 'Ver perfil' }));
-
-    expect(router.state.location.pathname).toBe('/staff/guests/s-keller');
+    expect(await screen.findByRole('heading', { name: 'Reservas' })).toBeInTheDocument();
+    expect(await screen.findByRole('table', { name: 'Reservas' })).toBeInTheDocument();
   });
 });
 
-describe('las dos presentaciones', () => {
-  it('la tabla y las tarjetas muestran los mismos huéspedes', async () => {
+describe('el demo, mientras Admin lo deje encendido', () => {
+  it('se ofrece como una vista más de Llegadas', async () => {
     renderRoutes(routes, { route: '/staff' });
+    await tabla();
 
-    await screen.findByRole('table', { name: 'Llegadas del período' });
+    await userEvent.click(screen.getByRole('radio', { name: 'Demo' }));
 
-    // Cada huésped aparece dos veces: una en la tabla y otra en su tarjeta.
-    // Tailwind decide cuál se ve; jsdom no calcula CSS.
-    expect(screen.getAllByText('Valeria Méndez y Andrés Rojas')).toHaveLength(2);
-    expect(screen.getAllByRole('link', { name: 'Ver perfil' })).toHaveLength(8);
-  });
-});
-
-describe('aviso del Concierge', () => {
-  it('muestra cuántos mensajes quedaron sin leer junto al nombre', async () => {
-    const at = new Date().toISOString();
-    stubConciergeApi([
-      {
-        id: 'm-1',
-        stayId: 's-mendez-rojas',
-        guestName: 'Valeria',
-        from: 'guest',
-        text: '¿tienen helicóptero?',
-        escalated: true,
-        readAt: null,
-        at,
-      },
-    ]);
-    renderRoutes(routes, { route: '/staff' });
-
-    const rows = within(await table()).getAllByRole('row');
-    const valeria = rows.find((row) => within(row).queryByText('Valeria Méndez y Andrés Rojas'));
-
-    expect(await within(valeria as HTMLElement).findByText('1')).toBeInTheDocument();
-  });
-});
-
-describe('tablero de villas y pendientes', () => {
-  it('muestra las 10 villas con su estado', async () => {
-    renderRoutes(routes, { route: '/staff' });
-
-    expect(await screen.findByRole('heading', { name: 'Villas' })).toBeInTheDocument();
-    expect(screen.getAllByText('Llega hoy')).toHaveLength(4);
-    expect(screen.getByText('Sale hoy')).toBeInTheDocument();
-    expect(screen.getByText('Libre')).toBeInTheDocument();
+    // La pantalla vieja entera, con su aviso de que son datos inventados.
+    expect(await screen.findByRole('table', { name: 'Llegadas del período' })).toBeInTheDocument();
+    expect(screen.getByText(/Sample data/)).toBeInTheDocument();
   });
 
-  it('lista lo que hay que preparar hoy, con su villa y su hora', async () => {
+  it('apagado en Admin, la opción desaparece', async () => {
+    // Así queda la base cuando Tony apaga el interruptor antes de publicar.
+    supabaseStub.tablas.humaya_ajustes = [
+      { negocio_id: 'n-1', clave: 'demo_visible', valor: false },
+    ];
     renderRoutes(routes, { route: '/staff' });
+    await tabla();
 
-    expect(await screen.findByRole('heading', { name: 'Preparar hoy' })).toBeInTheDocument();
-    expect(
-      await screen.findByText(/Flores de la zona y una nota escrita a mano/),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Villa 04 · antes de las/)).toBeInTheDocument();
+    expect(screen.queryByRole('radio', { name: 'Demo' })).not.toBeInTheDocument();
+    // Y las reservas de verdad siguen ahí.
+    expect(screen.getByRole('radio', { name: 'Upcoming' })).toBeInTheDocument();
   });
 });

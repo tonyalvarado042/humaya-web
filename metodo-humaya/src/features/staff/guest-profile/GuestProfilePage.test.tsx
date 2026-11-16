@@ -127,6 +127,12 @@ describe('experiencias WOW', () => {
     await userEvent.click(screen.getByRole('link', { name: '← Llegadas' }));
     expect(router.state.location.pathname).toBe('/staff');
 
+    // Llegadas ya no abre en los datos de ejemplo sino en las reservas de
+    // Cloudbeds. Valeria es una estadía de la demo, así que hay que pedirla:
+    // es la opción que Admin deja encendida mientras Tony no publique.
+    await screen.findByRole('heading', { name: 'Bookings' });
+    await userEvent.click(await screen.findByRole('radio', { name: 'Demo' }));
+
     const rows = within(
       await screen.findByRole('table', { name: 'Llegadas del período' }),
     ).getAllByRole('row');

@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  Card,
   EmptyState,
   SegmentedControl,
   StatTile,
@@ -10,152 +9,192 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
+  Tag,
 } from '@/components/ui';
-import { useArrivals, usePendingWowCount, useVillaStatus } from '@/hooks';
+import { useAjustes, useReservas } from '@/hooks';
 import { getToday } from '@/services/clock';
-import type { ArrivalRange } from '@/types';
-import { longDate, timeLabel, villaName } from '../format';
+import { resumirReservas, type FiltroReservas, type Reserva } from '@/services/reservas';
+import { longDate } from '../format';
+import { useIdiomaRecepcion } from '../puerta/contexto';
 import { Screen, ScreenError, ScreenHeading, ScreenLoading } from '../layout/ScreenState';
-import { AlertTags, ConciergeIndicator, InterviewBadge, ProfileLink } from './ArrivalRow';
-import { arrivalsCopy as copy } from './copy';
-import { PrepareToday } from './PrepareToday';
-import { VillaBoard } from './VillaBoard';
+import { arrivalsCopy, type ArrivalsTextos } from './copy';
+import { LlegadasDemo } from './LlegadasDemo';
 
-const rangeOptions = [
-  { value: 'today' as const, label: copy.today },
-  { value: 'tomorrow' as const, label: copy.tomorrow },
-  { value: 'week' as const, label: copy.week },
-];
+/** El rango de la estadía en una línea: "Dec 17 → Dec 21". */
+function rango(reserva: Reserva, locale: string): string {
+  const dia = (iso: string) =>
+    new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    }).format(new Date(`${iso.slice(0, 10)}T12:00:00Z`));
+  return `${dia(reserva.checkin)} → ${dia(reserva.checkout)}`;
+}
 
+function EstadoTag({ estado, copy }: { estado: string; copy: ArrivalsTextos }) {
+  if (estado === 'canceled') return <Tag tone="alert">{copy.estadoCancelada}</Tag>;
+  if (estado === 'not_confirmed') return <Tag tone="info">{copy.estadoSinConfirmar}</Tag>;
+  return <span className="text-[13px] text-muted">{copy.estadoConfirmada}</span>;
+}
+
+const filtros: FiltroReservas[] = ['proximas', 'todas', 'sin_correo'];
+
+/**
+ * "demo" no es un filtro de reservas: es la pantalla vieja entera. Va en el
+ * mismo control porque para recepción es una vista más de Llegadas, y porque
+ * un segundo control solo para eso sobraría el día que el demo se apague.
+ */
+type Vista = FiltroReservas | 'demo';
+
+/**
+ * Llegadas: las reservas de verdad.
+ *
+ * ── QUÉ CAMBIÓ ──────────────────────────────────────────────────────────
+ * Esta pantalla mostraba dos estadías de ejemplo —Valeria y Hannah— con su
+ * progreso de entrevista, sus alertas y su tablero de villas, todo inventado
+ * para la demo. Ahora muestra lo que hay en la base: las reservas que entraron
+ * de Cloudbeds, con su villa, su gente, su código de confirmación y, lo más
+ * importante para las próximas semanas, si tenemos un correo al que escribirles.
+ *
+ * Los componentes de la demo —PrepareToday, VillaBoard, ArrivalRow— se
+ * quitaron del árbol: solo servían a esta pantalla y dependían de campos que
+ * no existen fuera de los datos de ejemplo. Siguen en el historial de git, y
+ * el día que la entrevista y las alertas vivan en la base se recuperan de ahí
+ * en vez de arrastrarlos sin compilar.
+ */
 export function ArrivalsPage() {
-  const [range, setRange] = useState<ArrivalRange>('today');
+  const [idioma] = useIdiomaRecepcion();
+  const copy = arrivalsCopy[idioma];
+  const locale = idioma === 'es' ? 'es-CR' : 'en-US';
+  const hoy = getToday();
 
-  const arrivals = useArrivals(range);
-  const today = useArrivals('today');
-  const villas = useVillaStatus();
-  const pendingWows = usePendingWowCount();
+  const ajustes = useAjustes();
+  const [vista, setVista] = useState<Vista>('proximas');
+  // La vista demo no pide reservas: se queda con las próximas detrás, para que
+  // los indicadores de arriba no parpadeen al entrar y salir del demo.
+  const filtro: FiltroReservas = vista === 'demo' ? 'proximas' : vista;
+  const reservas = useReservas(filtro, hoy);
 
-  if (arrivals.isPending) {
+  // El resumen se calcula sobre el filtro "próximas", que es la lista de
+  // trabajo real: las canceladas y lo que ya pasó no cuentan para nada.
+  const todas = useReservas('proximas', hoy);
+  const resumen = useMemo(() => resumirReservas(todas.data ?? [], hoy), [todas.data, hoy]);
+
+  const demoEncendido = ajustes.data?.demoVisible ?? false;
+
+  if (reservas.isPending) {
     return <ScreenLoading label={copy.loading} />;
   }
 
-  if (arrivals.isError || !arrivals.data) {
-    return <ScreenError onRetry={() => void arrivals.refetch()} />;
+  if (reservas.isError || !reservas.data) {
+    return <ScreenError onRetry={() => void reservas.refetch()} />;
   }
 
-  const rows = arrivals.data;
-  const todayRows = today.data ?? [];
-  const occupied = (villas.data ?? []).filter(
-    (villa) => villa.state === 'arriving' || villa.state === 'occupied',
-  ).length;
-  const complete = todayRows.filter((arrival) => arrival.interview.complete).length;
+  const filas = reservas.data;
+
+  const opciones = [
+    ...filtros.map((valor) => ({
+      value: valor as Vista,
+      label: valor === 'proximas' ? copy.proximas : valor === 'todas' ? copy.todas : copy.sinCorreo,
+    })),
+    // El demo solo se ofrece mientras Admin lo deje encendido. Si Tony lo
+    // apaga, la opción desaparece y `vista` vuelve sola a las reservas reales.
+    ...(demoEncendido ? [{ value: 'demo' as Vista, label: copy.demo }] : []),
+  ];
+  const enDemo = vista === 'demo' && demoEncendido;
 
   return (
     <Screen>
       <ScreenHeading
-        eyebrow={longDate(getToday())}
+        eyebrow={longDate(hoy, locale)}
         title={copy.title}
         action={
           <SegmentedControl
             label={copy.rangeLabel}
-            options={rangeOptions}
-            value={range}
-            onChange={setRange}
+            options={opciones}
+            value={vista}
+            onChange={setVista}
           />
         }
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile label={copy.statArrivals} value={String(todayRows.length)} />
-        <StatTile label={copy.statOccupancy} value={String(occupied)} suffix={copy.ofTen} />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatTile label={copy.statProximas} value={String(resumen.proximas)} variant="ink" />
+        <StatTile label={copy.statPersonas} value={String(resumen.personas)} />
+        <StatTile label={copy.statSinCorreo} value={String(resumen.sinCorreo)} />
         <StatTile
-          label={copy.statInterviews}
-          value={String(complete)}
-          suffix={copy.ofArrivals(todayRows.length)}
+          label={copy.statPrimera}
+          value={
+            resumen.primeraLlegada
+              ? new Intl.DateTimeFormat(locale, {
+                  day: 'numeric',
+                  month: 'short',
+                  timeZone: 'UTC',
+                }).format(new Date(`${resumen.primeraLlegada}T12:00:00Z`))
+              : copy.sinFecha
+          }
         />
-        <StatTile label={copy.statWows} value={String(pendingWows.data ?? 0)} variant="ink" />
-      </section>
+      </div>
 
-      {rows.length === 0 ? (
-        <EmptyState title={copy.emptyTitle} description={copy.emptyBody} />
+      {enDemo ? (
+        <>
+          <p className="m-0 rounded-card border border-line bg-surface px-4 py-3 text-[13px] text-muted">
+            {copy.demoAviso}
+          </p>
+          <LlegadasDemo />
+        </>
+      ) : filas.length === 0 ? (
+        <EmptyState
+          title={copy.vacioTitulo}
+          description={filtro === 'sin_correo' ? copy.vacioSinCorreo : copy.vacioCuerpo}
+        />
       ) : (
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
-          <div className="min-w-0 flex-1">
-            {/* Tabla: desde 1024 px */}
-            <div className="hidden rounded-card border border-line bg-surface lg:block">
-              <Table aria-label={copy.tableLabel}>
-                <TableHead>
-                  <TableRow>
-                    <TableHeaderCell>{copy.colGuest}</TableHeaderCell>
-                    <TableHeaderCell>{copy.colVilla}</TableHeaderCell>
-                    <TableHeaderCell>{copy.colArrival}</TableHeaderCell>
-                    <TableHeaderCell>{copy.colPeople}</TableHeaderCell>
-                    <TableHeaderCell>{copy.colInterview}</TableHeaderCell>
-                    <TableHeaderCell>{copy.colAlerts}</TableHeaderCell>
-                    <TableHeaderCell>
-                      <span className="sr-only">{copy.seeProfile}</span>
-                    </TableHeaderCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((arrival) => (
-                    <TableRow key={arrival.stayId}>
-                      <TableCell>
-                        <span className="inline-flex items-center gap-2">
-                          <span className="font-medium">{arrival.guestName}</span>
-                          <ConciergeIndicator stayId={arrival.stayId} />
-                        </span>
-                      </TableCell>
-                      <TableCell>{villaName(arrival.villa)}</TableCell>
-                      <TableCell>{timeLabel(arrival.checkIn)}</TableCell>
-                      <TableCell>{arrival.partySize}</TableCell>
-                      <TableCell>
-                        <InterviewBadge interview={arrival.interview} />
-                      </TableCell>
-                      <TableCell>
-                        <AlertTags alerts={arrival.alerts} />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <ProfileLink stayId={arrival.stayId} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Tarjetas: debajo de 1024 px */}
-            <ul className="m-0 flex list-none flex-col gap-3 p-0 lg:hidden">
-              {rows.map((arrival) => (
-                <li key={arrival.stayId}>
-                  <Card className="flex flex-col gap-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex min-w-0 flex-col gap-0.5">
-                        <span className="inline-flex items-center gap-2">
-                          <span className="font-medium">{arrival.guestName}</span>
-                          <ConciergeIndicator stayId={arrival.stayId} />
-                        </span>
-                        <span className="text-[13px] text-muted">
-                          {villaName(arrival.villa)} · {timeLabel(arrival.checkIn)} ·{' '}
-                          {copy.people(arrival.partySize)}
-                        </span>
-                      </div>
-                      <InterviewBadge interview={arrival.interview} />
-                    </div>
-                    <AlertTags alerts={arrival.alerts} />
-                    <ProfileLink stayId={arrival.stayId} />
-                  </Card>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-5 xl:w-85 xl:shrink-0">
-            <VillaBoard villas={villas.data ?? []} />
-            <PrepareToday />
-          </div>
-        </div>
+        <Table aria-label={copy.title}>
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell>{copy.colHuesped}</TableHeaderCell>
+              <TableHeaderCell>{copy.colFechas}</TableHeaderCell>
+              <TableHeaderCell>{copy.colVilla}</TableHeaderCell>
+              <TableHeaderCell>{copy.colPersonas}</TableHeaderCell>
+              <TableHeaderCell>{copy.colFuente}</TableHeaderCell>
+              <TableHeaderCell>{copy.colCodigo}</TableHeaderCell>
+              <TableHeaderCell>{copy.colEstado}</TableHeaderCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filas.map((reserva) => (
+              <TableRow key={reserva.id}>
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span className="text-text">{reserva.huesped}</span>
+                    {reserva.email ? (
+                      <span className="text-[12px] text-muted">{reserva.email}</span>
+                    ) : (
+                      <span className="text-[12px] text-on-alert">{copy.sinCorreoFila}</span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>{rango(reserva, locale)}</TableCell>
+                <TableCell>
+                  {reserva.villa ?? <span className="text-muted-soft">{copy.sinVilla}</span>}
+                </TableCell>
+                <TableCell>{reserva.personas ?? '—'}</TableCell>
+                <TableCell>{reserva.fuente ?? '—'}</TableCell>
+                <TableCell>
+                  <span className="font-mono text-[13px]">
+                    {reserva.codigoOta ?? copy.sinCodigo}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <EstadoTag estado={reserva.estado} copy={copy} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
+
+      {enDemo ? null : <p className="m-0 text-[13px] text-muted-soft">{copy.fuenteDatos}</p>}
     </Screen>
   );
 }

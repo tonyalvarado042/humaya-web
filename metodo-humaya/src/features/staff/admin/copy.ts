@@ -1,4 +1,15 @@
 export const adminCopy = {
+  // El interruptor del demo. Tony, 15 de noviembre de 2026: «el demo debería
+  // quedar como opción temporal hasta que yo lo publique o en settings lo
+  // quite». Esta es esa parte de settings.
+  demoTitulo: 'Datos de ejemplo',
+  demoCuerpo:
+    'Mientras esté encendido, recepción puede ver las dos estadías inventadas de la demo desde el filtro de Reservas. Apagalo cuando publiques: los datos reales de Cloudbeds no se tocan.',
+  demoEncendido: 'Encendido',
+  demoApagado: 'Apagado',
+  demoApagar: 'Apagar el demo',
+  demoEncender: 'Encender el demo',
+  demoSoloAdmin: 'Solo un administrador puede cambiar esto.',
   title: 'Admin',
   opcionesTitle: 'Opciones del menú',
   opcionesBody: 'Lo que ves acá es lo que el huésped ve en el Home y en el menú de abajo.',

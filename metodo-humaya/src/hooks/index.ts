@@ -32,6 +32,8 @@ export { queryKeys } from './queryKeys';
 export { useCheckReservation } from './useEntrada';
 export { useBookSlot, useDaySchedule, useSpaSlots, useStayBookings } from './useSpa';
 export { useArrivals, useStay, useVillaStatus } from './useStays';
+export { useReservas } from './useReservas';
+export { useAjustes, useCambiarDemo } from './useAjustes';
 export { useProtocolTips } from './useProtocol';
 export { useVillaInfo } from './useVilla';
 export { useWeeklyProgram, useWorkoutSession } from './useWorkout';

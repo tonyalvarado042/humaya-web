@@ -1,6 +1,22 @@
-// Cómo se publica la app del huésped — experience.stayhumaya.com
+// Cómo se publican las dos apps — experience y staff.stayhumaya.com
 //
 // 15 de noviembre de 2026.
+//
+// ── POR QUÉ UN SOLO WORKER PARA LOS DOS DOMINIOS ────────────────────────
+// Tony pidió separar al huésped del personal: la app del huésped en
+// experience.stayhumaya.com y recepción en staff.stayhumaya.com. Eso NO exige
+// dos Workers: un Worker acepta varios dominios personalizados, y los dos
+// sirven el mismo `dist`.
+//
+// Quién ve qué lo decide el navegador, no la infraestructura: `ladoDe()` en
+// src/marca.ts mira el subdominio y el router monta un árbol distinto. En
+// experience.*, /staff ya no sirve recepción —manda al dominio del personal—;
+// en staff.*, la raíz es recepción.
+//
+// Dos Workers habrían significado dos builds del mismo código, dos lugares
+// donde desplegar y la posibilidad de que un dominio quede con una versión
+// vieja. La separación que importa es la de la PUERTA, no la del hosting:
+// /staff exige cuenta y clave del CRM (src/features/staff/puerta).
 //
 // ── POR QUÉ UN WORKER Y NO UN PROYECTO DE PAGES ─────────────────────────
 // La landing (stayhumaya.com) ya es un proyecto de Cloudflare Pages conectado

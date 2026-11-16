@@ -1,7 +1,7 @@
 import { cn } from '@/components/ui/cn';
 import type { VillaStatus } from '@/types';
 import { villaName } from '../format';
-import { arrivalsCopy as copy } from './copy';
+import { demoCopy as copy } from './copyDemo';
 
 const stateClasses: Record<VillaStatus['state'], string> = {
   arriving: 'bg-gold-dim text-ink',

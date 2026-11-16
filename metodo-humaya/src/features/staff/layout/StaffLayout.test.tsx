@@ -35,10 +35,10 @@ describe('sidebar de escritorio', () => {
     renderRoutes(routes, { route: '/staff' });
 
     const sidebar = await screen.findByRole('complementary');
-    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar', 'Concierge', 'Admin']) {
+    for (const label of ['Bookings', 'Guests', 'Spa & wellness', 'Concierge', 'Admin']) {
       expect(within(sidebar).getByRole('link', { name: new RegExp(label) })).toBeInTheDocument();
     }
-    expect(within(sidebar).getByRole('link', { name: 'Ver app del huésped' })).toHaveAttribute(
+    expect(within(sidebar).getByRole('link', { name: 'Open the guest app' })).toHaveAttribute(
       'href',
       '/app',
     );
@@ -48,11 +48,11 @@ describe('sidebar de escritorio', () => {
     renderRoutes(routes, { route: '/staff/spa' });
 
     const sidebar = await screen.findByRole('complementary');
-    expect(within(sidebar).getByRole('link', { name: 'Spa y bienestar' })).toHaveAttribute(
+    expect(within(sidebar).getByRole('link', { name: 'Spa & wellness' })).toHaveAttribute(
       'aria-current',
       'page',
     );
-    expect(within(sidebar).getByRole('link', { name: 'Llegadas' })).not.toHaveAttribute(
+    expect(within(sidebar).getByRole('link', { name: 'Bookings' })).not.toHaveAttribute(
       'aria-current',
     );
   });
@@ -109,10 +109,10 @@ describe('menú deslizable', () => {
   it('el botón de hamburguesa lo abre con los mismos destinos', async () => {
     renderRoutes(routes, { route: '/staff' });
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Abrir menú' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Open menu' }));
 
-    const drawer = screen.getByRole('dialog', { name: 'Recepción' });
-    for (const label of ['Llegadas', 'Huéspedes', 'Spa y bienestar', 'Concierge', 'Admin']) {
+    const drawer = screen.getByRole('dialog', { name: 'Front desk' });
+    for (const label of ['Bookings', 'Guests', 'Spa & wellness', 'Concierge', 'Admin']) {
       expect(within(drawer).getByRole('link', { name: new RegExp(label) })).toBeInTheDocument();
     }
   });
@@ -120,9 +120,9 @@ describe('menú deslizable', () => {
   it('se cierra al elegir un destino, y navega', async () => {
     const { router } = renderRoutes(routes, { route: '/staff' });
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Abrir menú' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Open menu' }));
     const drawer = screen.getByRole('dialog');
-    await userEvent.click(within(drawer).getByRole('link', { name: 'Spa y bienestar' }));
+    await userEvent.click(within(drawer).getByRole('link', { name: 'Spa & wellness' }));
 
     expect(router.state.location.pathname).toBe('/staff/spa');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -130,7 +130,7 @@ describe('menú deslizable', () => {
 
   it('Escape lo cierra y devuelve el foco a la hamburguesa', async () => {
     renderRoutes(routes, { route: '/staff' });
-    const trigger = await screen.findByRole('button', { name: 'Abrir menú' });
+    const trigger = await screen.findByRole('button', { name: 'Open menu' });
 
     await userEvent.click(trigger);
     await userEvent.keyboard('{Escape}');
@@ -145,6 +145,6 @@ describe('barra superior', () => {
     renderRoutes(routes, { route: '/staff/spa' });
 
     const header = await screen.findByRole('banner');
-    expect(within(header).getByText('Spa y bienestar')).toBeInTheDocument();
+    expect(within(header).getByText('Spa & wellness')).toBeInTheDocument();
   });
 });

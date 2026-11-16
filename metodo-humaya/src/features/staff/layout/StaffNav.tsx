@@ -2,7 +2,9 @@ import { House } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { cn } from '@/components/ui/cn';
 import { useConciergeConversations } from '@/hooks';
-import { STAFF_NAV, staffCopy as copy } from './nav';
+import { salir } from '@/services/sesion';
+import { useIdiomaRecepcion, useQuienEntro } from '../puerta/contexto';
+import { STAFF_NAV, staffCopy } from './nav';
 
 interface StaffNavProps {
   /** Se llama al elegir un destino, para cerrar el menú deslizable. */
@@ -13,8 +15,17 @@ interface StaffNavProps {
  * Los enlaces del dashboard. Los comparten el sidebar y el menú deslizable.
  * El badge de Concierge es la "notificación" de este MVP: sin backend push
  * real, se actualiza solo con el refetch periódico de useConciergeConversations.
+ *
+ * Abajo va quién entró. Antes decía "Turno mañana · Recepción", que era un
+ * dato de la demo: no había turnos ni había nadie. Ahora dice el nombre de la
+ * persona que tiene la sesión abierta, que sí es verdad y además sirve para
+ * notar de una ojeada si quedó la sesión de otra persona en la computadora.
  */
 export function StaffNav({ onNavigate }: StaffNavProps) {
+  const [idioma, cambiarIdioma] = useIdiomaRecepcion();
+  const copy = staffCopy[idioma];
+  const persona = useQuienEntro();
+
   const conversations = useConciergeConversations();
   const unreadTotal = (conversations.data ?? []).reduce(
     (sum, conversation) => sum + conversation.unreadCount,
@@ -24,7 +35,7 @@ export function StaffNav({ onNavigate }: StaffNavProps) {
   return (
     <div className="flex flex-1 flex-col gap-8">
       <ul className="m-0 flex list-none flex-col gap-1 p-0">
-        {STAFF_NAV.map(({ to, label, Icon, end }) => (
+        {STAFF_NAV[idioma].map(({ to, label, Icon, end }) => (
           <li key={to}>
             <NavLink
               to={to}
@@ -59,11 +70,27 @@ export function StaffNav({ onNavigate }: StaffNavProps) {
         </li>
       </ul>
 
-      <div className="mt-auto flex flex-col gap-3.5 px-3">
+      <div className="mt-auto flex flex-col items-start gap-3.5 px-3">
         <Link to="/app" onClick={onNavigate} className="text-sm text-gold">
           {copy.guestApp}
         </Link>
-        <span className="text-[13px] text-ink-muted">{copy.shift}</span>
+        <span className="text-[13px] text-ink-muted">{persona.nombre ?? persona.correo}</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={cambiarIdioma}
+            className="rounded-pill border border-ink-muted/40 px-3 py-1 text-[13px] text-ink-muted transition-colors hover:text-on-ink"
+          >
+            {copy.cambiarIdioma}
+          </button>
+          <button
+            type="button"
+            onClick={() => void salir()}
+            className="text-[13px] text-ink-muted underline-offset-4 transition-colors hover:text-on-ink hover:underline"
+          >
+            {copy.salir}
+          </button>
+        </div>
       </div>
     </div>
   );

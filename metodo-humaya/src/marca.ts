@@ -35,4 +35,52 @@ export const MARCA = {
   /** De dónde sale el correo y a dónde escribe el huésped si algo falla. */
   correo:
     (import.meta.env.VITE_MARCA_CORREO as string | undefined) ?? 'reservations@stayhumaya.com',
+
+  /**
+   * Los dos dominios de esta instalación. El huésped y el personal viven
+   * separados a pedido de Tony (15 de noviembre de 2026): la app del huésped en
+   * experience.stayhumaya.com, recepción en staff.stayhumaya.com.
+   *
+   * Sirven para mandar a cada quien a su casa: quien pida /staff en el dominio
+   * del huésped sale para el del personal, y al revés. Un hotel que compre la
+   * app pone sus dos dominios acá y no toca una pantalla.
+   */
+  dominioHuesped:
+    (import.meta.env.VITE_DOMINIO_HUESPED as string | undefined) ??
+    'https://experience.stayhumaya.com',
+  dominioPersonal:
+    (import.meta.env.VITE_DOMINIO_PERSONAL as string | undefined) ?? 'https://staff.stayhumaya.com',
+
+  /**
+   * ¿El dominio del personal ya existe de verdad?
+   *
+   * Comprobado el 15 de noviembre de 2026: staff.stayhumaya.com NO resuelve
+   * todavía (`nslookup` → Non-existent domain). Falta agregarlo como dominio
+   * personalizado del Worker en Cloudflare, que es lo que crea el CNAME.
+   *
+   * Mientras eso no pase, mandar a alguien para allá sería mandarlo a un error
+   * del navegador. Así que la separación arranca APAGADA: /staff se sirve donde
+   * sea, pero siempre detrás de la puerta. Lo que protege los datos es la
+   * puerta, no el subdominio.
+   *
+   * Para encenderla, cuando el dominio exista: VITE_DOMINIOS_SEPARADOS=true.
+   */
+  dominiosSeparados: import.meta.env.VITE_DOMINIOS_SEPARADOS === 'true',
 } as const;
+
+/** Qué lado de la app sirve este dominio. */
+export type Lado = 'huesped' | 'personal' | 'ambos';
+
+/**
+ * El huésped y el personal comparten código pero no dominio. Quien entre por
+ * el dominio equivocado se manda al correcto en vez de ver una pantalla que no
+ * le toca. En local y en los previews no se separa: ahí se prueban los dos.
+ *
+ * Mira el subdominio y no el dominio completo, para que siga funcionando
+ * cuando la app se venda y los dominios sean otros.
+ */
+export function ladoDe(hostname: string): Lado {
+  if (hostname.startsWith('staff.')) return 'personal';
+  if (hostname.startsWith('experience.')) return 'huesped';
+  return 'ambos';
+}

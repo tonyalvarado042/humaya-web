@@ -4,7 +4,7 @@ import { Badge, Tag } from '@/components/ui';
 import { useConciergeConversations } from '@/hooks';
 import { localizedText } from '@/i18n/localizedText';
 import type { Arrival } from '@/types';
-import { arrivalsCopy as copy } from './copy';
+import { demoCopy as copy } from './copyDemo';
 
 /** El Badge del estado de la entrevista, igual en la tabla y en las tarjetas. */
 export function InterviewBadge({ interview }: { interview: Arrival['interview'] }) {

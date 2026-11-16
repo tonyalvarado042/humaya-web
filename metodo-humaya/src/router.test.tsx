@@ -61,9 +61,12 @@ describe('rutas base', () => {
     );
   });
 
-  it('muestra recepción en /staff', () => {
+  it('muestra recepción en /staff', async () => {
     renderAt('/staff');
-    expect(screen.getByText('Recepción')).toBeInTheDocument();
+    // Ahora hay puerta: primero revisa la sesión y después monta la pantalla.
+    // La sesión abierta la pone setup.ts; quién entra y quién no se prueba en
+    // Puerta.test.tsx.
+    expect(await screen.findByText('Front desk')).toBeInTheDocument();
   });
 
   it('monta el catálogo del sistema visual en desarrollo', () => {

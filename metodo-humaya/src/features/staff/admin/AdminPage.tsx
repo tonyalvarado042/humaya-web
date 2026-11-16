@@ -2,6 +2,8 @@ import { useState, type FormEvent } from 'react';
 import { Badge, Button, Card, Input, Textarea } from '@/components/ui';
 import {
   useAdminOpciones,
+  useAjustes,
+  useCambiarDemo,
   useAdminServicios,
   useCrearServicio,
   useToggleOpcion,
@@ -20,6 +22,8 @@ import { adminCopy as copy } from './copy';
 export function AdminPage() {
   const opciones = useAdminOpciones();
   const servicios = useAdminServicios();
+  const ajustes = useAjustes();
+  const cambiarDemo = useCambiarDemo();
   const toggleOpcion = useToggleOpcion();
   const toggleServicio = useToggleServicio();
   const crearServicio = useCrearServicio();
@@ -80,9 +84,39 @@ export function AdminPage() {
     );
   }
 
+  const demoVisible = ajustes.data?.demoVisible ?? false;
+
   return (
     <Screen>
       <ScreenHeading eyebrow="Recepción" title={copy.title} />
+
+      <section className="flex flex-col gap-3">
+        <Card>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="m-0 font-display text-xl text-text">{copy.demoTitulo}</h2>
+              <Badge tone={demoVisible ? 'success' : 'neutral'}>
+                {demoVisible ? copy.demoEncendido : copy.demoApagado}
+              </Badge>
+            </div>
+            <p className="m-0 text-sm leading-relaxed text-muted">{copy.demoCuerpo}</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                variant="ghost"
+                disabled={cambiarDemo.isPending}
+                onClick={() => cambiarDemo.mutate(!demoVisible)}
+              >
+                {demoVisible ? copy.demoApagar : copy.demoEncender}
+              </Button>
+              {cambiarDemo.isError ? (
+                <span role="alert" className="text-[13px] text-on-alert">
+                  {copy.demoSoloAdmin}
+                </span>
+              ) : null}
+            </div>
+          </div>
+        </Card>
+      </section>
 
       <section className="flex flex-col gap-3">
         <div>

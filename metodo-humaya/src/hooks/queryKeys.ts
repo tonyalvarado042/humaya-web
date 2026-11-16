@@ -6,6 +6,10 @@ import type { ArrivalRange, InterviewDepth, SpaFacility } from '@/types';
  */
 export const queryKeys = {
   arrivals: (range: ArrivalRange) => ['arrivals', range] as const,
+  /** Los ajustes del hotel: hoy, el interruptor del demo. */
+  ajustes: () => ['ajustes'] as const,
+  /** Las reservas reales de Cloudbeds, no las llegadas de la demo. */
+  reservas: (filtro: string, hoy: string) => ['reservas', filtro, hoy] as const,
   stay: (stayId: string) => ['stay', stayId] as const,
   villaStatus: (date: string) => ['villa-status', date] as const,
 
