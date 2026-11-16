@@ -22,11 +22,11 @@ export function useConciergeSuggestions(): LocalizedText[] {
   return getSuggestions();
 }
 
-export function useSendMessage(stayId: string, guestName: string) {
+export function useSendMessage(stayId: string, guestName: string, idioma?: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (text: string) => sendMessage(stayId, guestName, text),
+    mutationFn: (text: string) => sendMessage(stayId, guestName, text, idioma),
     onSuccess: (messages) => {
       queryClient.setQueryData(queryKeys.conciergeMessages(stayId), messages);
       void queryClient.invalidateQueries({ queryKey: queryKeys.conciergeConversations() });

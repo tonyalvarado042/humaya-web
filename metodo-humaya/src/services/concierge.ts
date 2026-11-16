@@ -34,14 +34,29 @@ export async function getMessages(stayId: string): Promise<ChatMessage[]> {
   return data.messages;
 }
 
+/**
+ * El huesped escribe.
+ *
+ * Manda tambien el idioma en que tiene la app. Es el unico lugar donde ese
+ * dato existe de verdad: el servidor no puede deducirlo del texto sin
+ * equivocarse con un "ok" o un "gracias", y recepcion necesita saberlo para
+ * contestarle en el idioma correcto.
+ */
 export async function sendMessage(
   stayId: string,
   guestName: string,
   text: string,
+  idioma?: string,
 ): Promise<ChatMessage[]> {
   const data = await call<{ messages: ChatMessage[] }>(CONCIERGE_URL, {
     method: 'POST',
-    body: JSON.stringify({ action: 'send', stay_id: stayId, guest_name: guestName, text }),
+    body: JSON.stringify({
+      action: 'send',
+      stay_id: stayId,
+      guest_name: guestName,
+      text,
+      idioma,
+    }),
   });
   return data.messages;
 }

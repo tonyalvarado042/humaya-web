@@ -23,7 +23,7 @@ export function ConciergePage() {
   const messages = useConciergeMessages(stayId);
   const suggestions = useConciergeSuggestions();
   const guestName = profile.data?.guest.fullName ?? '';
-  const sendMessage = useSendMessage(stayId, guestName);
+  const sendMessage = useSendMessage(stayId, guestName, language);
 
   function send(text: string) {
     const clean = text.trim();

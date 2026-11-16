@@ -32,6 +32,13 @@ export {
   useTemasBase,
 } from './useConciergeBase';
 export {
+  useAsignacion,
+  useAsignar,
+  useBorrarNota,
+  useCrearNota,
+  useNotasInternas,
+} from './useConciergeStaff';
+export {
   useAcceptPrivacy,
   useAlerts,
   useGuestProfile,

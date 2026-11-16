@@ -11,6 +11,7 @@ import {
 import { DEMO_STAYS } from '@/mocks';
 import { Screen, ScreenError, ScreenLoading } from '../layout/ScreenState';
 import { conciergeThreadCopy as copy } from './copy';
+import { NotasInternas, PanelHuesped } from './PanelHuesped';
 
 function messageAt(iso: string): string {
   if (!iso) return '';
@@ -72,6 +73,8 @@ export function ConciergeThreadPage() {
       <h1 className="m-0 font-display text-[28px] font-medium lg:text-[32px]">
         {demoStay.guestName}
       </h1>
+
+      <PanelHuesped stayId={stayId} messages={messages.data} />
 
       {messages.data.some((message) => message.from === 'concierge' && message.escalated) ? (
         <p role="status" className="m-0 text-sm text-on-alert">
@@ -193,6 +196,7 @@ export function ConciergeThreadPage() {
           </span>
         </div>
       </form>
+      <NotasInternas stayId={stayId} />
     </Screen>
   );
 }
