@@ -21,6 +21,27 @@ async function call<T>(input: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+/**
+ * La sesion de recepcion, para las acciones que solo recepcion puede hacer.
+ *
+ * Cambiar el menu del huesped o el catalogo de servicios le cambia la app a
+ * TODO huesped, asi que la funcion exige esta sesion desde el 16 de noviembre
+ * de 2026. Antes no pedia nada: un POST desde cualquier parte del mundo podia
+ * apagar opciones o inventar servicios.
+ *
+ * Las lecturas y `reservarServicio` NO mandan token a proposito: las usa la
+ * app del huesped, que entra por codigo de confirmacion y no tiene cuenta.
+ * Por eso el import es dinamico: asi el huesped nunca descarga el SDK de Auth.
+ */
+async function cabeceraDeRecepcion(): Promise<Record<string, string>> {
+  const { cliente } = await import('./sesion');
+  const db = await cliente();
+  const {
+    data: { session },
+  } = await db.auth.getSession();
+  return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+}
+
 interface OpcionRow {
   id: string;
   clave: string;
@@ -74,6 +95,7 @@ export async function getOpciones(onlyEnabled = false): Promise<AdminOpcion[]> {
 export async function toggleOpcion(id: string, habilitada: boolean): Promise<void> {
   await call<{ ok: true }>(ADMIN_URL, {
     method: 'POST',
+    headers: await cabeceraDeRecepcion(),
     body: JSON.stringify({ action: 'toggle_opcion', id, habilitada }),
   });
 }
@@ -87,6 +109,7 @@ export async function getServicios(onlyEnabled = false): Promise<Servicio[]> {
 export async function toggleServicio(id: string, habilitado: boolean): Promise<void> {
   await call<{ ok: true }>(ADMIN_URL, {
     method: 'POST',
+    headers: await cabeceraDeRecepcion(),
     body: JSON.stringify({ action: 'toggle_servicio', id, habilitado }),
   });
 }
@@ -105,6 +128,7 @@ export interface NuevoServicio {
 export async function crearServicio(servicio: NuevoServicio): Promise<Servicio> {
   const data = await call<{ servicio: ServicioRow }>(ADMIN_URL, {
     method: 'POST',
+    headers: await cabeceraDeRecepcion(),
     body: JSON.stringify({
       action: 'crear_servicio',
       nombre: servicio.nombre,
