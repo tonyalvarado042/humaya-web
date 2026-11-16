@@ -3,7 +3,7 @@ export const panelCopy = {
   escribeIngles: 'Escribe en inglés',
   escribeEspanol: 'Escribe en español',
   esperando: (cuanto: string) => `Esperando hace ${cuanto}`,
-  reciexn: 'un momento',
+  recienAhora: 'un momento',
   minutos: (n: number) => (n === 1 ? '1 minuto' : `${n} minutos`),
   horas: (n: number) => (n === 1 ? '1 hora' : `${n} horas`),
   dias: (n: number) => (n === 1 ? '1 día' : `${n} días`),

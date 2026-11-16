@@ -8,14 +8,19 @@ import {
   useGuestProfile,
   useNotasInternas,
 } from '@/hooks';
+import { ahora } from '@/services/reloj';
 import type { ChatMessage } from '@/types';
 import { useQuienEntro } from '../puerta/contexto';
 import { panelCopy as copy } from './copyPanel';
 import { esperaDesde } from './espera';
 
 function haceCuanto(iso: string): string {
-  const minutos = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
-  if (minutos < 1) return copy.reciexn;
+  // `ahora()` y no `Date.now()`: el reloj de la máquina puede ir corrido —
+  // el 16 de noviembre de 2026 el de Tony iba 4 minutos adelantado, y una
+  // nota recién escrita aparecía como «hace 4 minutos». Un número que dice
+  // cuánto lleva esperando un huésped no puede depender de eso.
+  const minutos = Math.max(0, Math.round((ahora() - new Date(iso).getTime()) / 60000));
+  if (minutos < 1) return copy.recienAhora;
   if (minutos < 60) return copy.minutos(minutos);
   const horas = Math.floor(minutos / 60);
   if (horas < 24) return copy.horas(horas);
