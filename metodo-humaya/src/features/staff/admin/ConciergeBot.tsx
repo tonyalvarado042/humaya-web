@@ -40,6 +40,10 @@ export function ConciergeBot() {
 
   const datos = estado.data;
   const activos = temas.data?.filter((t) => t.activo).length ?? 0;
+  // Una llave puesta no es una llave que sirve: hasta que la prueba pase, no
+  // se promete nada en verde ni se deja encender el bot.
+  const llaveRota = datos?.prueba?.ok === false;
+  const llaveSirve = !!datos?.hayLlave && !llaveRota;
 
   function agregar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -92,8 +96,8 @@ export function ConciergeBot() {
                 <Badge tone={datos?.encendido ? 'success' : 'neutral'}>
                   {datos?.encendido ? copy.encendido : copy.apagado}
                 </Badge>
-                <Badge tone={datos?.hayLlave ? 'success' : 'warning'}>
-                  {datos?.hayLlave ? copy.conLlave : copy.sinLlave}
+                <Badge tone={llaveSirve ? 'success' : 'warning'}>
+                  {!datos?.hayLlave ? copy.sinLlave : llaveRota ? copy.llaveRota : copy.conLlave}
                 </Badge>
                 <Badge tone={activos > 0 ? 'success' : 'warning'}>
                   {activos > 0 ? copy.temasEncendidos(activos) : copy.sinTemas}
@@ -113,6 +117,9 @@ export function ConciergeBot() {
               no tenerlo. */}
           {datos && !datos.hayLlave ? (
             <p className="m-0 text-sm leading-relaxed text-on-alert">{copy.faltaLlave}</p>
+          ) : null}
+          {llaveRota ? (
+            <p className="m-0 text-sm leading-relaxed text-on-alert">{copy.llaveNoSirve}</p>
           ) : null}
           {datos?.hayLlave && activos === 0 ? (
             <p className="m-0 text-sm leading-relaxed text-muted">{copy.faltanTemas}</p>
@@ -134,7 +141,7 @@ export function ConciergeBot() {
               {probar.isPending ? copy.probando : copy.probar}
             </Button>
             <Button
-              disabled={guardar.isPending || !datos?.hayLlave || activos === 0}
+              disabled={guardar.isPending || !llaveSirve || activos === 0}
               onClick={() => guardar.mutate({ encendido: !datos?.encendido })}
             >
               {datos?.encendido ? copy.apagar : copy.encender}

@@ -14,6 +14,7 @@ export const botCopy = {
   apagado: 'Apagado',
   conLlave: 'Con llave',
   sinLlave: 'Sin llave',
+  llaveRota: 'Llave inv\u00e1lida',
   sinTemas: 'Sin temas encendidos',
   temasEncendidos: (cuantos: number) =>
     cuantos === 1 ? '1 tema encendido' : `${cuantos} temas encendidos`,
@@ -31,6 +32,8 @@ export const botCopy = {
   // Se dice POR QUÉ no se puede encender, en vez de dejar un botón que rebota.
   faltaLlave:
     'Falta la llave de Anthropic. Mientras no esté, el bot no se puede encender y el Concierge sigue contestando «ya se lo paso al equipo», que es verdad. La llave se guarda en los secretos del proyecto en Supabase, nunca acá ni en el código.',
+  llaveNoSirve:
+    'La llave de Anthropic est\u00e1 puesta pero el modelo la rechaza. Hay que reemplazarla en los secretos del proyecto en Supabase (Edge Functions \u2192 ANTHROPIC_API_KEY). Mientras tanto el bot no se enciende y el Concierge sigue pasando todo al equipo.',
   faltanTemas:
     'Todavía no hay ningún tema encendido. Un bot sin datos inventa: por eso no se deja encender hasta que haya al menos uno.',
 
