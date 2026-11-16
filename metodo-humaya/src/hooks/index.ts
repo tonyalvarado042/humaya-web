@@ -22,6 +22,7 @@ export {
   useSaveAnswer,
 } from './useInterview';
 export { queryKeys } from './queryKeys';
+export { useCheckReservation } from './useEntrada';
 export { useBookSlot, useDaySchedule, useSpaSlots, useStayBookings } from './useSpa';
 export { useArrivals, useStay, useVillaStatus } from './useStays';
 export { useProtocolTips } from './useProtocol';

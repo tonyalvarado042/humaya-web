@@ -6,4 +6,5 @@ export const demoHomeCopy = {
   guestCta: 'App del huésped',
   staffCta: 'Recepción',
   disclaimer: 'Demo con datos ficticios. No contiene información de huéspedes reales.',
+  entradaCta: '¿Ya reservaste? Buscá tu estadía',
 };
