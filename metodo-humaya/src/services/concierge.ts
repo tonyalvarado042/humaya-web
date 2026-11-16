@@ -1,5 +1,9 @@
 import { CONCIERGE_ANSWERS } from '@/mocks/concierge';
 import type { ChatMessage, ConciergeConversation, LocalizedText } from '@/types';
+// La bandeja de recepcion y las respuestas del staff mandan la sesion del
+// CRM. El hilo del huesped no: entra por codigo de confirmacion, no tiene
+// cuenta, y su propio hilo es suyo.
+import { cabeceraDeRecepcion } from './sesion';
 
 /**
  * Único servicio del MVP con API real: Edge Function `humaya-concierge` en el
@@ -49,13 +53,16 @@ export function getSuggestions(): LocalizedText[] {
 
 /** Bandeja de /staff/concierge: una fila por huésped demo. */
 export async function getConversations(): Promise<ConciergeConversation[]> {
-  const data = await call<{ conversations: ConciergeConversation[] }>(`${CONCIERGE_URL}?staff=1`);
+  const data = await call<{ conversations: ConciergeConversation[] }>(`${CONCIERGE_URL}?staff=1`, {
+    headers: await cabeceraDeRecepcion(),
+  });
   return data.conversations;
 }
 
 export async function sendStaffReply(stayId: string, text: string): Promise<ChatMessage[]> {
   const data = await call<{ messages: ChatMessage[] }>(CONCIERGE_URL, {
     method: 'POST',
+    headers: await cabeceraDeRecepcion(),
     body: JSON.stringify({ action: 'reply', stay_id: stayId, text }),
   });
   return data.messages;
@@ -64,6 +71,7 @@ export async function sendStaffReply(stayId: string, text: string): Promise<Chat
 export async function markConversationRead(stayId: string): Promise<void> {
   await call<{ ok: true }>(CONCIERGE_URL, {
     method: 'POST',
+    headers: await cabeceraDeRecepcion(),
     body: JSON.stringify({ action: 'read', stay_id: stayId }),
   });
 }

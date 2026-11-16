@@ -17,6 +17,15 @@ export {
   useSendStaffReply,
 } from './useConcierge';
 export {
+  useBorrarTema,
+  useCrearTema,
+  useEditarTema,
+  useEstadoBot,
+  useGuardarAjustesBot,
+  useProbarBot,
+  useTemasBase,
+} from './useConciergeBase';
+export {
   useAcceptPrivacy,
   useAlerts,
   useGuestProfile,

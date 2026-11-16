@@ -14,6 +14,7 @@ import type { CambiosServicio } from '@/services/admin';
 import type { Servicio } from '@/types';
 import { Screen, ScreenError, ScreenHeading, ScreenLoading } from '../layout/ScreenState';
 import { adminCopy as copy } from './copy';
+import { ConciergeBot } from './ConciergeBot';
 
 /**
  * Lo que se configura acá maneja, en el mismo momento, el Home del huésped
@@ -158,6 +159,8 @@ export function AdminPage() {
           ))}
         </ul>
       </section>
+
+      <ConciergeBot />
 
       <section className="flex flex-col gap-3">
         <div>

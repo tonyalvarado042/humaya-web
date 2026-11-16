@@ -1,4 +1,8 @@
 import type { AdminOpcion, Servicio, ServicioSlot } from '@/types';
+// Las tres acciones que cambian lo que ve el huesped mandan la sesion de
+// recepcion. Las lecturas y reservarServicio no: las usa la app del huesped,
+// que entra por codigo de confirmacion y no tiene cuenta.
+import { cabeceraDeRecepcion } from './sesion';
 
 /**
  * Lo que se configura desde /staff/admin: qué opciones se ven en el Home/menú
@@ -19,27 +23,6 @@ async function call<T>(input: string, init?: RequestInit): Promise<T> {
     throw new Error(`admin_http_${response.status}`);
   }
   return response.json() as Promise<T>;
-}
-
-/**
- * La sesion de recepcion, para las acciones que solo recepcion puede hacer.
- *
- * Cambiar el menu del huesped o el catalogo de servicios le cambia la app a
- * TODO huesped, asi que la funcion exige esta sesion desde el 16 de noviembre
- * de 2026. Antes no pedia nada: un POST desde cualquier parte del mundo podia
- * apagar opciones o inventar servicios.
- *
- * Las lecturas y `reservarServicio` NO mandan token a proposito: las usa la
- * app del huesped, que entra por codigo de confirmacion y no tiene cuenta.
- * Por eso el import es dinamico: asi el huesped nunca descarga el SDK de Auth.
- */
-async function cabeceraDeRecepcion(): Promise<Record<string, string>> {
-  const { cliente } = await import('./sesion');
-  const db = await cliente();
-  const {
-    data: { session },
-  } = await db.auth.getSession();
-  return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
 }
 
 interface OpcionRow {

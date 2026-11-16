@@ -154,3 +154,30 @@ export async function token(): Promise<string | null> {
   } = await db.auth.getSession();
   return session?.access_token ?? null;
 }
+
+/**
+ * La cabecera `Authorization` de quien esta en recepcion, o vacia si no hay
+ * sesion.
+ *
+ * Las funciones que cambian lo que ve el huesped —la configuracion del menu,
+ * el catalogo de servicios, la bandeja del Concierge— la exigen. Hasta el 16
+ * de noviembre de 2026 no exigian nada: usan la llave de servicio, asi que
+ * RLS no las frena, y cualquiera en internet podia llamarlas.
+ *
+ * Devuelve un objeto vacio en vez de fallar: quien llama decide. Asi la misma
+ * funcion sirve para una llamada del huesped, que no tiene cuenta, sin tener
+ * que envolverla en un try.
+ */
+export async function cabeceraDeRecepcion(): Promise<Record<string, string>> {
+  try {
+    const db = await cliente();
+    const {
+      data: { session },
+    } = await db.auth.getSession();
+    return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+  } catch {
+    // Sin SDK o sin red no hay cabecera. El servidor respondera 401 y la
+    // pantalla lo dira: es mejor que romperse antes de pedir.
+    return {};
+  }
+}
