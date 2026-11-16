@@ -13,6 +13,11 @@ export const conciergeThreadCopy = {
   notFoundBody: 'Revisá el enlace o volvé a la bandeja del Concierge.',
   thread: (guestName: string) => `Conversación con ${guestName}`,
   empty: 'Todavía no hay mensajes en esta conversación.',
+  emptyPorQue:
+    'Todo lo que se escriba acá queda guardado y se ve completo, de los dos lados. Esta conversación está vacía porque nadie escribió todavía.',
+  guardadas: 'Respuestas guardadas',
+  guardadasAyuda:
+    'Tocá una y queda en el cuadro para que la leas y la ajustes antes de mandarla. Se editan en Admin.',
   replyLabel: 'Tu respuesta',
   replyPlaceholder: 'Escribí la respuesta para el huésped…',
   send: 'Enviar',

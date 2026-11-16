@@ -243,3 +243,114 @@ export async function guardarLlave(valor: string): Promise<void> {
   // a buscar el problema donde no esta.
   if (error) throw new Error(error.message || 'llave_error');
 }
+
+/**
+ * Respuestas guardadas: los textos que recepcion manda una y otra vez.
+ *
+ * No es lo mismo que la base del bot. La base es lo que el BOT puede afirmar
+ * y entra en un prompt; esto son mensajes enteros que una PERSONA manda tal
+ * cual, o toca para tenerlos en el cuadro y editarlos antes de enviar. No
+ * pasan por ningun modelo, asi que salen exactamente como se escribieron.
+ */
+export interface RespuestaGuardada {
+  id: string;
+  titulo: string;
+  texto: string;
+  textoEn: string | null;
+  activo: boolean;
+  orden: number;
+}
+
+interface RespuestaRow {
+  id: string;
+  titulo: string;
+  texto: string;
+  texto_en: string | null;
+  activo: boolean;
+  orden: number;
+}
+
+function aRespuesta(fila: RespuestaRow): RespuestaGuardada {
+  return {
+    id: fila.id,
+    titulo: fila.titulo,
+    texto: fila.texto,
+    textoEn: fila.texto_en,
+    activo: fila.activo,
+    orden: fila.orden,
+  };
+}
+
+/** `soloActivas` es para el hilo: ahi no sirve ofrecer una respuesta apagada. */
+export async function getRespuestas(soloActivas = false): Promise<RespuestaGuardada[]> {
+  const db = await cliente();
+  let consulta = db
+    .from('humaya_concierge_respuestas')
+    .select('id,titulo,texto,texto_en,activo,orden')
+    .order('orden', { ascending: true });
+  if (soloActivas) consulta = consulta.eq('activo', true);
+
+  const { data, error } = await consulta;
+  if (error) throw new Error(`respuestas_${error.code ?? 'error'}`);
+  return ((data ?? []) as RespuestaRow[]).map(aRespuesta);
+}
+
+export interface CambiosRespuesta {
+  titulo?: string;
+  texto?: string;
+  textoEn?: string | null;
+  activo?: boolean;
+}
+
+export async function editarRespuesta(id: string, cambios: CambiosRespuesta): Promise<void> {
+  const db = await cliente();
+  const fila: Record<string, unknown> = { actualizado_en: new Date().toISOString() };
+  if (cambios.titulo !== undefined) fila.titulo = cambios.titulo;
+  if (cambios.texto !== undefined) fila.texto = cambios.texto;
+  if (cambios.textoEn !== undefined) fila.texto_en = cambios.textoEn;
+  if (cambios.activo !== undefined) fila.activo = cambios.activo;
+
+  // Sin `select()`, una fila que RLS no deja tocar devuelve exito con cero
+  // filas y la pantalla diria que guardo algo que no guardo.
+  const { data, error } = await db
+    .from('humaya_concierge_respuestas')
+    .update(fila)
+    .eq('id', id)
+    .select('id');
+
+  if (error) throw new Error(`respuestas_${error.code ?? 'error'}`);
+  if (!data || data.length === 0) throw new Error('respuestas_sin_permiso');
+}
+
+export async function crearRespuesta(titulo: string, texto: string): Promise<RespuestaGuardada> {
+  const db = await cliente();
+  const { data: ultimas } = await db
+    .from('humaya_concierge_respuestas')
+    .select('orden')
+    .order('orden', { ascending: false })
+    .limit(1);
+  const orden = ((ultimas?.[0] as { orden?: number } | undefined)?.orden ?? 0) + 10;
+
+  const { data, error } = await db
+    .from('humaya_concierge_respuestas')
+    // Esta SI nace encendida: la escribio una persona para mandarla, a
+    // diferencia de un tema de la base, que el bot va a afirmar solo.
+    .insert({ titulo, texto, activo: true, orden })
+    .select('id,titulo,texto,texto_en,activo,orden')
+    .single();
+
+  if (error) throw new Error(`respuestas_${error.code ?? 'error'}`);
+  return aRespuesta(data as RespuestaRow);
+}
+
+export async function borrarRespuesta(id: string): Promise<void> {
+  const db = await cliente();
+  const { data, error } = await db
+    .from('humaya_concierge_respuestas')
+    .delete()
+    .eq('id', id)
+    .select('id');
+
+  if (error) throw new Error(`respuestas_${error.code ?? 'error'}`);
+  if (!data || data.length === 0) throw new Error('respuestas_sin_permiso');
+}

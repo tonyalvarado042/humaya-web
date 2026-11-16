@@ -13,6 +13,7 @@ import {
 } from '@/hooks';
 import type { TemaBase } from '@/services/conciergeBase';
 import { botCopy as copy } from './copyBot';
+import { RespuestasGuardadas } from './RespuestasGuardadas';
 
 /**
  * El Concierge, en settings: qué sabe, si está encendido y cuánto va gastando.
@@ -327,6 +328,8 @@ export function ConciergeBot() {
           ) : null}
         </form>
       </Card>
+
+      <RespuestasGuardadas />
     </section>
   );
 }

@@ -1,14 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  borrarRespuesta,
   borrarTema,
+  crearRespuesta,
   crearTema,
+  editarRespuesta,
   editarTema,
   getEstadoBot,
   getEstadoLlave,
+  getRespuestas,
   getTemas,
   guardarLlave,
   guardarAjustesBot,
   type AjustesBot,
+  type CambiosRespuesta,
   type CambiosTema,
 } from '@/services/conciergeBase';
 
@@ -107,6 +112,50 @@ export function useGuardarAjustesBot() {
     mutationFn: (ajustes: AjustesBot) => guardarAjustesBot(ajustes),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ESTADO });
+    },
+  });
+}
+
+const RESPUESTAS = ['concierge-respuestas'];
+
+export function useRespuestasGuardadas(soloActivas = false) {
+  return useQuery({
+    queryKey: [...RESPUESTAS, soloActivas],
+    queryFn: () => getRespuestas(soloActivas),
+  });
+}
+
+export function useEditarRespuesta() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, cambios }: { id: string; cambios: CambiosRespuesta }) =>
+      editarRespuesta(id, cambios),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: RESPUESTAS });
+    },
+  });
+}
+
+export function useCrearRespuesta() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ titulo, texto }: { titulo: string; texto: string }) =>
+      crearRespuesta(titulo, texto),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: RESPUESTAS });
+    },
+  });
+}
+
+export function useBorrarRespuesta() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => borrarRespuesta(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: RESPUESTAS });
     },
   });
 }

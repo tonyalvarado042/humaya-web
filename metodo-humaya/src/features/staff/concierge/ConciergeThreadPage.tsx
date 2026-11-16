@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Send } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { ChatBubble, EmptyState, IconButton, Input } from '@/components/ui';
-import { useConciergeMessages, useMarkConversationRead, useSendStaffReply } from '@/hooks';
+import { ChatBubble, Chip, EmptyState, IconButton, Input } from '@/components/ui';
+import {
+  useConciergeMessages,
+  useMarkConversationRead,
+  useRespuestasGuardadas,
+  useSendStaffReply,
+} from '@/hooks';
 import { DEMO_STAYS } from '@/mocks';
 import { Screen, ScreenError, ScreenLoading } from '../layout/ScreenState';
 import { conciergeThreadCopy as copy } from './copy';
@@ -24,6 +29,8 @@ export function ConciergeThreadPage() {
   const messages = useConciergeMessages(stayId ?? '');
   const markRead = useMarkConversationRead(stayId ?? '');
   const sendReply = useSendStaffReply(stayId ?? '');
+  // Solo las encendidas: en el hilo no sirve ofrecer una respuesta apagada.
+  const respuestas = useRespuestasGuardadas(true);
 
   useEffect(() => {
     if (stayId && demoStay) markRead.mutate();
@@ -76,7 +83,10 @@ export function ConciergeThreadPage() {
         className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4.5"
       >
         {messages.data.length === 0 ? (
-          <p className="m-0 text-sm text-muted">{copy.empty}</p>
+          <div className="flex flex-col gap-1">
+            <p className="m-0 text-sm text-muted">{copy.empty}</p>
+            <p className="m-0 text-[13px] text-muted-soft">{copy.emptyPorQue}</p>
+          </div>
         ) : (
           messages.data.map((message) => (
             <div key={message.id} className="flex flex-col gap-1">
@@ -99,6 +109,29 @@ export function ConciergeThreadPage() {
         <p role="alert" className="m-0 text-sm text-on-alert">
           {copy.error}
         </p>
+      ) : null}
+
+      {respuestas.data && respuestas.data.length > 0 ? (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs uppercase tracking-[0.18em] text-muted-soft">
+            {copy.guardadas}
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {respuestas.data.map((respuesta) => (
+              <Chip
+                key={respuesta.id}
+                title={respuesta.texto}
+                onClick={() => setDraft(respuesta.texto)}
+              >
+                {respuesta.titulo}
+              </Chip>
+            ))}
+          </div>
+          {/* Pone el texto en el cuadro, no lo manda: el huesped merece que
+              alguien lo lea antes de enviarlo, y casi siempre hay que
+              ajustarle una palabra. */}
+          <span className="text-[13px] text-muted-soft">{copy.guardadasAyuda}</span>
+        </div>
       ) : null}
 
       <form

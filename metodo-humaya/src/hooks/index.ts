@@ -17,14 +17,18 @@ export {
   useSendStaffReply,
 } from './useConcierge';
 export {
+  useBorrarRespuesta,
   useBorrarTema,
+  useCrearRespuesta,
   useCrearTema,
+  useEditarRespuesta,
   useEditarTema,
   useEstadoBot,
   useEstadoLlave,
   useGuardarAjustesBot,
   useGuardarLlave,
   useProbarBot,
+  useRespuestasGuardadas,
   useTemasBase,
 } from './useConciergeBase';
 export {
