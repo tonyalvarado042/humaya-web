@@ -1,4 +1,4 @@
-import { CalendarDays, MessageCircle, Settings, Tent, Users } from 'lucide-react';
+import { CalendarClock, CalendarDays, MessageCircle, Settings, Users } from 'lucide-react';
 import type { Idioma } from '@/hooks/useIdiomaElegido';
 
 export interface DestinoStaff {
@@ -21,14 +21,14 @@ export const STAFF_NAV: Record<Idioma, DestinoStaff[]> = {
   en: [
     { to: '/staff', label: 'Bookings', Icon: CalendarDays, end: true },
     { to: '/staff/guests', label: 'Guests', Icon: Users, end: false },
-    { to: '/staff/spa', label: 'Spa & wellness', Icon: Tent, end: false },
+    { to: '/staff/spa', label: 'Schedule', Icon: CalendarClock, end: false },
     { to: '/staff/concierge', label: 'Concierge', Icon: MessageCircle, end: false },
     { to: '/staff/admin', label: 'Admin', Icon: Settings, end: false },
   ],
   es: [
     { to: '/staff', label: 'Reservas', Icon: CalendarDays, end: true },
     { to: '/staff/guests', label: 'Huéspedes', Icon: Users, end: false },
-    { to: '/staff/spa', label: 'Spa y bienestar', Icon: Tent, end: false },
+    { to: '/staff/spa', label: 'Agenda', Icon: CalendarClock, end: false },
     { to: '/staff/concierge', label: 'Concierge', Icon: MessageCircle, end: false },
     { to: '/staff/admin', label: 'Admin', Icon: Settings, end: false },
   ],

@@ -51,6 +51,7 @@ export {
   useInterviewQuestions,
   useSaveAnswer,
 } from './useInterview';
+export { useAgendaPorServicio } from './useAgenda';
 export { queryKeys } from './queryKeys';
 export { useCheckReservation } from './useEntrada';
 export { useBookSlot, useDaySchedule, useSpaSlots, useStayBookings } from './useSpa';

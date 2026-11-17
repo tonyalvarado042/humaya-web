@@ -42,6 +42,10 @@ export const queryKeys = {
   adminServicios: (onlyEnabled: boolean) => ['admin-servicios', onlyEnabled] as const,
   servicioSlots: (servicioId: string, fecha: string) =>
     ['servicio-slots', servicioId, fecha] as const,
+
+  /** La agenda real de recepción: lo que hay reservado entre dos fechas. */
+  agendaPorServicio: (desde: string, hasta: string) =>
+    ['agenda-por-servicio', desde, hasta] as const,
 };
 
 /** Prefijos que hay que invalidar cuando cambia algo del spa. */

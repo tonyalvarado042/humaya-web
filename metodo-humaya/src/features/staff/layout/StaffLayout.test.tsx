@@ -35,7 +35,7 @@ describe('sidebar de escritorio', () => {
     renderRoutes(routes, { route: '/staff' });
 
     const sidebar = await screen.findByRole('complementary');
-    for (const label of ['Bookings', 'Guests', 'Spa & wellness', 'Concierge', 'Admin']) {
+    for (const label of ['Bookings', 'Guests', 'Schedule', 'Concierge', 'Admin']) {
       expect(within(sidebar).getByRole('link', { name: new RegExp(label) })).toBeInTheDocument();
     }
     expect(within(sidebar).getByRole('link', { name: 'Open the guest app' })).toHaveAttribute(
@@ -48,7 +48,7 @@ describe('sidebar de escritorio', () => {
     renderRoutes(routes, { route: '/staff/spa' });
 
     const sidebar = await screen.findByRole('complementary');
-    expect(within(sidebar).getByRole('link', { name: 'Spa & wellness' })).toHaveAttribute(
+    expect(within(sidebar).getByRole('link', { name: 'Schedule' })).toHaveAttribute(
       'aria-current',
       'page',
     );
@@ -112,7 +112,7 @@ describe('menú deslizable', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Open menu' }));
 
     const drawer = screen.getByRole('dialog', { name: 'Front desk' });
-    for (const label of ['Bookings', 'Guests', 'Spa & wellness', 'Concierge', 'Admin']) {
+    for (const label of ['Bookings', 'Guests', 'Schedule', 'Concierge', 'Admin']) {
       expect(within(drawer).getByRole('link', { name: new RegExp(label) })).toBeInTheDocument();
     }
   });
@@ -122,7 +122,7 @@ describe('menú deslizable', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Open menu' }));
     const drawer = screen.getByRole('dialog');
-    await userEvent.click(within(drawer).getByRole('link', { name: 'Spa & wellness' }));
+    await userEvent.click(within(drawer).getByRole('link', { name: 'Schedule' }));
 
     expect(router.state.location.pathname).toBe('/staff/spa');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -145,6 +145,6 @@ describe('barra superior', () => {
     renderRoutes(routes, { route: '/staff/spa' });
 
     const header = await screen.findByRole('banner');
-    expect(within(header).getByText('Spa & wellness')).toBeInTheDocument();
+    expect(within(header).getByText('Schedule')).toBeInTheDocument();
   });
 });

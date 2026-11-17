@@ -1,96 +1,138 @@
-import { screen, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resetMockState } from '@/mocks';
 import { routes } from '@/router';
-import { bookSlot } from '@/services/spa';
-import { stubConciergeApi } from '@/test/conciergeApiStub';
+import { diaSiguiente, hoyEnCostaRica } from '@/services/clock';
+import { supabaseStub } from '@/test/supabaseStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
+const ENTRENADOR = '11111111-1111-1111-1111-111111111111';
+const MASAJE = '22222222-2222-2222-2222-222222222222';
+
+/**
+ * La fecha que la pantalla tenía escrita en el código hasta el 17 de
+ * noviembre de 2026. Quedó acá como guardia: si alguien vuelve a fijar un día,
+ * el primer test de abajo lo agarra. Es una fecha pasada, así que no puede
+ * volver a coincidir con «hoy».
+ */
+const LA_FECHA_QUE_ESTABA_FIJA = '2026-11-15';
+
 beforeEach(() => {
-  resetMockState();
-  stubConciergeApi();
+  // La pantalla no llama a ninguna función, pero el reloj corregido mide el
+  // desfase contra el servidor. Sin esto, la suite saldría a la red.
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 200 })));
+
+  supabaseStub.tablas.humaya_servicios = [
+    {
+      id: ENTRENADOR,
+      nombre: 'Entrenamiento personal',
+      proveedor: 'Personal trainer',
+      duracion_min: 60,
+      habilitado: true,
+      orden: 1,
+    },
+    {
+      id: MASAJE,
+      nombre: 'Masaje',
+      proveedor: null,
+      duracion_min: 90,
+      habilitado: true,
+      orden: 2,
+    },
+  ];
+
+  supabaseStub.tablas.humaya_servicio_reservas = [
+    {
+      id: 'r-hoy',
+      servicio_id: ENTRENADOR,
+      stay_id: 's-weber',
+      guest_name: 'Hannah Weber',
+      fecha: hoyEnCostaRica(),
+      hora_inicio: '16:00:00',
+    },
+    {
+      id: 'r-manana',
+      servicio_id: ENTRENADOR,
+      stay_id: 's-mendez-rojas',
+      guest_name: 'Valeria Méndez',
+      fecha: diaSiguiente(hoyEnCostaRica()),
+      hora_inicio: '08:00:00',
+    },
+    {
+      id: 'r-de-la-fecha-fija',
+      servicio_id: ENTRENADOR,
+      stay_id: 's-keller',
+      guest_name: 'Familia Keller',
+      fecha: LA_FECHA_QUE_ESTABA_FIJA,
+      hora_inicio: '17:00:00',
+    },
+  ];
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function schedule() {
-  return screen.findByRole('table', { name: 'Agenda del día' });
-}
-
-describe('agenda del 15 de noviembre', () => {
-  it('muestra la fecha del día', async () => {
+describe('la agenda de servicios', () => {
+  it('abre en el día de verdad, no en una fecha fija del código', async () => {
     renderRoutes(routes, { route: '/staff/spa' });
 
-    expect(await screen.findByText(/Domingo 15 de noviembre/)).toBeInTheDocument();
+    // Cada reserva sale dos veces: en la tabla ancha y en la tarjeta
+    // angosta. Las dos están en el DOM; solo el CSS decide cuál se ve.
+    expect(await screen.findAllByText('Hannah Weber')).not.toHaveLength(0);
+    expect(screen.queryAllByText('Familia Keller')).toHaveLength(0);
   });
 
-  it('cuenta 5 reservas de sauna y 4 de cold plunge', async () => {
+  it('muestra la hora, el huésped y con quién es el servicio', async () => {
     renderRoutes(routes, { route: '/staff/spa' });
 
-    await schedule();
-    const sauna = screen.getByText('Reservas de sauna').closest('div')?.parentElement;
-    const cold = screen.getByText('Reservas de cold plunge').closest('div')?.parentElement;
-
-    expect(within(sauna as HTMLElement).getByText('5')).toBeInTheDocument();
-    expect(within(cold as HTMLElement).getByText('4')).toBeInTheDocument();
+    await screen.findAllByText('Hannah Weber');
+    expect(screen.getAllByText('4:00 p.m.').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Con Personal trainer · 60 min/).length).toBeGreaterThan(0);
   });
 
-  it('abre los 9 horarios del spa', async () => {
+  it('cambiar a mañana trae lo de mañana y saca lo de hoy', async () => {
     renderRoutes(routes, { route: '/staff/spa' });
+    await screen.findAllByText('Hannah Weber');
 
-    // 9 horarios más la fila del encabezado.
-    expect(within(await schedule()).getAllByRole('row')).toHaveLength(10);
+    await userEvent.click(screen.getByRole('radio', { name: 'Mañana' }));
+
+    expect(await screen.findAllByText('Valeria Méndez')).not.toHaveLength(0);
+    expect(screen.queryAllByText('Hannah Weber')).toHaveLength(0);
   });
 
-  it('pone a Valeria en el sauna de las 17:00, con su villa', async () => {
+  it('por servicio dice cuál no tiene a nadie anotado', async () => {
+    // Que el masaje esté vacío es información, no una fila que sobra.
     renderRoutes(routes, { route: '/staff/spa' });
+    await screen.findAllByText('Hannah Weber');
 
-    const rows = within(await schedule()).getAllByRole('row');
-    const row = rows.find((item) => within(item).queryByText('17:00')) as HTMLElement;
+    await userEvent.click(screen.getByRole('radio', { name: 'Por servicio' }));
 
-    expect(within(row).getByText('Valeria Méndez y Andrés Rojas')).toBeInTheDocument();
-    expect(within(row).getAllByText('Villa 04').length).toBeGreaterThan(0);
+    expect(await screen.findByText('Masaje')).toBeInTheDocument();
+    expect(screen.getByText('Nadie anotado en estos días.')).toBeInTheDocument();
   });
 
-  it('la próxima sesión es la primera con reserva', async () => {
+  it('explica que el sauna y el cold plunge no llegan acá', async () => {
+    // Callarlo haría que recepción concluya que nadie los usa.
     renderRoutes(routes, { route: '/staff/spa' });
 
-    await schedule();
-    const next = screen.getByText('Próxima sesión').closest('div')?.parentElement;
-    expect(within(next as HTMLElement).getByText('06:00')).toBeInTheDocument();
-  });
-});
-
-describe('una reserva hecha desde la app del huésped', () => {
-  it('aparece en la agenda de recepción', async () => {
-    await bookSlot('cold_plunge', '2026-11-15T21:00:00-06:00', 's-keller');
-
-    renderRoutes(routes, { route: '/staff/spa' });
-
-    const rows = within(await schedule()).getAllByRole('row');
-    const row = rows.find((item) => within(item).queryByText('21:00')) as HTMLElement;
-
-    expect(within(row).getByText('Familia Keller')).toBeInTheDocument();
-    expect(within(row).getByText('Villa 07')).toBeInTheDocument();
+    expect(await screen.findByText(/Sauna y cold plunge no salen acá/)).toBeInTheDocument();
   });
 });
 
-describe('las dos presentaciones', () => {
-  it('los horarios libres se resumen en la vista angosta', async () => {
+describe('cuando no hay nada reservado', () => {
+  it('lo dice en vez de dejar la pantalla en blanco', async () => {
+    supabaseStub.tablas.humaya_servicio_reservas = [];
     renderRoutes(routes, { route: '/staff/spa' });
 
-    await schedule();
-    // 16:00 y 21:00 no tienen ninguna reserva ese día.
-    expect(screen.getByText(/^Libre:/)).toBeInTheDocument();
+    expect(await screen.findByText('No hay nada reservado en estos días')).toBeInTheDocument();
   });
 
-  it('cada horario con reserva tiene su tarjeta además de su fila', async () => {
+  it('y si tampoco hay catálogo, dice dónde se agregan', async () => {
+    supabaseStub.tablas.humaya_servicios = [];
+    supabaseStub.tablas.humaya_servicio_reservas = [];
     renderRoutes(routes, { route: '/staff/spa' });
 
-    await schedule();
-    // En la tabla y en la tarjeta: la hora aparece dos veces.
-    expect(screen.getAllByText('17:00')).toHaveLength(2);
+    expect(await screen.findByText('No hay servicios en el catálogo')).toBeInTheDocument();
   });
 });
