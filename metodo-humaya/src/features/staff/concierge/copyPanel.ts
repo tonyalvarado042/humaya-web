@@ -36,14 +36,18 @@ export const panelCopy = {
   yaNosDijoAyuda: 'Salió de su entrevista. Si está acá, no hay que volver a preguntarlo.',
   yaReservo: (n: number) => `Lo que ya reservó · ${n}`,
   sinReservas: 'Todavía no reservó nada.',
+  reservasNoCargaron: 'No pudimos leer sus reservas. No es que no tenga: no lo sabemos.',
   fichaCompleta: 'Abrir la ficha completa',
 
+  // En inglés, igual que en la ficha completa y en las experiencias WOW: son
+  // los nombres de los pilares del método, no palabras sueltas. Traducirlos
+  // solo acá le daría al equipo dos vocabularios para lo mismo.
   pilares: {
-    move: 'Movimiento',
-    nourish: 'Alimentación',
-    connect: 'Vínculos',
-    create: 'Crear',
-    believe: 'Sentido',
+    move: 'Move',
+    nourish: 'Nourish',
+    connect: 'Connect',
+    create: 'Create',
+    believe: 'Believe',
   } as Record<string, string>,
 
   instalaciones: {

@@ -263,7 +263,13 @@ export function PanelHuesped({ stayId, messages }: PanelProps) {
             ))}
           </ul>
         ) : (
-          <p className="m-0 text-[13px] text-muted-soft">{copy.sinReservas}</p>
+          // «Todavía no reservó nada» solo si de verdad lo sabemos. Si la
+          // consulta falló, decirlo igual sería inventar un dato: alguien
+          // podría contestarle que el sauna está libre a una hora que ya
+          // tiene tomada.
+          <p className="m-0 text-[13px] text-muted-soft">
+            {reservas.isError ? copy.reservasNoCargaron : copy.sinReservas}
+          </p>
         )}
       </Plegable>
 
