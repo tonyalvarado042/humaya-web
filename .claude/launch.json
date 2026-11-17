@@ -26,6 +26,20 @@
         "5173"
       ],
       "port": 5173
+    },
+    {
+      "name": "humaya-experience-build",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "metodo-humaya",
+        "run",
+        "preview",
+        "--",
+        "--port",
+        "4173"
+      ],
+      "port": 4173
     }
   ]
 }

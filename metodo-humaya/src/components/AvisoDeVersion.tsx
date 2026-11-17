@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { hayVersionNueva, traerVersionNueva } from '@/services/version';
@@ -10,6 +10,7 @@ const copy = {
   titulo: 'Hay una versión más nueva de esta pantalla.',
   cuerpo: 'Lo que estás viendo puede estar desactualizado.',
   actualizar: 'Actualizar',
+  actualizando: 'Trayéndola…',
 };
 
 /**
@@ -26,6 +27,8 @@ const copy = {
  */
 export function AvisoDeVersion() {
   const [hay, setHay] = useState(false);
+  const [trayendo, setTrayendo] = useState(false);
+  const barra = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let vivo = true;
@@ -51,18 +54,50 @@ export function AvisoDeVersion() {
     };
   }, []);
 
+  /**
+   * La barra va fija abajo, así que tapa lo último de la pantalla — y lo
+   * último de una conversación es el botón de enviar. En vez de taparlo, le
+   * deja ese espacio libre al final de la página. Se mide en vez de fijarse
+   * a ojo porque en un teléfono el texto se parte en varias líneas.
+   */
+  useLayoutEffect(() => {
+    if (!hay) return;
+
+    const medir = () => {
+      document.body.style.paddingBottom = `${barra.current?.offsetHeight ?? 0}px`;
+    };
+
+    medir();
+    window.addEventListener('resize', medir);
+    return () => {
+      window.removeEventListener('resize', medir);
+      document.body.style.paddingBottom = '';
+    };
+  }, [hay]);
+
   if (!hay) return null;
 
   return (
     <div
+      ref={barra}
       role="status"
       className="fixed inset-x-0 bottom-0 z-50 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 border-t border-line-strong bg-surface px-4 py-3 shadow-lg"
     >
       <RefreshCw size={16} strokeWidth={1.8} aria-hidden="true" className="shrink-0 text-gold" />
       <span className="text-sm font-medium text-text">{copy.titulo}</span>
       <span className="text-[13px] text-muted">{copy.cuerpo}</span>
-      <Button variant="outline" onClick={() => void traerVersionNueva()}>
-        {copy.actualizar}
+      {/* Traer la versión nueva puede tardar unos segundos: hay que esperar
+          a que el service worker nuevo tome el mando. Sin este aviso, el
+          botón parece no hacer nada y se toca otra vez. */}
+      <Button
+        variant="outline"
+        disabled={trayendo}
+        onClick={() => {
+          setTrayendo(true);
+          void traerVersionNueva();
+        }}
+      >
+        {trayendo ? copy.actualizando : copy.actualizar}
       </Button>
     </div>
   );

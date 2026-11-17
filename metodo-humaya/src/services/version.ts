@@ -59,13 +59,46 @@ export async function hayVersionNueva(): Promise<boolean> {
   }
 }
 
-/** Trae la versión nueva. Recarga aunque el service worker no coopere. */
+/** Cuánto se espera a que el service worker nuevo tome el mando. */
+const ESPERA_MAX_MS = 6000;
+
+/**
+ * Trae la versión nueva.
+ *
+ * ── POR QUÉ NO ALCANZA CON RECARGAR ─────────────────────────────────────
+ * Comprobado el 16 de noviembre de 2026, con el botón ya publicado: al
+ * tocarlo, la pantalla recargaba y seguía mostrando la versión vieja. Hacía
+ * falta tocarlo DOS veces.
+ *
+ * La razón es que el service worker viejo todavía manda cuando empieza la
+ * recarga, y contesta con el `index.html` que tiene guardado — el viejo. El
+ * nuevo se instala durante esa misma carga y recién queda al mando después,
+ * así que es la recarga siguiente la que trae la versión nueva.
+ *
+ * Un botón que no hace nada la primera vez es peor que no tener botón: el
+ * que lo toca concluye que la pantalla está trabada. Así que acá se espera a
+ * que el service worker nuevo tome el mando, y recién entonces se recarga.
+ */
 export async function traerVersionNueva(): Promise<void> {
   try {
-    const registros = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(registros.map((registro) => registro.update()));
-    for (const registro of registros) {
-      registro.waiting?.postMessage({ type: 'SKIP_WAITING' });
+    if (navigator.serviceWorker) {
+      // El oyente se pone ANTES de pedir la actualización. Al revés, el
+      // cambio de mando puede pasar mientras tanto y perderse.
+      const tomoElMando = new Promise<void>((listo) => {
+        navigator.serviceWorker.addEventListener('controllerchange', () => listo(), {
+          once: true,
+        });
+      });
+
+      const registros = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registros.map((registro) => registro.update()));
+      for (const registro of registros) {
+        registro.waiting?.postMessage({ type: 'SKIP_WAITING' });
+      }
+
+      // Si nadie toma el mando, se recarga igual: una pantalla que no
+      // recarga es peor que una que recarga de más.
+      await Promise.race([tomoElMando, new Promise((listo) => setTimeout(listo, ESPERA_MAX_MS))]);
     }
   } catch {
     // Si no hay service worker, la recarga sola alcanza.
