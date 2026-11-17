@@ -85,7 +85,11 @@ export function ConciergeThreadPage() {
         una línea que separa a alguien de la conversación que vino a leer.
       */}
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-6">
-        <aside className="order-1 flex flex-col gap-5 lg:sticky lg:top-6 lg:order-2 lg:w-96 lg:shrink-0">
+        {/* 320 px en una laptop de 1024 y 384 desde 1280. Con 384 fijos, a
+            1024 le quedaban 280 px al chat —ancho de teléfono— después del
+            menú lateral y los márgenes. La ficha se angosta antes que el
+            chat: el chat es el trabajo. */}
+        <aside className="order-1 flex flex-col gap-5 lg:sticky lg:top-6 lg:order-2 lg:w-80 lg:shrink-0 xl:w-96">
           <PanelHuesped stayId={stayId} messages={messages.data} />
         </aside>
 
