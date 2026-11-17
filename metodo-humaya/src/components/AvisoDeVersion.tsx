@@ -6,12 +6,29 @@ import { hayVersionNueva, traerVersionNueva } from '@/services/version';
 /** Cada cinco minutos alcanza: un despliegue no es algo que pase cada rato. */
 const CADA_CUANTO_MS = 5 * 60_000;
 
-const copy = {
-  titulo: 'Hay una versión más nueva de esta pantalla.',
-  cuerpo: 'Lo que estás viendo puede estar desactualizado.',
-  actualizar: 'Actualizar',
-  actualizando: 'Trayéndola…',
-};
+/**
+ * Recepción trabaja en español o en inglés, así que el aviso también.
+ *
+ * La app del huésped habla cuatro idiomas y todavía no tiene estos textos:
+ * por eso el aviso vive por ahora solo en recepción, que además es donde
+ * una pantalla vieja hace daño de verdad.
+ */
+const textos = {
+  es: {
+    titulo: 'Hay una versión más nueva de esta pantalla.',
+    cuerpo: 'Lo que estás viendo puede estar desactualizado.',
+    actualizar: 'Actualizar',
+    actualizando: 'Trayéndola…',
+  },
+  en: {
+    titulo: 'There is a newer version of this screen.',
+    cuerpo: 'What you are looking at may be out of date.',
+    actualizar: 'Update',
+    actualizando: 'Fetching it…',
+  },
+} as const;
+
+export type IdiomaDelAviso = keyof typeof textos;
 
 /**
  * Avisa cuando el servidor ya publicó algo más nuevo que lo que esta pestaña
@@ -25,7 +42,8 @@ const copy = {
  * Porque el aviso no es una sugerencia: mientras esté, la pantalla está
  * mintiendo. Ocupa una línea abajo y se va sola al actualizar.
  */
-export function AvisoDeVersion() {
+export function AvisoDeVersion({ idioma = 'es' }: { idioma?: IdiomaDelAviso }) {
+  const copy = textos[idioma];
   const [hay, setHay] = useState(false);
   const [trayendo, setTrayendo] = useState(false);
   const barra = useRef<HTMLDivElement>(null);

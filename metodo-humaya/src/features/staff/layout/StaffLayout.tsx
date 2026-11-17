@@ -2,6 +2,7 @@ import { Menu } from 'lucide-react';
 import type { Idioma } from '@/hooks/useIdiomaElegido';
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { AvisoDeVersion } from '@/components/AvisoDeVersion';
 import { HumayaLogo } from '@/components/HumayaLogo';
 import { Drawer } from '@/components/ui';
 import { useIdiomaRecepcion } from '../puerta/contexto';
@@ -32,6 +33,9 @@ export function StaffLayout() {
 
   return (
     <div data-theme="staff" className="min-h-dvh bg-bg text-text">
+      {/* Acá y no en la raíz: una pantalla vieja en recepción hace daño, y
+          estos textos todavía no existen en los cuatro idiomas del huésped. */}
+      <AvisoDeVersion idioma={idioma} />
       <div className="flex min-h-dvh">
         {/* Sidebar: solo desde 1024 px */}
         <aside className="hidden w-62 shrink-0 flex-col gap-8 bg-nav px-4.5 py-7 text-on-ink lg:flex">
