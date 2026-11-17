@@ -11,7 +11,7 @@ import {
 import { DEMO_STAYS } from '@/mocks';
 import { Screen, ScreenError, ScreenLoading } from '../layout/ScreenState';
 import { conciergeThreadCopy as copy } from './copy';
-import { NotasInternas, PanelHuesped } from './PanelHuesped';
+import { PanelHuesped } from './PanelHuesped';
 
 function messageAt(iso: string): string {
   if (!iso) return '';
@@ -74,129 +74,144 @@ export function ConciergeThreadPage() {
         {demoStay.guestName}
       </h1>
 
-      <PanelHuesped stayId={stayId} messages={messages.data} />
+      {/*
+        La ficha y el chat, lado a lado.
 
-      {messages.data.some((message) => message.from === 'concierge' && message.escalated) ? (
-        <p role="status" className="m-0 text-sm text-on-alert">
-          {copy.escalatedNotice}
-        </p>
-      ) : null}
+        En escritorio la ficha queda fija a la derecha: el que contesta tiene
+        que poder leer las alergias y lo que el huésped ya nos dijo MIENTRAS
+        escribe, no antes de empezar a bajar. En móvil va arriba, porque el
+        contexto se lee primero y el chat empieza debajo — y por eso todo lo
+        que no es urgente va plegado: en un teléfono, cada línea de más es
+        una línea que separa a alguien de la conversación que vino a leer.
+      */}
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-6">
+        <aside className="order-1 flex flex-col gap-5 lg:sticky lg:top-6 lg:order-2 lg:w-96 lg:shrink-0">
+          <PanelHuesped stayId={stayId} messages={messages.data} />
+        </aside>
 
-      <div
-        role="log"
-        aria-label={copy.thread(demoStay.guestName)}
-        className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4.5"
-      >
-        {messages.data.length === 0 ? (
-          <div className="flex flex-col gap-1">
-            <p className="m-0 text-sm text-muted">{copy.empty}</p>
-            <p className="m-0 text-[13px] text-muted-soft">{copy.emptyPorQue}</p>
+        <div className="order-2 flex min-w-0 flex-1 flex-col gap-5 lg:order-1">
+          {messages.data.some((message) => message.from === 'concierge' && message.escalated) ? (
+            <p role="status" className="m-0 text-sm text-on-alert">
+              {copy.escalatedNotice}
+            </p>
+          ) : null}
+
+          <div
+            role="log"
+            aria-label={copy.thread(demoStay.guestName)}
+            className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4.5"
+          >
+            {messages.data.length === 0 ? (
+              <div className="flex flex-col gap-1">
+                <p className="m-0 text-sm text-muted">{copy.empty}</p>
+                <p className="m-0 text-[13px] text-muted-soft">{copy.emptyPorQue}</p>
+              </div>
+            ) : (
+              messages.data.map((message) => (
+                <div key={message.id} className="flex flex-col gap-1">
+                  <ChatBubble from={message.from}>{message.text}</ChatBubble>
+                  <span
+                    className={
+                      message.from === 'guest'
+                        ? 'self-end text-xs text-muted-soft'
+                        : 'self-start text-xs text-muted-soft'
+                    }
+                  >
+                    {messageAt(message.at)}
+                  </span>
+                </div>
+              ))
+            )}
           </div>
-        ) : (
-          messages.data.map((message) => (
-            <div key={message.id} className="flex flex-col gap-1">
-              <ChatBubble from={message.from}>{message.text}</ChatBubble>
-              <span
-                className={
-                  message.from === 'guest'
-                    ? 'self-end text-xs text-muted-soft'
-                    : 'self-start text-xs text-muted-soft'
-                }
-              >
-                {messageAt(message.at)}
+
+          {sendReply.isError ? (
+            <p role="alert" className="m-0 text-sm text-on-alert">
+              {copy.error}
+            </p>
+          ) : null}
+
+          {respuestas.data && respuestas.data.length > 0 ? (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs uppercase tracking-[0.18em] text-muted-soft">
+                {copy.guardadas}
               </span>
-            </div>
-          ))
-        )}
-      </div>
-
-      {sendReply.isError ? (
-        <p role="alert" className="m-0 text-sm text-on-alert">
-          {copy.error}
-        </p>
-      ) : null}
-
-      {respuestas.data && respuestas.data.length > 0 ? (
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs uppercase tracking-[0.18em] text-muted-soft">
-            {copy.guardadas}
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {respuestas.data.map((respuesta) => (
-              <Chip
-                key={respuesta.id}
-                title={respuesta.texto}
-                onClick={() => {
-                  setDraft(respuesta.texto);
-                  setDraftEn(respuesta.textoEn ?? '');
-                }}
-              >
-                {respuesta.titulo}
-              </Chip>
-            ))}
-          </div>
-          {/* Pone el texto en el cuadro, no lo manda: el huesped merece que
+              <div className="flex flex-wrap gap-2">
+                {respuestas.data.map((respuesta) => (
+                  <Chip
+                    key={respuesta.id}
+                    title={respuesta.texto}
+                    onClick={() => {
+                      setDraft(respuesta.texto);
+                      setDraftEn(respuesta.textoEn ?? '');
+                    }}
+                  >
+                    {respuesta.titulo}
+                  </Chip>
+                ))}
+              </div>
+              {/* Pone el texto en el cuadro, no lo manda: el huesped merece que
               alguien lo lea antes de enviarlo, y casi siempre hay que
               ajustarle una palabra. */}
-          <span className="text-[13px] text-muted-soft">{copy.guardadasAyuda}</span>
-        </div>
-      ) : null}
+              <span className="text-[13px] text-muted-soft">{copy.guardadasAyuda}</span>
+            </div>
+          ) : null}
 
-      <form
-        className="flex flex-col gap-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          send();
-        }}
-      >
-        <Input
-          label={copy.replyLabel}
-          placeholder={copy.replyPlaceholder}
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-        />
-        <Input
-          label={copy.replyLabelEn}
-          placeholder={copy.replyPlaceholderEn}
-          value={draftEn}
-          onChange={(event) => setDraftEn(event.target.value)}
-        />
+          <form
+            className="flex flex-col gap-3"
+            onSubmit={(event) => {
+              event.preventDefault();
+              send();
+            }}
+          >
+            <Input
+              label={copy.replyLabel}
+              placeholder={copy.replyPlaceholder}
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+            />
+            <Input
+              label={copy.replyLabelEn}
+              placeholder={copy.replyPlaceholderEn}
+              value={draftEn}
+              onChange={(event) => setDraftEn(event.target.value)}
+            />
 
-        {/* Como le llega. 53 de 62 reservas entran por OTAs, asi que el
+            {/* Como le llega. 53 de 62 reservas entran por OTAs, asi que el
             huesped promedio lee en ingles: si el campo en ingles esta vacio,
             la pantalla lo dice ANTES de mandar, no despues. */}
-        {draft.trim() ? (
-          <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4">
-            <span className="text-xs uppercase tracking-[0.18em] text-muted-soft">
-              {copy.vistaPrevia}
-            </span>
-            <span className="text-[13px] text-muted">{copy.siLeeEspanol}</span>
-            <ChatBubble from="staff">{draft}</ChatBubble>
-            <span className="text-[13px] text-muted">{copy.siLeeIngles}</span>
-            <ChatBubble from="staff">{draftEn.trim() || draft}</ChatBubble>
-            {!draftEn.trim() ? (
-              <p role="status" className="m-0 text-[13px] text-on-alert">
-                {copy.sinIngles}
-              </p>
+            {draft.trim() ? (
+              <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4">
+                <span className="text-xs uppercase tracking-[0.18em] text-muted-soft">
+                  {copy.vistaPrevia}
+                </span>
+                <span className="text-[13px] text-muted">{copy.siLeeEspanol}</span>
+                <ChatBubble from="staff">{draft}</ChatBubble>
+                <span className="text-[13px] text-muted">{copy.siLeeIngles}</span>
+                <ChatBubble from="staff">{draftEn.trim() || draft}</ChatBubble>
+                {!draftEn.trim() ? (
+                  <p role="status" className="m-0 text-[13px] text-on-alert">
+                    {copy.sinIngles}
+                  </p>
+                ) : null}
+              </div>
             ) : null}
-          </div>
-        ) : null}
 
-        <div className="flex items-center gap-2">
-          <IconButton
-            type="submit"
-            aria-label={sendReply.isPending ? copy.sending : copy.send}
-            size="lg"
-            disabled={!draft.trim() || sendReply.isPending}
-          >
-            <Send size={20} strokeWidth={1.8} aria-hidden="true" />
-          </IconButton>
-          <span className="text-[13px] text-muted-soft">
-            {sendReply.isPending ? copy.sending : copy.send}
-          </span>
+            <div className="flex items-center gap-2">
+              <IconButton
+                type="submit"
+                aria-label={sendReply.isPending ? copy.sending : copy.send}
+                size="lg"
+                disabled={!draft.trim() || sendReply.isPending}
+              >
+                <Send size={20} strokeWidth={1.8} aria-hidden="true" />
+              </IconButton>
+              <span className="text-[13px] text-muted-soft">
+                {sendReply.isPending ? copy.sending : copy.send}
+              </span>
+            </div>
+          </form>
         </div>
-      </form>
-      <NotasInternas stayId={stayId} />
+      </div>
     </Screen>
   );
 }

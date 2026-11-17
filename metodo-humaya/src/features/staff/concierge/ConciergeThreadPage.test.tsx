@@ -126,6 +126,56 @@ describe('Conversación de un huésped', () => {
     });
   });
 
+  it('la ficha pone adelante lo que no se puede olvidar', async () => {
+    // El orden no es decoración. Esto ya existía en el perfil del huésped, a
+    // dos pantallas de distancia; nadie se va de una conversación abierta
+    // para ir a leerlo, así que en la práctica no existía.
+    stubConciergeApi();
+    renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
+
+    // Lo que puede terminar en una ambulancia.
+    expect(await screen.findByText('Nunca olvidar')).toBeInTheDocument();
+    expect(screen.getByText('Andrés: alergia a frutos secos')).toBeInTheDocument();
+
+    // Dónde va en su estadía: la misma pregunta se contesta distinto el
+    // primer día que la última mañana.
+    expect(screen.getByText(/Llega hoy a las/)).toBeInTheDocument();
+
+    // La celebración que, si nadie menciona, se pierde.
+    expect(screen.getByText(/Aniversario · 5 años/)).toBeInTheDocument();
+
+    // Cómo pidió que lo atendamos, en sus palabras.
+    expect(screen.getByText(/mensaje antes de que alguien pase por la villa/)).toBeInTheDocument();
+  });
+
+  it('lo que el huésped ya contestó está a un clic, para no volver a preguntarlo', async () => {
+    stubConciergeApi();
+    renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
+
+    const seccion = await screen.findByText(/Lo que ya nos dijo · 5/);
+    const plegable = seccion.closest('details');
+
+    // Cerrada al entrar: el chat es lo que se viene a leer, no el expediente.
+    // Se comprueba el atributo y no el texto porque en jsdom los hijos de un
+    // <details> cerrado siguen en el DOM — buscar el texto daría verde con la
+    // sección trabada.
+    expect(plegable).not.toHaveAttribute('open');
+
+    await userEvent.click(seccion);
+    expect(plegable).toHaveAttribute('open');
+
+    expect(screen.getByText(/caminata al amanecer/)).toBeInTheDocument();
+    expect(screen.getByText(/Buscan tiempo en silencio/)).toBeInTheDocument();
+  });
+
+  it('desde la conversación se llega a la ficha completa', async () => {
+    stubConciergeApi();
+    renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
+
+    const enlace = await screen.findByRole('link', { name: /Abrir la ficha completa/ });
+    expect(enlace).toHaveAttribute('href', '/staff/guests/s-mendez-rojas');
+  });
+
   it('una estadía que no existe muestra el estado vacío', async () => {
     stubConciergeApi();
     renderRoutes(routes, { route: '/staff/concierge/no-existe' });
