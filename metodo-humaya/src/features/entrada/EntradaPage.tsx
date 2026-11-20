@@ -116,12 +116,22 @@ export function EntradaPage() {
 
         <div aria-live="polite" className="flex w-full flex-col items-center gap-7">
           {check.data?.found ? (
+            /*
+              El huesped que se identifica NO puede quedar en una pantalla sin
+              salida. Hasta el 20 de noviembre de 2026 esto terminaba en las
+              fechas: ni un boton, ni un enlace. Se identificaba, leia «vamos
+              a dejarte los dias listos» y ahi se acababa todo.
+
+              Todavia no hay a donde mandarlo —/app es la demo, con los datos
+              de otra persona—, asi que lo que se le da es lo unico cierto:
+              que su reserva esta, y por donde escribir. Los mismos contactos
+              que ya tenia el camino de «no la encontramos».
+            */
             <div className="flex flex-col items-center gap-3">
               <span className="text-eyebrow text-gold">{copy.eyebrow}</span>
               <h1 className="m-0 font-display text-3xl font-medium">
                 {copy.foundTitle(check.data.guestName ?? '')}
               </h1>
-              <p className="m-0 text-base leading-relaxed text-muted">{copy.foundBody}</p>
               {check.data.checkin ? (
                 <p className="m-0 text-sm text-gold">
                   {copy.fechas(
@@ -130,6 +140,17 @@ export function EntradaPage() {
                   )}
                 </p>
               ) : null}
+              <p className="m-0 text-base leading-relaxed text-muted">{copy.foundBody}</p>
+
+              <div className="mt-2 flex flex-col items-center gap-1 text-sm">
+                <p className="m-0 text-muted">{copy.foundContacto}</p>
+                <a href={`mailto:${copy.contactEmail}`} className="text-gold">
+                  {copy.contactEmail}
+                </a>
+                <a href={copy.whatsappHref} className="text-gold">
+                  {copy.contactWhatsapp}
+                </a>
+              </div>
             </div>
           ) : check.data && !check.data.found ? (
             <div className="flex flex-col items-center gap-4">

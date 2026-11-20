@@ -33,7 +33,17 @@ export interface EntradaTextos {
   faltaCodigo: string;
   faltaApellido: string;
   foundTitle: (quien: string) => string;
+  /**
+   * Lo que pasa DESPUES, dicho sin prometer de mas.
+   *
+   * Hasta el 20 de noviembre de 2026 decia «vamos a dejarte los dias listos»
+   * y la pantalla se acababa ahi: ni un boton, ni un enlace, nada. El huesped
+   * se identificaba y quedaba viendo una promesa sin cumplir. Ahora dice lo
+   * que de verdad pasa —su reserva esta en el sistema y recepcion la ve— y
+   * le deja a mano por donde escribir.
+   */
   foundBody: string;
+  foundContacto: string;
   fechas: (entrada: string, salida: string) => string;
   notFoundTitle: string;
   notFoundBody: string;
@@ -63,7 +73,10 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     faltaCodigo: 'Enter your confirmation code or the email you booked with.',
     faltaApellido: 'Enter the last name on the booking.',
     foundTitle: (quien) => (quien ? `Found you, ${quien}.` : 'Found you.'),
-    foundBody: 'We have your reservation. Let’s get your days ready.',
+    foundBody:
+      'Your stay is already with us, and the front desk can see it. ' +
+      'Nothing else to do right now.',
+    foundContacto: 'Want anything ready before you arrive? Write to us:',
     fechas: (entrada, salida) => `${entrada} → ${salida}`,
     notFoundTitle: 'We couldn’t find it',
     notFoundBody:
@@ -90,7 +103,10 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     faltaCodigo: 'Escribí tu código de confirmación o el correo con el que reservaste.',
     faltaApellido: 'Escribí el apellido de la reserva.',
     foundTitle: (quien) => (quien ? `¡Te encontramos, ${quien}!` : '¡Te encontramos!'),
-    foundBody: 'Ya tenemos tu reserva. Vamos a dejarte los días listos.',
+    foundBody:
+      'Tu estadía ya está con nosotros y recepción la ve. ' +
+      'No tenés que hacer nada más por ahora.',
+    foundContacto: '¿Querés dejar algo listo antes de llegar? Escribinos:',
     fechas: (entrada, salida) => `${entrada} → ${salida}`,
     notFoundTitle: 'No la encontramos',
     notFoundBody:

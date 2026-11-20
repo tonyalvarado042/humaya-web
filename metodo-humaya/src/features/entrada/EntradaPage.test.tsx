@@ -93,6 +93,51 @@ describe('Entrada', () => {
     });
   });
 
+  it('el huesped que se identifica NO queda en una pantalla sin salida', async () => {
+    // Hasta el 20 de noviembre de 2026 esto terminaba en las fechas: ni un
+    // boton, ni un enlace. Se identificaba y ahi se acababa todo, despues de
+    // leer que le ibamos a dejar los dias listos.
+    vi.mocked(fetch).mockResolvedValue(
+      jsonResponse({
+        found: true,
+        guestName: 'Connor & Sheri Galloway',
+        checkin: '2026-12-27',
+        checkout: '2026-12-31',
+      }),
+    );
+    renderPage();
+
+    await userEvent.type(screen.getByLabelText('Confirmation code or email'), 'HMMS93AC2K');
+    await userEvent.type(screen.getByLabelText('Last name'), 'Galloway');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await screen.findByRole('heading', { name: 'Found you, Connor & Sheri Galloway.' });
+
+    const correo = screen.getByRole('link', { name: /@/ });
+    expect(correo).toHaveAttribute('href', expect.stringContaining('mailto:'));
+    expect(screen.getByRole('link', { name: 'WhatsApp' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('wa.me'),
+    );
+  });
+
+  it('no le promete al huesped algo que no va a pasar', async () => {
+    // No hay a donde mandarlo todavia: /app es la demo, con los datos de otra
+    // persona. Mientras eso siga asi, la pantalla no puede decir que le vamos
+    // a dejar los dias listos.
+    vi.mocked(fetch).mockResolvedValue(
+      jsonResponse({ found: true, guestName: 'Galloway', checkin: '2026-12-27' }),
+    );
+    renderPage();
+
+    await userEvent.type(screen.getByLabelText('Confirmation code or email'), 'HMMS93AC2K');
+    await userEvent.type(screen.getByLabelText('Last name'), 'Galloway');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await screen.findByRole('heading', { name: 'Found you, Galloway.' });
+    expect(screen.queryByText(/get your days ready/i)).not.toBeInTheDocument();
+  });
+
   it('cuando no la encuentra, ofrece el camino de vuelta', async () => {
     vi.mocked(fetch).mockResolvedValue(jsonResponse({ found: false }));
     renderPage();
