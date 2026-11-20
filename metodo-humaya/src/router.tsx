@@ -19,6 +19,7 @@ import { ArrivalsPage } from '@/features/staff/arrivals/ArrivalsPage';
 import { ConciergeInboxPage } from '@/features/staff/concierge/ConciergeInboxPage';
 import { ConciergeThreadPage } from '@/features/staff/concierge/ConciergeThreadPage';
 import { GuestProfilePage } from '@/features/staff/guest-profile/GuestProfilePage';
+import { GuestsListPage } from '@/features/staff/guests/GuestsListPage';
 import { StaffLayout } from '@/features/staff/layout/StaffLayout';
 import { Puerta } from '@/features/staff/puerta/Puerta';
 import { SpaPage } from '@/features/staff/spa/SpaPage';
@@ -57,9 +58,10 @@ export function createRoutes({
           ),
           children: [
             { index: true, element: <ArrivalsPage /> },
-            // Sin estadía en la URL, la pantalla muestra su estado "no encontrado"
-            // con el camino de vuelta a Llegadas.
-            { path: 'guests', element: <GuestProfilePage /> },
+            // Antes acá vivía la ficha SIN estadía, así que el menú siempre
+            // decía «No encontramos a ese huésped»: un destino que no llevaba
+            // a ninguna parte. Ahora es la lista de quién está en la casa.
+            { path: 'guests', element: <GuestsListPage /> },
             { path: 'guests/:stayId', element: <GuestProfilePage /> },
             { path: 'spa', element: <SpaPage /> },
             { path: 'concierge', element: <ConciergeInboxPage /> },

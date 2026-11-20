@@ -18,7 +18,7 @@ import type { ChatMessage, Stay } from '@/types';
 import { useQuienEntro } from '../puerta/contexto';
 import { panelCopy as copy } from './copyPanel';
 import { esperaDesde } from './espera';
-import { momentoDeLaEstadia, type Momento } from './estadia';
+import { momentoDeLaEstadia, type Momento } from '../estadia';
 
 function haceCuanto(iso: string): string {
   // `ahora()` y no `Date.now()`: el reloj de la máquina puede ir corrido —

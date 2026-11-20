@@ -201,9 +201,13 @@ describe('estadía que no existe', () => {
     expect(await screen.findByText('No encontramos a ese huésped')).toBeInTheDocument();
   });
 
-  it('lo mismo sin estadía en la URL', async () => {
+  it('sin estadía en la URL ya NO cae acá: esa dirección es la lista', async () => {
+    // Hasta el 20 de noviembre de 2026, el elemento «Huéspedes» del menú
+    // llevaba a esta ficha sin estadía, así que siempre decía «No encontramos
+    // a ese huésped». Era un destino del menú que no llevaba a ninguna parte.
     renderRoutes(routes, { route: '/staff/guests' });
 
-    expect(await screen.findByText('No encontramos a ese huésped')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Guests' })).toBeInTheDocument();
+    expect(screen.queryByText('No encontramos a ese huésped')).not.toBeInTheDocument();
   });
 });

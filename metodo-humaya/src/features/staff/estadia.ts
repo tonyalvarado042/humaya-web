@@ -1,5 +1,3 @@
-import type { Stay } from '@/types';
-
 /**
  * En qué momento de su estadía está el huésped.
  *
@@ -37,7 +35,19 @@ export interface Momento {
   seVaManana: boolean;
 }
 
-export function momentoDeLaEstadia(stay: Stay, hoy: string): Momento {
+/**
+ * Lo unico que hace falta saber de una estadia para ubicarla en el tiempo.
+ *
+ * No pide un `Stay` entero a proposito: asi la misma cuenta sirve para la
+ * ficha de la demo y para una reserva real de Cloudbeds, que trae las dos
+ * fechas y nada mas.
+ */
+export interface Fechas {
+  checkIn: string;
+  checkOut: string;
+}
+
+export function momentoDeLaEstadia(stay: Fechas, hoy: string): Momento {
   const entrada = soloDia(stay.checkIn);
   const salida = soloDia(stay.checkOut);
   const dia = soloDia(hoy);
