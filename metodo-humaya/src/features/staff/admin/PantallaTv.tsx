@@ -2,13 +2,15 @@ import { useRef, useState, type FormEvent } from 'react';
 import { Badge, Button, Card, Input, Textarea } from '@/components/ui';
 import {
   useAjustesTv,
+  useAlrededor,
+  useGuardarAlrededor,
   useGuardarAjustesTv,
   useGuardarVillaTv,
   useSubirFotoDelHotel,
   useVillasTv,
 } from '@/hooks';
 import { direccionDelTv, urlDeFoto } from '@/services/tv';
-import type { AjustesTv } from '@/services/tv';
+import type { AjustesTv, CategoriaCerca } from '@/services/tv';
 import type { CambiosVillaTv, VillaTv } from '@/types';
 import { useIdiomaRecepcion } from '../puerta/contexto';
 import { tvCopy } from './copyTv';
@@ -73,6 +75,8 @@ export function PantallaTv() {
           />
         ))
       )}
+
+      <Alrededor />
 
       <Card variant="accent">
         <h3 className="m-0 font-display text-lg font-medium">{copy.guiaTitulo}</h3>
@@ -264,6 +268,162 @@ function FormularioDelHotel({ ajustes }: { ajustes: AjustesTv }) {
         </fieldset>
 
         <div className="flex flex-wrap items-center gap-2">
+          <Button type="submit" disabled={guardar.isPending}>
+            {guardar.isPending ? copy.guardando : copy.guardar}
+          </Button>
+          {guardar.isSuccess ? (
+            <span className="text-[13px] text-muted">{copy.guardado}</span>
+          ) : null}
+          {guardar.isError ? (
+            <span role="alert" className="text-[13px] text-on-alert">
+              {copy.errorGuardar}
+            </span>
+          ) : null}
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+/**
+ * «Alrededor»: los lugares que el televisor le recomienda al huésped.
+ *
+ * ── POR QUÉ EXISTE ESTA PANTALLA ────────────────────────────────────────
+ * Tony, 21 de noviembre de 2026: «¿cómo se cambia around here? poner más
+ * cosas». Hasta ese día la respuesta era «en la base, en la columna guia»,
+ * y eso no es una respuesta: es pedirle al hotel que escriba JSON para
+ * agregar un restaurante.
+ *
+ * ── POR QUÉ UN SOLO «GUARDAR» Y NO UNO POR LUGAR ────────────────────────
+ * Porque se edita de a tandas —se agregan tres lugares de una sentada— y un
+ * guardado por campo serían treinta escrituras y treinta formas de quedar a
+ * medias.
+ */
+function Alrededor() {
+  const lista = useAlrededor();
+  if (!lista.data) return null;
+  return <EditorAlrededor inicial={lista.data} />;
+}
+
+function EditorAlrededor({ inicial }: { inicial: CategoriaCerca[] }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = tvCopy[idioma];
+  const guardar = useGuardarAlrededor();
+  const [grupos, setGrupos] = useState<CategoriaCerca[]>(inicial);
+
+  const cuantos = grupos.reduce((suma, g) => suma + g.items.length, 0);
+
+  function cambiarGrupo(i: number, cambio: Partial<CategoriaCerca>) {
+    setGrupos((antes) => antes.map((g, n) => (n === i ? { ...g, ...cambio } : g)));
+  }
+
+  function cambiarLugar(i: number, j: number, campo: 'name' | 'distance' | 'note', valor: string) {
+    setGrupos((antes) =>
+      antes.map((g, n) =>
+        n === i
+          ? { ...g, items: g.items.map((l, m) => (m === j ? { ...l, [campo]: valor } : l)) }
+          : g,
+      ),
+    );
+  }
+
+  return (
+    <Card>
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          // Sin lugares en blanco: una fila vacía en el televisor es una
+          // tarjeta sin nombre que el huésped no entiende.
+          guardar.mutate(
+            grupos
+              .map((g) => ({ ...g, items: g.items.filter((l) => l.name.trim()) }))
+              .filter((g) => g.category.trim() && g.items.length > 0),
+          );
+        }}
+      >
+        <div>
+          <h3 className="m-0 font-display text-lg font-medium">{copy.alrededorTitulo}</h3>
+          <p className="m-0 text-[13px] leading-relaxed text-muted">{copy.alrededorCuerpo}</p>
+          <p className="m-0 text-[13px] text-muted-soft">{copy.alrededorCuantos(cuantos)}</p>
+        </div>
+
+        {grupos.length === 0 ? (
+          <p className="m-0 text-[13px] text-muted-soft">{copy.alrededorVacio}</p>
+        ) : null}
+
+        {grupos.map((grupo, i) => (
+          <fieldset
+            key={i}
+            className="m-0 flex flex-col gap-2.5 rounded-card border border-line p-4"
+          >
+            <div className="flex flex-wrap items-end gap-2">
+              <div className="min-w-50 flex-1">
+                <Input
+                  label={copy.categoriaLabel}
+                  value={grupo.category}
+                  onChange={(e) => cambiarGrupo(i, { category: e.target.value })}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setGrupos((antes) => antes.filter((_, n) => n !== i))}
+              >
+                {copy.quitarCategoria}
+              </Button>
+            </div>
+
+            {grupo.items.map((lugar, j) => (
+              <div key={j} className="flex flex-col gap-2 border-t border-line-soft pt-2.5">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <Input
+                    label={copy.lugarNombre}
+                    value={lugar.name}
+                    onChange={(e) => cambiarLugar(i, j, 'name', e.target.value)}
+                  />
+                  <Input
+                    label={copy.lugarDistancia}
+                    value={lugar.distance}
+                    onChange={(e) => cambiarLugar(i, j, 'distance', e.target.value)}
+                  />
+                </div>
+                <Textarea
+                  label={copy.lugarNota}
+                  rows={2}
+                  value={lugar.note}
+                  onChange={(e) => cambiarLugar(i, j, 'note', e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => cambiarGrupo(i, { items: grupo.items.filter((_, m) => m !== j) })}
+                >
+                  {copy.quitarLugar}
+                </Button>
+              </div>
+            ))}
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                cambiarGrupo(i, { items: [...grupo.items, { name: '', distance: '', note: '' }] })
+              }
+            >
+              {copy.agregarLugar}
+            </Button>
+          </fieldset>
+        ))}
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setGrupos((antes) => [...antes, { category: '', items: [] }])}
+          >
+            {copy.agregarCategoria}
+          </Button>
           <Button type="submit" disabled={guardar.isPending}>
             {guardar.isPending ? copy.guardando : copy.guardar}
           </Button>

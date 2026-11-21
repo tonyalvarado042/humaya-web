@@ -55,6 +55,8 @@ export {
 export { useAgendaPorServicio } from './useAgenda';
 export {
   useAjustesTv,
+  useAlrededor,
+  useGuardarAlrededor,
   useGuardarAjustesTv,
   useGuardarVillaTv,
   useSubirFotoDelHotel,

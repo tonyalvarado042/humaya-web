@@ -1,13 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getAjustesTv,
+  getAlrededor,
+  guardarAlrededor,
   getVillasTv,
   guardarAjustesTv,
   guardarVillaTv,
   subirFotoDelHotel,
   subirFotoTv,
 } from '@/services/tv';
-import type { AjustesTv } from '@/services/tv';
+import type { AjustesTv, CategoriaCerca } from '@/services/tv';
 import type { CambiosVillaTv } from '@/types';
 import { queryKeys } from './queryKeys';
 
@@ -42,6 +44,25 @@ export function useSubirFotoDelHotel() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.ajustesTv() });
+    },
+  });
+}
+
+/** Los lugares que el televisor recomienda. Una lista para todo el hotel. */
+export function useAlrededor() {
+  return useQuery({
+    queryKey: queryKeys.alrededorTv(),
+    queryFn: getAlrededor,
+  });
+}
+
+export function useGuardarAlrededor() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (local: CategoriaCerca[]) => guardarAlrededor(local),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.alrededorTv() });
     },
   });
 }

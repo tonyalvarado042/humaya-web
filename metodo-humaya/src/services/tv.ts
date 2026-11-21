@@ -318,6 +318,93 @@ export async function subirFotoDelHotel(archivo: File): Promise<string> {
   return subirFoto(`hotel-${elNegocio()}`, archivo);
 }
 
+/**
+ * «Alrededor»: los lugares que el televisor le recomienda al huésped.
+ *
+ * ── POR QUÉ SE PUEDE EDITAR ─────────────────────────────────────────────
+ * Tony, 21 de noviembre de 2026: «¿cómo se cambia around here? poner más
+ * cosas». Hasta ese día la respuesta era «en la base, en la columna `guia`
+ * de humaya_tv_ajustes», y eso no es una respuesta: es pedirle al hotel que
+ * escriba JSON para agregar un restaurante.
+ *
+ * Es una sola lista para TODAS las pantallas del hotel, por lo mismo que la
+ * guía de la casa: copiada por villa, cambiar un horario sería cambiarlo
+ * diez veces.
+ */
+export interface LugarCerca {
+  name: string;
+  distance: string;
+  note: string;
+}
+
+export interface CategoriaCerca {
+  category: string;
+  items: LugarCerca[];
+}
+
+function aLugar(valor: unknown): LugarCerca {
+  const o = (valor ?? {}) as Record<string, unknown>;
+  return {
+    name: typeof o.name === 'string' ? o.name : '',
+    distance: typeof o.distance === 'string' ? o.distance : '',
+    note: typeof o.note === 'string' ? o.note : '',
+  };
+}
+
+/** Lo que haya en la base, saneado: el televisor no puede reventar por un
+ *  campo que alguien dejó a medias. */
+export function comoAlrededor(valor: unknown): CategoriaCerca[] {
+  if (!Array.isArray(valor)) return [];
+  return valor.map((grupo) => {
+    const o = (grupo ?? {}) as Record<string, unknown>;
+    return {
+      category: typeof o.category === 'string' ? o.category : '',
+      items: Array.isArray(o.items) ? o.items.map(aLugar) : [],
+    };
+  });
+}
+
+export async function getAlrededor(): Promise<CategoriaCerca[]> {
+  const db = await cliente();
+  const { data, error } = await db
+    .from('humaya_tv_ajustes')
+    .select('guia')
+    .eq('negocio_id', elNegocio())
+    .maybeSingle();
+
+  if (error) throw new Error(`tv_guia_${error.code ?? 'error'}`);
+  const guia = ((data ?? {}) as { guia?: Record<string, unknown> }).guia ?? {};
+  return comoAlrededor(guia.local);
+}
+
+/**
+ * Guarda solo `local` y deja el resto de la guía como estaba.
+ *
+ * Se vuelve a leer antes de escribir a propósito: `guia` es un jsonb entero
+ * y mandarlo armado desde la pantalla borraría las reglas, los pasos de
+ * salida y las emergencias, que esta pantalla no edita.
+ */
+export async function guardarAlrededor(local: CategoriaCerca[]): Promise<void> {
+  const db = await cliente();
+  const { data: antes, error: leer } = await db
+    .from('humaya_tv_ajustes')
+    .select('guia')
+    .eq('negocio_id', elNegocio())
+    .maybeSingle();
+  if (leer) throw new Error(`tv_guia_${leer.code ?? 'error'}`);
+
+  const guia = { ...(((antes ?? {}) as { guia?: object }).guia ?? {}), local };
+
+  const { data, error } = await db
+    .from('humaya_tv_ajustes')
+    .update({ guia, actualizado_en: new Date().toISOString() })
+    .eq('negocio_id', elNegocio())
+    .select('negocio_id');
+
+  if (error) throw new Error(`tv_guia_${error.code ?? 'error'}`);
+  if (!data || data.length === 0) throw new Error('tv_guia_sin_permiso');
+}
+
 /** Cómo se ve esa foto, para mostrarla en el admin. */
 export function urlDeFoto(nombre: string): string {
   return `${SUPABASE_URL}/storage/v1/object/public/humaya-tv/${encodeURIComponent(nombre)}.jpg`;

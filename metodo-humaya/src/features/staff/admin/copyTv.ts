@@ -79,6 +79,20 @@ export interface TvTextos {
   guiaTitulo: string;
   guiaCuerpo: string;
 
+  /** «Alrededor»: los lugares que el televisor recomienda. */
+  alrededorTitulo: string;
+  alrededorCuerpo: string;
+  alrededorCuantos: (lugares: number) => string;
+  categoriaLabel: string;
+  lugarNombre: string;
+  lugarDistancia: string;
+  lugarNota: string;
+  agregarLugar: string;
+  quitarLugar: string;
+  agregarCategoria: string;
+  quitarCategoria: string;
+  alrededorVacio: string;
+
   cargando: string;
   vacio: string;
   vacioCuerpo: string;
@@ -175,6 +189,20 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     errorGuardar: 'No se pudo guardar. Solo un administrador puede cambiar esto.',
 
     // ── La guía ───────────────────────────────────────────────────────
+    alrededorTitulo: 'Alrededor',
+    alrededorCuerpo:
+      'Lo que el televisor le recomienda al huésped: dónde comer, qué hacer, las aguas termales. Es una sola lista para todas las pantallas del hotel, y se ve también en el teléfono del huésped.',
+    alrededorCuantos: (lugares) => (lugares === 1 ? '1 lugar' : `${lugares} lugares`),
+    categoriaLabel: 'Categoría',
+    lugarNombre: 'Lugar',
+    lugarDistancia: 'A qué distancia',
+    lugarNota: 'Qué decirle al huésped',
+    agregarLugar: 'Agregar lugar',
+    quitarLugar: 'Quitar',
+    agregarCategoria: 'Agregar categoría',
+    quitarCategoria: 'Quitar la categoría',
+    alrededorVacio: 'Todavía no hay ningún lugar.',
+
     guiaTitulo: 'La guía de la casa',
     guiaCuerpo:
       'Las reglas, cómo funciona la villa, los lugares cercanos, los pasos de salida y las emergencias. Es la misma para todas las pantallas del hotel, y por eso todavía no se edita acá: con una copia por villa, cambiar una regla significaría cambiarla en cada una. Hoy se cambia en la base, en humaya_tv_ajustes.',
@@ -269,6 +297,20 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     guardando: 'Saving…',
     guardado: 'Saved. The television picks it up in under a minute.',
     errorGuardar: 'It could not be saved. Only an administrator can change this.',
+
+    alrededorTitulo: 'Around here',
+    alrededorCuerpo:
+      'What the television recommends to the guest: where to eat, what to do, the hot springs. It is one list for every screen in the hotel, and it also shows on the guest’s phone.',
+    alrededorCuantos: (lugares) => (lugares === 1 ? '1 place' : `${lugares} places`),
+    categoriaLabel: 'Category',
+    lugarNombre: 'Place',
+    lugarDistancia: 'How far',
+    lugarNota: 'What to tell the guest',
+    agregarLugar: 'Add place',
+    quitarLugar: 'Remove',
+    agregarCategoria: 'Add category',
+    quitarCategoria: 'Remove the category',
+    alrededorVacio: 'There are no places yet.',
 
     guiaTitulo: 'The house guide',
     guiaCuerpo:
