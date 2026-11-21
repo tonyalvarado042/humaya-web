@@ -102,6 +102,13 @@ export function createRoutes({
    * la app del huésped, con su selector de estadías de la demo, en la casa de
    * recepción. Ahora sale para el dominio del huésped, igual que `/staff`
    * sale para el del personal.
+   *
+   * ⚠️ LAS DOS MUDANZAS SABEN DE UN SOLO HOTEL. `MARCA.dominioHuesped` y
+   * `dominioPersonal` salen de variables de entorno: `aplicarHotel()` pisa el
+   * nombre y el correo con los del hotel resuelto, pero NO los dominios. Con
+   * un segundo hotel con dominio propio, estas dos lo mandarían al dominio de
+   * HUMAYA — peor que no mudarlo. Antes de darle dominio propio a otro hotel,
+   * los dominios tienen que salir de su fila, no del entorno.
    */
   const app: RouteObject =
     lado === 'personal' && MARCA.dominiosSeparados
