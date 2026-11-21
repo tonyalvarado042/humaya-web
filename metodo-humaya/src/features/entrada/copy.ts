@@ -33,6 +33,14 @@ export interface EntradaTextos {
   faltaCodigo: string;
   faltaApellido: string;
   foundTitle: (quien: string) => string;
+  /** Cuando este telefono ya encontro la estadia antes. */
+  volvisteTitle: (quien: string) => string;
+  volvisteBody: string;
+  noSoyYo: string;
+  /** Que es HUMAYA Experience, dicho al huesped. */
+  queEsTitulo: string;
+  queEsCuerpo: string;
+  queEsPersona: string;
   /**
    * Lo que pasa DESPUES, dicho sin prometer de mas.
    *
@@ -83,6 +91,14 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     faltaCodigo: 'Enter your confirmation code or the email you booked with.',
     faltaApellido: 'Enter the last name on the booking.',
     foundTitle: (quien) => (quien ? `Found you, ${quien}.` : 'Found you.'),
+    volvisteTitle: (quien) => (quien ? `Welcome back, ${quien}.` : 'Welcome back.'),
+    volvisteBody:
+      'We remembered your stay on this phone, so you do not have to look for your code again.',
+    noSoyYo: 'Not you? Look up another booking',
+    queEsTitulo: 'HUMAYA Experience',
+    queEsCuerpo:
+      'Your stay, on the television in your villa and here on your phone. It is not here to replace anyone: it is here so that when we talk, we already know what you need.',
+    queEsPersona: 'Whatever you ask, a person answers.',
     foundBody:
       'Your stay is already with us, and the front desk can see it. ' +
       'Nothing else to do right now.',
@@ -117,6 +133,14 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     faltaCodigo: 'Escribí tu código de confirmación o el correo con el que reservaste.',
     faltaApellido: 'Escribí el apellido de la reserva.',
     foundTitle: (quien) => (quien ? `¡Te encontramos, ${quien}!` : '¡Te encontramos!'),
+    volvisteTitle: (quien) => (quien ? `Qué bueno verte, ${quien}.` : 'Qué bueno verte.'),
+    volvisteBody:
+      'Nos acordamos de tu estadía en este teléfono, así que no tenés que volver a buscar tu código.',
+    noSoyYo: '¿No sos vos? Buscar otra reserva',
+    queEsTitulo: 'HUMAYA Experience',
+    queEsCuerpo:
+      'Tu estadía, en el televisor de tu villa y acá en tu teléfono. No está para reemplazar a nadie: está para que, cuando hablemos, ya sepamos qué necesitás.',
+    queEsPersona: 'Lo que pidas, lo contesta una persona.',
     foundBody:
       'Tu estadía ya está con nosotros y recepción la ve. ' +
       'No tenés que hacer nada más por ahora.',

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { LogoDelHotel } from '@/components/LogoDelHotel';
 import { Button, Input } from '@/components/ui';
 import { useCheckReservation } from '@/hooks';
+import { miEstadia, olvidarEstadia, recordarEstadia } from '@/services/miEstadia';
 import { entradaCopy, type Idioma } from './copy';
 
 const LLAVE_IDIOMA = 'humaya.entrada.idioma';
@@ -67,7 +68,25 @@ export function EntradaPage() {
   const [codigo, setCodigo] = useState(codigoDelEnlace);
   const [apellido, setApellido] = useState('');
   const [tocado, setTocado] = useState(false);
+  // Lo que este telefono ya encontro antes. El QR vive pegado en la pantalla
+  // de la villa: el huesped lo abre mas de una vez, y hasta hoy cada vez
+  // tenia que volver a buscar su codigo de Airbnb.
+  const [guardada, setGuardada] = useState(miEstadia);
   const check = useCheckReservation();
+
+  // Encontrada una vez, no se vuelve a preguntar. No es una sesion con
+  // permisos: es su nombre y sus fechas, que el ya vio en esta pantalla.
+  const encontrada = check.data;
+  useEffect(() => {
+    if (encontrada?.found && encontrada.reserva) {
+      recordarEstadia({
+        reserva: encontrada.reserva,
+        guestName: encontrada.guestName ?? null,
+        checkin: encontrada.checkin ?? null,
+        checkout: encontrada.checkout ?? null,
+      });
+    }
+  }, [encontrada]);
   const copy = entradaCopy[idioma];
 
   useEffect(() => {
@@ -152,6 +171,49 @@ export function EntradaPage() {
                 </a>
               </div>
             </div>
+          ) : guardada && !check.data ? (
+            /*
+              Este telefono ya encontro esta estadia. No se le vuelve a pedir
+              el codigo: el QR vive pegado en la pantalla de la villa y el
+              huesped lo abre mas de una vez.
+
+              No es una sesion con permisos —no abre ninguna puerta—: es su
+              nombre y sus fechas, que el mismo ya vio aca. Por eso vive en su
+              telefono y se olvida sola dos dias despues de la salida.
+            */
+            <div className="flex flex-col items-center gap-3">
+              <span className="text-eyebrow text-gold">{copy.eyebrow}</span>
+              <h1 className="m-0 font-display text-3xl font-medium">
+                {copy.volvisteTitle(guardada.guestName ?? '')}
+              </h1>
+              {guardada.checkin ? (
+                <p className="m-0 text-sm text-gold">
+                  {copy.fechas(fecha(guardada.checkin, idioma), fecha(guardada.checkout, idioma))}
+                </p>
+              ) : null}
+              <p className="m-0 text-base leading-relaxed text-muted">{copy.volvisteBody}</p>
+
+              <div className="mt-2 flex flex-col items-center gap-1 text-sm">
+                <p className="m-0 text-muted">{copy.foundContacto}</p>
+                <a href={`mailto:${copy.contactEmail}`} className="text-gold">
+                  {copy.contactEmail}
+                </a>
+                <a href={copy.whatsappHref} className="text-gold">
+                  {copy.contactWhatsapp}
+                </a>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  olvidarEstadia();
+                  setGuardada(null);
+                }}
+                className="mt-2 text-[13px] text-muted underline"
+              >
+                {copy.noSoyYo}
+              </button>
+            </div>
           ) : check.data && !check.data.found ? (
             <div className="flex flex-col items-center gap-4">
               <span className="text-eyebrow text-gold">{copy.eyebrow}</span>
@@ -214,6 +276,20 @@ export function EntradaPage() {
               </form>
             </>
           )}
+        </div>
+
+        {/* Qué es esto, dicho al huésped. El manual del equipo lo llama
+            Servicio 3.0: «anticipar y conectar… reducir fricciones», con una
+            regla que manda sobre cualquier pantalla — «la tecnología prepara
+            al equipo; la persona entrega el servicio». Por eso lo último que
+            se lee no es lo que hace la app, sino que del otro lado hay
+            alguien. Y por eso se nombra: HUMAYA Experience. */}
+        <div className="mt-2 flex flex-col items-center gap-1.5 border-t border-line-soft pt-6 text-center">
+          <span className="text-eyebrow text-gold">{copy.queEsTitulo}</span>
+          <p className="m-0 max-w-prose text-[13px] leading-relaxed text-muted">
+            {copy.queEsCuerpo}
+          </p>
+          <p className="m-0 text-[13px] font-medium text-text">{copy.queEsPersona}</p>
         </div>
       </section>
     </main>

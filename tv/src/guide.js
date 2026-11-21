@@ -39,10 +39,21 @@ details{background:#fff;border-radius:14px;margin:8px 0;padding:14px 16px}summar
 .place{display:flex;justify-content:space-between;gap:12px;background:#fff;border-radius:14px;padding:14px 16px;margin:8px 0}.place p{margin:4px 0 0;font-size:14px;color:#6b5f55;line-height:1.45}.place span{font-size:12px;color:#9a7b5c;white-space:nowrap}
 ol{background:#fff;border-radius:14px;padding:14px 16px 14px 36px;line-height:1.8;margin:0}
 .sos{display:flex;justify-content:space-between;background:#fff;border-radius:14px;padding:14px 16px;margin:8px 0;color:#9b2c1f;text-decoration:none}
+.exp p{margin:8px 0 0;line-height:1.55;color:#4a4038;font-size:15px}.exp .lead{font-size:17px;color:#2b2520;margin-top:2px}.btn{display:block;margin-top:14px;border-radius:12px;padding:13px;background:#2b2520;color:#fff;font:600 15px Inter,system-ui;text-align:center;text-decoration:none}.pie{display:block;text-align:center;margin-top:8px;color:#9a7b5c;font-size:12px}
 footer{text-align:center;color:#a99a8c;font-size:12px;margin-top:30px;letter-spacing:.2em}
 </style></head><body>
 <header><div><small>${esc(S.name)}</small><h1>${st.active && st.guest ? "Welcome, " + esc(st.guest) : "Welcome to " + esc(S.name)}</h1></div></header>
 <main>
+<div class="card exp">
+  <div class="k">HUMAYA Experience</div>
+  <p class="lead">Your stay, on the television and here on your phone.</p>
+  <p>It is not here to replace anyone. It is here so that when we talk, we already
+     know what you need: the Wi-Fi, your villa, what is worth doing nearby and how
+     to reach us, all within reach — so that nothing gets between you and being here.</p>
+  <p><b>Whatever you ask, a person answers.</b></p>
+  <a class="btn" href="https://experience.stayhumaya.com/entrada">Find my stay</a>
+  <small class="pie">Your last name and your booking code, once.</small>
+</div>
 ${wifi}${stay}
 ${S.welcome ? `<p class="lead">${esc(S.welcome)}</p>` : ""}
 ${section("From " + (S.host || "your host"), notes)}
@@ -51,6 +62,6 @@ ${section("House rules", items(S.rules))}
 ${section("Around here", local)}
 ${section("Check-out by " + t12(S.checkout_time), steps ? `<ol>${steps}</ol>` : "")}
 ${section("Emergency", sos)}
-<footer>${esc(S.name)} · COSTA RICA</footer>
+<footer>HUMAYA EXPERIENCE · ${esc(S.name)} · COSTA RICA</footer>
 </main></body></html>`;
 }
