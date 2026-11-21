@@ -64,3 +64,40 @@ export function actualizarLaApp(): boolean {
   void listo.then(() => window.location.reload());
   return true;
 }
+
+/**
+ * La pestaña abierta se pone al día sola cuando sale una versión nueva.
+ *
+ * ── LA CAUSA RAÍZ DE «NO PUDIMOS CARGAR ESTA PANTALLA» ──────────────────
+ * El service worker sirve de su caché el `index.html` que precargó, con el
+ * nombre del bundle de ESE momento adentro. Cuando se publica, workbox
+ * instala el nuevo y toma el control —`skipWaiting`—, pero la pestaña que ya
+ * estaba abierta sigue corriendo el JavaScript viejo hasta que alguien
+ * navegue. Puede durar días; en un teléfono con la PWA instalada, más.
+ *
+ * Mientras el contrato con el servidor no cambie eso solo es contenido
+ * atrasado. Cuando cambia —el 20 de noviembre de 2026 las funciones
+ * empezaron a exigir el hotel— el código viejo llama mal y la pantalla
+ * muestra un error que el huésped no puede arreglar. Pasó tres veces en un
+ * día, una de ellas en la pantalla de Tony.
+ *
+ * ── POR QUÉ `controllerchange` Y NO UN TEMPORIZADOR ─────────────────────
+ * Porque ese evento es exactamente «un service worker nuevo acaba de tomar
+ * el control de esta página»: ni antes ni después, y sin preguntar nada.
+ *
+ * ── POR QUÉ NO SE RECARGA EN LA PRIMERA VISITA ──────────────────────────
+ * Porque `controllerchange` también salta cuando se instala el PRIMER
+ * service worker, donde no hay nada viejo que reemplazar. Si ya hay
+ * `controller`, hubo un service worker antes y entonces sí vale recargar.
+ */
+export function alDiaConElServidor(sw: ServiceWorkerContainer | undefined): void {
+  // Sin controlador no hay nada viejo corriendo: es la primera visita.
+  if (!sw?.controller) return;
+
+  let recargando = false;
+  sw.addEventListener('controllerchange', () => {
+    if (recargando) return;
+    recargando = true;
+    window.location.reload();
+  });
+}

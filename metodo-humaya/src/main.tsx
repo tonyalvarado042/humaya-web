@@ -6,6 +6,7 @@ import { crearRouter } from '@/router';
 import { FaltaElHotel } from '@/components/FaltaElHotel';
 import { aplicarHotel } from '@/marca';
 import { codigoDeLaRuta, resolverHotel } from '@/services/hotel';
+import { alDiaConElServidor } from '@/services/actualizar';
 import '@/i18n';
 import '@/styles/tokens.css';
 
@@ -17,6 +18,10 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Una pestaña abierta desde antes de publicar sigue con el código viejo: el
+// service worker se lo guarda. Esto la recarga cuando entra la versión nueva.
+alDiaConElServidor(typeof navigator === 'undefined' ? undefined : navigator.serviceWorker);
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { actualizarLaApp, esPantallaVieja } from './actualizar';
+import { actualizarLaApp, alDiaConElServidor, esPantallaVieja } from './actualizar';
 import { getOpciones } from './admin';
 
 /**
@@ -82,6 +82,57 @@ describe('desde una llamada de verdad', () => {
     vi.stubGlobal('location', { reload: recargar } as unknown as Location);
 
     await expect(getOpciones()).rejects.toThrow('admin_http_500');
+    expect(recargar).not.toHaveBeenCalled();
+  });
+});
+
+describe('ponerse al día cuando sale una versión nueva', () => {
+  /** Un `ServiceWorkerContainer` de mentira, con su oyente. */
+  function contenedor(hayControlador: boolean) {
+    const oyentes: Array<() => void> = [];
+    return {
+      sw: {
+        controller: hayControlador ? {} : null,
+        addEventListener: (_: string, f: () => void) => oyentes.push(f),
+      } as unknown as ServiceWorkerContainer,
+      sueltaElEvento: () => oyentes.forEach((f) => f()),
+      cuantosOyentes: () => oyentes.length,
+    };
+  }
+
+  it('recarga cuando un service worker nuevo toma el control', () => {
+    const { sw, sueltaElEvento } = contenedor(true);
+
+    alDiaConElServidor(sw);
+    sueltaElEvento();
+
+    expect(recargar).toHaveBeenCalledTimes(1);
+  });
+
+  it('una sola vez, aunque el evento salte de nuevo', () => {
+    const { sw, sueltaElEvento } = contenedor(true);
+
+    alDiaConElServidor(sw);
+    sueltaElEvento();
+    sueltaElEvento();
+
+    expect(recargar).toHaveBeenCalledTimes(1);
+  });
+
+  it('en la PRIMERA visita no recarga: no hay nada viejo que reemplazar', () => {
+    // `controllerchange` también salta al instalar el primer service worker.
+    // Recargar ahí sería recargarle la página a quien recién llega.
+    const { sw, cuantosOyentes } = contenedor(false);
+
+    alDiaConElServidor(sw);
+
+    expect(cuantosOyentes()).toBe(0);
+    expect(recargar).not.toHaveBeenCalled();
+  });
+
+  it('sin service worker no hace nada', () => {
+    alDiaConElServidor(undefined);
+
     expect(recargar).not.toHaveBeenCalled();
   });
 });
