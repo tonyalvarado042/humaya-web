@@ -29,6 +29,7 @@ interface FilaOcupacion {
   huesped: string | null;
   llegada: string | null;
   salida: string | null;
+  esta_ahora: boolean | null;
 }
 
 interface Fila {
@@ -104,7 +105,7 @@ export async function getVillasTv(): Promise<VillaTv[]> {
 
   const { data: ocupadas } = await db
     .from('humaya_tv_ocupacion')
-    .select('villa_id,huesped,llegada,salida')
+    .select('villa_id,huesped,llegada,salida,esta_ahora')
     .eq('negocio_id', elNegocio());
 
   const porVilla = new Map<string, ReservaDeVilla>();
@@ -114,6 +115,7 @@ export async function getVillasTv(): Promise<VillaTv[]> {
         huesped: fila.huesped,
         llegada: fila.llegada,
         salida: fila.salida,
+        estaAhora: fila.esta_ahora === true,
       });
     }
   }

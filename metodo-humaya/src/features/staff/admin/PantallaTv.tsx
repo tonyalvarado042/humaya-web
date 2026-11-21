@@ -296,6 +296,7 @@ function Editor({ villa }: { villa: VillaTv }) {
   const notaTitulo = useCampo(villa.notaTitulo);
   const notaTexto = useCampo(villa.notaTexto);
   const [reloj, setReloj] = useState(villa.relojPosicion);
+  const [aMano, setAMano] = useState(Boolean(villa.huesped));
 
   const direccion = direccionDelTv(villa);
 
@@ -367,7 +368,9 @@ function Editor({ villa }: { villa: VillaTv }) {
           <div className="flex flex-col gap-1 rounded-card border border-line bg-surface-sunken px-4 py-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[15px] font-medium text-text">
-                {copy.deLaReserva(villa.reserva.huesped)}
+                {villa.reserva.estaAhora
+                  ? copy.deLaReserva(villa.reserva.huesped)
+                  : copy.llegaElDia(villa.reserva.huesped, villa.reserva.llegada ?? '')}
               </span>
               <Badge tone="success">{copy.insigniaReserva}</Badge>
             </div>
@@ -378,6 +381,15 @@ function Editor({ villa }: { villa: VillaTv }) {
             ) : null}
           </div>
         ) : (
+          <p className="m-0 text-[13px] leading-relaxed text-muted-soft">{copy.nadieTodavia}</p>
+        )}
+
+        {/* Lo de escribirlo a mano NO se ofrece de entrada: se pide solo si
+            alguien lo pide. Estaba a la vista siempre que no hubiera reserva
+            HOY —es decir, casi siempre, porque la primera llegada puede ser
+            dentro de un mes— y desde afuera se veia igual que antes: una
+            pantalla pidiendo el nombre que el hotel ya tiene. */}
+        {aMano ? (
           <>
             <p className="m-0 text-[13px] leading-relaxed text-muted-soft">{copy.sinReserva}</p>
             <Input
@@ -406,6 +418,10 @@ function Editor({ villa }: { villa: VillaTv }) {
               </Button>
             ) : null}
           </>
+        ) : (
+          <Button type="button" variant="ghost" onClick={() => setAMano(true)}>
+            {copy.entroAlguienMas}
+          </Button>
         )}
 
         {/* El horario es del hotel, no de la reserva: se edita siempre. */}

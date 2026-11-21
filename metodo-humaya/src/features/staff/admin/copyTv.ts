@@ -27,6 +27,9 @@ export interface TvTextos {
   huespedTitulo: string;
   huespedCuerpo: string;
   deLaReserva: (huesped: string) => string;
+  llegaElDia: (huesped: string, cuando: string) => string;
+  nadieTodavia: string;
+  entroAlguienMas: string;
   deLaReservaFechas: (desde: string, hasta: string) => string;
   insigniaReserva: string;
   sinReserva: string;
@@ -115,10 +118,13 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     huespedCuerpo:
       'El televisor saluda por el nombre y cuenta en qué noche va. Esto se llena solo con las reservas: la pantalla toma el nombre y las fechas de quien tenga esta villa asignada en Cloudbeds.',
     deLaReserva: (huesped) => `${huesped}, de la reserva de Cloudbeds.`,
+    llegaElDia: (huesped, cuando) => `Llega el ${cuando}: ${huesped}.`,
+    nadieTodavia: 'No hay ninguna reserva con esta villa asignada.',
+    entroAlguienMas: '¿Entró alguien que no está en Cloudbeds?',
     deLaReservaFechas: (desde, hasta) => `Del ${desde} al ${hasta}.`,
     insigniaReserva: 'Automático',
     sinReserva:
-      'Hoy ninguna reserva tiene esta villa asignada. Si entró alguien que todavía no está en Cloudbeds, escribilo acá abajo; en cuanto la reserva aparezca, manda la reserva.',
+      'Escribilo solo si entró alguien que todavía no está en Cloudbeds. En cuanto la reserva aparezca, manda la reserva.',
     horarioTitulo: 'Horario de la casa',
     huespedLabel: 'Nombre del huésped',
     huespedPlaceholder: 'Sarah Lovestad',
@@ -211,10 +217,13 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     huespedCuerpo:
       'The television greets them by name and tells them which night they are on. This fills itself from the bookings: the screen takes the name and the dates from whoever has this villa assigned in Cloudbeds.',
     deLaReserva: (huesped) => `${huesped}, from the Cloudbeds booking.`,
+    llegaElDia: (huesped, cuando) => `Arrives on ${cuando}: ${huesped}.`,
+    nadieTodavia: 'No booking has this villa assigned.',
+    entroAlguienMas: 'Did someone check in who is not in Cloudbeds?',
     deLaReservaFechas: (desde, hasta) => `From ${desde} to ${hasta}.`,
     insigniaReserva: 'Automatic',
     sinReserva:
-      'No booking has this villa assigned today. If someone checked in who is not in Cloudbeds yet, write it below; as soon as the booking shows up, the booking wins.',
+      'Write this only if someone checked in who is not in Cloudbeds yet. As soon as the booking shows up, the booking wins.',
     horarioTitulo: 'House hours',
     huespedLabel: 'Guest name',
     huespedPlaceholder: 'Sarah Lovestad',

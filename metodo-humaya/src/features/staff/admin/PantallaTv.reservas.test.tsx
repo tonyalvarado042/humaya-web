@@ -79,6 +79,7 @@ describe('cuando la reserva tiene la villa asignada', () => {
         huesped: 'Casey Herrera',
         llegada: '2026-12-18',
         salida: '2026-12-21',
+        esta_ahora: true,
       },
     ];
   });
@@ -94,6 +95,27 @@ describe('cuando la reserva tiene la villa asignada', () => {
     expect(screen.queryByLabelText('Nombre del huésped')).not.toBeInTheDocument();
   });
 
+  it('cuando todavía no llegó, lo dice: no pide que lo escriban', async () => {
+    // Hoy HUMAYA no tiene a nadie —la primera llegada es el 17 de
+    // diciembre— y aun así la pantalla tiene algo que decir. Antes caía al
+    // campo a mano, que es justo lo que Tony no quería ver.
+    supabaseStub.tablas.humaya_tv_ocupacion = [
+      {
+        negocio_id: NEGOCIO_DE_PRUEBA,
+        villa_id: 'v1-capi-capi',
+        huesped: 'Casey Herrera',
+        llegada: '2026-12-18',
+        salida: '2026-12-21',
+        esta_ahora: false,
+      },
+    ];
+
+    await abrirElEditor();
+
+    expect(await screen.findByText(/Llega el 2026-12-18: Casey Herrera/)).toBeInTheDocument();
+    expect(screen.queryByLabelText('Nombre del huésped')).not.toBeInTheDocument();
+  });
+
   it('el horario de la casa sigue siendo del hotel, no de la reserva', async () => {
     await abrirElEditor();
 
@@ -104,13 +126,25 @@ describe('cuando la reserva tiene la villa asignada', () => {
 });
 
 describe('cuando ninguna reserva tiene esta villa', () => {
-  it('se puede escribir a mano, y se explica por qué', async () => {
+  it('NO pide el nombre: lo dice y ofrece escribirlo solo si se lo piden', async () => {
+    // EL PUNTO. Tony, el 21 de noviembre: «el nombre del huésped sigue
+    // pidiéndolo». Antes, sin reserva HOY —que es casi siempre, porque la
+    // primera llegada puede ser dentro de un mes— el campo estaba a la
+    // vista y la pantalla se veía igual que antes de automatizar nada.
     await abrirElEditor();
 
-    expect(
-      await screen.findByText(/Hoy ninguna reserva tiene esta villa asignada/),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText('Nombre del huésped')).toBeInTheDocument();
+    expect(await screen.findByText(/No hay ninguna reserva con esta villa/)).toBeInTheDocument();
+    expect(screen.queryByLabelText('Nombre del huésped')).not.toBeInTheDocument();
+  });
+
+  it('el campo a mano aparece solo si alguien lo pide', async () => {
+    await abrirElEditor();
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /Entró alguien que no está en Cloudbeds/ }),
+    );
+
+    expect(await screen.findByLabelText('Nombre del huésped')).toBeInTheDocument();
   });
 });
 

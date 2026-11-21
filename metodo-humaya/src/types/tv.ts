@@ -1,9 +1,17 @@
 /** Una villa en la pantalla de su televisor. */
-/** Quién está en la villa según Cloudbeds. */
+/** Quién está en la villa según Cloudbeds, o quién llega. */
 export interface ReservaDeVilla {
   huesped: string;
   llegada: string | null;
   salida: string | null;
+  /**
+   * Si ya está adentro. Si es `false`, todavía va a llegar.
+   *
+   * Hace falta porque la vista devuelve la reserva EN CURSO o, si no hay, LA
+   * PRÓXIMA: sin esto, Admin diría «está en la villa» de alguien que llega
+   * en tres semanas.
+   */
+  estaAhora: boolean;
 }
 
 export interface VillaTv {
