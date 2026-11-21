@@ -3,7 +3,7 @@ import type { Idioma } from '@/hooks/useIdiomaElegido';
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { AvisoDeVersion } from '@/components/AvisoDeVersion';
-import { HumayaLogo } from '@/components/HumayaLogo';
+import { LogoDelHotel } from '@/components/LogoDelHotel';
 import { Drawer } from '@/components/ui';
 import { useIdiomaRecepcion } from '../puerta/contexto';
 import { STAFF_NAV, staffCopy } from './nav';
@@ -40,7 +40,7 @@ export function StaffLayout() {
         {/* Sidebar: solo desde 1024 px */}
         <aside className="hidden w-62 shrink-0 flex-col gap-8 bg-nav px-4.5 py-7 text-on-ink lg:flex">
           <div className="flex flex-col gap-1 px-3">
-            <HumayaLogo className="w-30" />
+            <LogoDelHotel className="w-30" />
             <span className="text-[13px] text-ink-muted">{copy.area}</span>
           </div>
           <StaffNav />
@@ -57,7 +57,7 @@ export function StaffLayout() {
             >
               <Menu size={20} strokeWidth={1.8} aria-hidden="true" />
             </button>
-            <HumayaLogo variant="mark" className="h-8 w-auto shrink-0" />
+            <LogoDelHotel variant="mark" className="h-8 w-auto shrink-0" />
             <div className="flex min-w-0 flex-col">
               <span className="truncate text-[13px] text-muted">
                 {currentLabel(pathname, idioma)}

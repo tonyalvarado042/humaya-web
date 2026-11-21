@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { HumayaLogo } from '@/components/HumayaLogo';
+import { LogoDelHotel } from '@/components/LogoDelHotel';
 import { Button, Input } from '@/components/ui';
 import { useCheckReservation } from '@/hooks';
 import { entradaCopy, type Idioma } from './copy';
@@ -112,7 +112,7 @@ export function EntradaPage() {
       </div>
 
       <section className="flex w-full max-w-md flex-1 flex-col items-center justify-center gap-7 text-center">
-        <HumayaLogo className="w-40 max-w-full" />
+        <LogoDelHotel className="w-40 max-w-full" />
 
         <div aria-live="polite" className="flex w-full flex-col items-center gap-7">
           {check.data?.found ? (

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { HumayaLogo } from '@/components/HumayaLogo';
+import { LogoDelHotel } from '@/components/LogoDelHotel';
 import { Button, Input } from '@/components/ui';
 import { useIdiomaElegido } from '@/hooks/useIdiomaElegido';
 import {
@@ -58,7 +58,7 @@ function Encabezado({ copy }: { copy: PuertaTextos }) {
       {/* El símbolo dorado, no el wordmark: el wordmark es blanco y el fondo de
           recepción es crema (rgb(244,240,232)). Blanco sobre crema no se ve.
           Comprobado en pantalla, no supuesto. */}
-      <HumayaLogo variant="mark" className="w-14" />
+      <LogoDelHotel variant="mark" className="w-14" />
       <span className="text-[12px] tracking-[0.18em] text-muted uppercase">{copy.area}</span>
     </div>
   );

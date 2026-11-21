@@ -68,7 +68,7 @@ describe('Conversación de un huésped', () => {
       expect.stringContaining('/humaya-concierge'),
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ action: 'read', stay_id: 's-weber' }),
+        body: JSON.stringify({ hotel: 'humaya', action: 'read', stay_id: 's-weber' }),
       }),
     );
   });
@@ -119,6 +119,9 @@ describe('Conversación de un huésped', () => {
 
     expect(envio).toBeDefined();
     expect(JSON.parse(envio!)).toEqual({
+      // El hotel viaja en toda llamada al Concierge: sin él la función
+      // contesta con la base de conocimiento de todos los hoteles juntos.
+      hotel: 'humaya',
       action: 'reply',
       stay_id: 's-mendez-rojas',
       text: 'Ya está reservado.',

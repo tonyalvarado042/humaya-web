@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { HumayaLogo } from '@/components/HumayaLogo';
+import { LogoDelHotel } from '@/components/LogoDelHotel';
 import { Card } from '@/components/ui';
 import { useAdminOpciones, useGuestProfile, useInterviewProgress } from '@/hooks';
 import { descripcionDeOpcion, etiquetaDeOpcion } from '@/i18n/opciones';
@@ -68,7 +68,7 @@ export function HomePage() {
   return (
     <Screen>
       <header className="flex items-center justify-between gap-3">
-        <HumayaLogo className="w-20 shrink-0 min-[390px]:w-24" />
+        <LogoDelHotel className="w-20 shrink-0 min-[390px]:w-24" />
         <div className="flex items-end gap-2">
           <GuestPicker />
           <LanguageSelector />

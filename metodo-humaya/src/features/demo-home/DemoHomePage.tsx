@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { HumayaLogo } from '@/components/HumayaLogo';
+import { LogoDelHotel } from '@/components/LogoDelHotel';
 import { buttonClasses } from '@/components/ui';
 import { demoHomeCopy as copy } from './copy';
 
@@ -16,7 +16,7 @@ export function DemoHomePage() {
       className="flex min-h-dvh items-center justify-center bg-bg px-5 py-10 text-text"
     >
       <section className="flex w-full max-w-2xl flex-col items-center gap-8 text-center">
-        <HumayaLogo className="w-52 max-w-full" />
+        <LogoDelHotel className="w-52 max-w-full" />
 
         <div className="flex flex-col items-center gap-3">
           <span className="text-eyebrow text-gold">{copy.eyebrow}</span>

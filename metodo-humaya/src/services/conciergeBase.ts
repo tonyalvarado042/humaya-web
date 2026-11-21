@@ -1,3 +1,4 @@
+import { codigoActual } from '@/marca';
 import { cabeceraDeRecepcion, cliente } from './sesion';
 import { elNegocio } from './negocio';
 
@@ -145,7 +146,13 @@ export interface EstadoBot {
  * es una fuga.
  */
 export async function getEstadoBot(probar = false): Promise<EstadoBot> {
-  const response = await fetch(`${CONCIERGE_URL}?que=estado${probar ? '&probar=1' : ''}`, {
+  // El hotel viaja en la direccion: sin el, la funcion contaba los temas, los
+  // servicios y el gasto de TODOS los hoteles juntos.
+  const codigo = codigoActual();
+  if (!codigo) throw new Error('concierge_sin_hotel');
+  const direccion =
+    `${CONCIERGE_URL}?que=estado&hotel=${encodeURIComponent(codigo)}` + (probar ? '&probar=1' : '');
+  const response = await fetch(direccion, {
     headers: { 'Content-Type': 'application/json', ...(await cabeceraDeRecepcion()) },
   });
   if (!response.ok) throw new Error(`estado_http_${response.status}`);

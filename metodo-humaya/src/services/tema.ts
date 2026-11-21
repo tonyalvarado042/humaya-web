@@ -58,10 +58,37 @@ export interface Tema {
   fuenteTexto?: string;
   /** Si las fuentes hay que bajarlas de Google en vez de las que ya vienen. */
   fuenteGoogle?: boolean;
+
+  /**
+   * El logo largo, para fondos oscuros, y el cuadrado.
+   *
+   * ── POR QUÉ SON DATO Y NO CÓDIGO ────────────────────────────────────────
+   * Porque lo eran y estaba mal: `HumayaLogo` pintaba `/wordmark-white.png`
+   * siempre, así que el hotel demo mostraba el logotipo de HUMAYA en la barra
+   * de recepción y en el Home del huésped. Comprobado en vivo el 21 de
+   * noviembre de 2026.
+   *
+   * Un hotel sin logo propio NO muestra el de otro: muestra su nombre.
+   */
+  logo?: string;
+  logoMarca?: string;
 }
 
 /** Un color de verdad y no cualquier texto: esto termina dentro de una hoja de estilos. */
 const HEX = /^#[0-9a-fA-F]{6}$/;
+
+/**
+ * Una dirección de imagen que se puede poner en un `src`.
+ *
+ * Solo una ruta de este mismo sitio o un `https://`. Sin esto, un `tema`
+ * escrito a mano podría meter `javascript:` en el `src` de una etiqueta que
+ * se pinta en todas las pantallas.
+ */
+const IMAGEN = /^(\/[A-Za-z0-9._/-]{1,200}|https:\/\/[A-Za-z0-9._~:/?#[\]@!$&'()*+,;=%-]{1,400})$/;
+
+export function esImagen(valor: unknown): valor is string {
+  return typeof valor === 'string' && IMAGEN.test(valor.trim());
+}
 
 /** Un nombre de fuente, sin comillas ni nada que cierre una declaración CSS. */
 const NOMBRE_DE_FUENTE = /^[A-Za-z0-9 ]{1,40}$/;

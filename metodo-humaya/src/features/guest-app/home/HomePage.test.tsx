@@ -24,10 +24,10 @@ function fichas() {
 }
 
 describe('saludo', () => {
-  it('muestra el wordmark oficial', async () => {
+  it('muestra el logotipo del hotel, con su nombre como texto alternativo', async () => {
     renderWithProviders(<HomePage />, { stayId: VALERIA });
 
-    expect(await screen.findByRole('img', { name: 'Humaya' })).toHaveAttribute(
+    expect(await screen.findByRole('img', { name: 'HUMAYA' })).toHaveAttribute(
       'src',
       '/wordmark-white.png',
     );

@@ -21,11 +21,11 @@ afterEach(() => {
  * el contenido y el comportamiento, no la visibilidad.
  */
 describe('sidebar de escritorio', () => {
-  it('muestra el wordmark oficial', async () => {
+  it('muestra el logotipo del hotel, con su nombre como texto alternativo', async () => {
     renderRoutes(routes, { route: '/staff' });
 
     const sidebar = await screen.findByRole('complementary');
-    expect(within(sidebar).getByRole('img', { name: 'Humaya' })).toHaveAttribute(
+    expect(within(sidebar).getByRole('img', { name: 'HUMAYA' })).toHaveAttribute(
       'src',
       '/wordmark-white.png',
     );

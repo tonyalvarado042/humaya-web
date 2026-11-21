@@ -30,7 +30,7 @@ describe('getMessages', () => {
     const messages = await getMessages('s-mendez-rojas');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `${FN_URL}?stay_id=s-mendez-rojas`,
+      `${FN_URL}?stay_id=s-mendez-rojas&hotel=humaya`,
       expect.objectContaining({
         headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
       }),
@@ -51,6 +51,7 @@ describe('sendMessage', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
+          hotel: 'humaya',
           action: 'send',
           stay_id: 's-mendez-rojas',
           guest_name: 'Valeria',
@@ -77,7 +78,7 @@ describe('getConversations', () => {
 
     await getConversations();
 
-    expect(fetchMock).toHaveBeenCalledWith(`${FN_URL}?staff=1`, expect.anything());
+    expect(fetchMock).toHaveBeenCalledWith(`${FN_URL}?staff=1&hotel=humaya`, expect.anything());
   });
 });
 
@@ -93,6 +94,7 @@ describe('sendStaffReply', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
+          hotel: 'humaya',
           action: 'reply',
           stay_id: 's-weber',
           text: 'Ya te confirmamos el horario.',
@@ -113,7 +115,7 @@ describe('markConversationRead', () => {
       FN_URL,
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ action: 'read', stay_id: 's-weber' }),
+        body: JSON.stringify({ hotel: 'humaya', action: 'read', stay_id: 's-weber' }),
       }),
     );
   });
