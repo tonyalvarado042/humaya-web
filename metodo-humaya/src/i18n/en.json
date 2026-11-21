@@ -33,7 +33,7 @@
     "protocolDay": "Day {{day}} of 7",
     "protocolLoading": "your tips for today",
     "protocolError": "We couldn't load your tips for today.",
-    "protocolEmptyTitle": "Your protocol hasn't started yet",
+    "protocolEmptyTitle": "Your prep hasn't started yet",
     "protocolEmptyBody": "Seven days before you arrive, we'll share something simple with you each day.",
     "guestPicker": "Demo guest",
     "demoArrivalToday": "{{name}} · arrives today",

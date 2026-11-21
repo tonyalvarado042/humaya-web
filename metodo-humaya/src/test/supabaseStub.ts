@@ -64,6 +64,9 @@ export function stubSesionAbierta(usuario: FilaUsuario = USUARIO_RECEPCION): voi
 
 type Fila = Record<string, unknown>;
 
+/** Para los `id` que la base pondria sola en un insert. */
+let contador = 0;
+
 /**
  * El encadenado de PostgREST: cada filtro devuelve el mismo objeto y el await
  * resuelve. `then` lo hace esperable sin ser una promesa de verdad, que es
@@ -74,6 +77,7 @@ class Consulta implements PromiseLike<{ data: Fila[] | Fila | null; error: null 
   private readonly filtros: string[] = [];
   private uno = false;
   private cambios: Fila | null = null;
+  private borrando = false;
 
   private readonly nombreTabla: string;
 
@@ -171,6 +175,41 @@ class Consulta implements PromiseLike<{ data: Fila[] | Fila | null; error: null 
     return this;
   }
 
+  single() {
+    this.uno = true;
+    return this;
+  }
+
+  /**
+   * Filas nuevas, como PostgREST: quedan en la tabla y `select()` las
+   * devuelve. El `id` se inventa solo si la fila no trae uno, porque la base
+   * lo pone por omision y el codigo que llama cuenta con recibirlo.
+   */
+  insert(filas: Fila | Fila[]) {
+    const lista = (Array.isArray(filas) ? filas : [filas]).map((fila) => ({
+      id: `fila-${++contador}`,
+      ...fila,
+    }));
+    const tabla = supabaseStub.tablas[this.nombreTabla] ?? [];
+    tabla.push(...lista);
+    supabaseStub.tablas[this.nombreTabla] = tabla;
+    this.filas = lista;
+    this.filtros.push('insert');
+    return this;
+  }
+
+  /**
+   * Igual que `update`: se marca y se aplica DESPUES de los filtros.
+   *
+   * Si borrara al llamarlo, `.delete().eq('id', 1)` vaciaria la tabla entera
+   * y una prueba de aislamiento entre hoteles pasaria sin probar nada.
+   */
+  delete() {
+    this.borrando = true;
+    this.filtros.push('delete');
+    return this;
+  }
+
   then<R1 = { data: Fila[] | Fila | null; error: null }, R2 = never>(
     alCumplir?:
       ((valor: { data: Fila[] | Fila | null; error: null }) => R1 | PromiseLike<R1>) | null,
@@ -184,6 +223,10 @@ class Consulta implements PromiseLike<{ data: Fila[] | Fila | null; error: null 
       }
       supabaseStub.tablas[this.nombreTabla] = tabla;
       this.filas = this.filas.map((fila) => ({ ...fila, ...this.cambios }));
+    }
+    if (this.borrando) {
+      const tabla = supabaseStub.tablas[this.nombreTabla] ?? [];
+      supabaseStub.tablas[this.nombreTabla] = tabla.filter((fila) => !this.filas.includes(fila));
     }
     const data = this.uno ? (this.filas[0] ?? null) : this.filas;
     return Promise.resolve({ data, error: null }).then(alCumplir, alFallar);

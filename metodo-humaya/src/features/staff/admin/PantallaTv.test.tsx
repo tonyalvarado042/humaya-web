@@ -64,12 +64,20 @@ describe('las pantallas del TV en Admin', () => {
     expect(await screen.findByText(new RegExp(`k=${CLAVE}`))).toBeInTheDocument();
   });
 
-  it('avisa que la guía es la misma para las diez pantallas', async () => {
-    // Sin decirlo, alguien la editaría villa por villa y terminaría con diez
-    // versiones distintas de la misma regla.
+  it('avisa que la guía es la misma para todas las pantallas', async () => {
+    // Sin decirlo, alguien la editaría villa por villa y terminaría con una
+    // versión distinta de la misma regla en cada una.
+    //
+    // Decía «las diez pantallas», y esta prueba lo exigía. Abriendo la
+    // pantalla contra el hotel demo el 21 de noviembre de 2026 —que tiene
+    // dos villas— el aviso afirmaba diez. Un número inventado, sostenido por
+    // una prueba en verde.
     renderWithProviders(<PantallaTv />);
 
-    expect(await screen.findByText(/Es la misma para las diez pantallas/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Es la misma para todas las pantallas del hotel/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/diez pantallas/)).not.toBeInTheDocument();
   });
 
   it('cuando no hay ninguna villa, dice dónde se crean', async () => {

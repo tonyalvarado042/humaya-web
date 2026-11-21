@@ -36,6 +36,7 @@ export async function getNotas(stayId: string): Promise<NotaInterna[]> {
   const { data, error } = await db
     .from('humaya_concierge_notas')
     .select('id,texto,autor,creado_en')
+    .eq('negocio_id', elNegocio())
     .eq('stay_id', stayId)
     .order('creado_en', { ascending: false });
 
@@ -74,6 +75,7 @@ export async function borrarNota(id: string): Promise<void> {
   const { data, error } = await db
     .from('humaya_concierge_notas')
     .delete()
+    .eq('negocio_id', elNegocio())
     .eq('id', id)
     .select('id');
 

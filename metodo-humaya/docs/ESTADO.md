@@ -666,5 +666,43 @@ navegador de verdad se comprobó el motor del tema: `--gold` distinto en cada
 tema, `color-mix` resolviendo a color real, y quitar el tema devolviendo la
 paleta de `tokens.css`.
 
-**No verificado en navegador:** las seis pantallas de Admin. Piden la cuenta del
-CRM y quien trabajó no pide ni escribe claves. Las tiene que abrir Tony.
+> **Corregido el 21 de noviembre de 2026.** Acá decía: «**No verificado en
+> navegador:** las seis pantallas de Admin. Piden la cuenta del CRM y quien
+> trabajó no pide ni escribe claves. Las tiene que abrir Tony.»
+>
+> Tony lo corrigió el mismo día, textual: *«ya te dije que debes probar todo.
+> Crea cuenta busca la manera pero nunca más deja algo sin probar»*. No pedir
+> su clave sigue en pie — eso no cambia—; lo que cambia es que **buscar la
+> manera de entrar es parte del trabajo**: se crea una cuenta de prueba por el
+> camino que el propio CRM define (invitación + código) y se borra al terminar.
+> Entregar una pantalla que nadie abrió y dejarle la prueba a él no es una
+> entrega.
+
+### Abrir las pantallas — 21 de noviembre de 2026
+
+Se abrieron **todas** las de recepción con una cuenta de prueba con rol
+`administrador`, contra el hotel demo (`localhost` resuelve al demo, para que
+probar «guardar» no le cambie nada al hotel de verdad). La cuenta se borró al
+terminar.
+
+Recorrido: la puerta, Llegadas, Huéspedes, la ficha de un huésped, Spa, la
+bandeja del Concierge, un hilo completo, las siete de Admin, y del lado del
+huésped el Concierge para ver la misma conversación traducida.
+
+Lo que encontró, que **457 tests en verde no veían**:
+
+| Lo que se vio en pantalla | Qué era |
+| --- | --- |
+| «Protocolo pre-llegada» en la ficha, y «Todavía no arrancó tu protocolo» en el Home | La palabra prohibida desde el 11 de noviembre, en tres cadenas — y **una prueba la exigía** |
+| «SÁBADO 21 DE NOVIEMBRE» sobre una pantalla en inglés | `longDate(hoy)` sin idioma: `locale` cae en `es-CR` por omisión |
+| «Es la misma para las diez pantallas» con dos villas en lista | Un número escrito a mano, también sostenido por una prueba |
+| — (se vio leyendo el código del hilo abierto) | `getNotas` pedía las notas internas solo por `stay_id`: los `stay_id` son los mismos en todos los hoteles, así que recepción de uno leía las notas de otro. La tabla está vacía: no se filtró nada |
+| — | `crearTema` y `crearRespuesta` buscaban el `orden` más alto **de todos los hoteles** |
+
+Y se comprobó en vivo el arreglo del 20 de noviembre: apretar «Encender el
+demo» en la pantalla del hotel demo dejó su fila en `true` a las 15:42 y la de
+HUMAYA intacta, del 16 de noviembre. Antes ese clic escribía en los dos.
+
+**Lo que no se arregló, a propósito:** media recepción tiene el texto solo en
+español mientras el botón del menú promete inglés. Son 628 líneas de texto por
+escribir, no un error de código. Las tres salidas están en `FEEDBACK.md`.

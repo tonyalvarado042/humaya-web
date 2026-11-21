@@ -78,7 +78,7 @@ export const tvCopy = {
   // ── La guía ─────────────────────────────────────────────────────────
   guiaTitulo: 'La guía de la casa',
   guiaCuerpo:
-    'Las reglas, cómo funciona la villa, los lugares cercanos, los pasos de salida y las emergencias. Es la misma para las diez pantallas, y por eso todavía no se edita acá: con una copia por villa, cambiar una regla significaría cambiarla diez veces. Hoy se cambia en la base, en humaya_tv_ajustes.',
+    'Las reglas, cómo funciona la villa, los lugares cercanos, los pasos de salida y las emergencias. Es la misma para todas las pantallas del hotel, y por eso todavía no se edita acá: con una copia por villa, cambiar una regla significaría cambiarla en cada una. Hoy se cambia en la base, en humaya_tv_ajustes.',
 
   cargando: 'las pantallas del TV',
   vacio: 'Todavía no hay ninguna villa',

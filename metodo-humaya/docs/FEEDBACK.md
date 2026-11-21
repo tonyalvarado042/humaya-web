@@ -127,3 +127,36 @@ Ninguna es irreversible; si alguna no le gusta, se cambia.
 | Los botones que necesitan rol `administrador` **no se muestran** a los demás roles | Regla de la casa: lo que se sabe que va a rebotar se explica, no se ofrece | `useEsAdministrador()` |
 | Encender y apagar **sí** se muestra a todo recepción | Pasa por la función `humaya-admin`, que acepta los cuatro roles: esconderlo sería romper algo que funciona | — |
 | El formulario **mide el contraste** y avisa | Un color bonito que no se lee no se descubre hasta que un huésped no encuentra el botón | `src/services/contraste.ts` |
+
+---
+
+## Decisiones tomadas sin Anthony — 21 de noviembre de 2026
+
+De abrir **todas** las pantallas de recepción como administrador, con cuenta de prueba, contra el
+hotel demo. Ninguna es irreversible.
+
+| Decisión | Por qué | Cómo se deshace |
+| --- | --- | --- |
+| «Protocolo pre-llegada» pasa a **«Preparación pre-llegada»** | La palabra está prohibida desde el 11 de noviembre y estaba en pantalla. De las dos salidas que `marca.ts` propone —«el orden», «la secuencia»— ninguna suena a una fila de una línea de tiempo; el huésped ya ve esa misma cosa como **«Preparate»**, así que recepción usa su misma palabra en vez de inventar una tercera | `src/services/guests.ts` |
+| Una prueba sostiene el vocabulario prohibido | La regla llevaba diez días escrita en `marca.ts` y la app la rompía en tres lugares. Una regla que solo vive en un comentario se rompe sola | `src/i18n/sinPalabrasProhibidas.test.ts` |
+| El aviso de la guía del TV deja de decir «las diez pantallas» | El hotel demo tiene dos. El número estaba escrito a mano y una prueba lo exigía | `copyTv.ts` |
+| El cliente falso aprende `insert`, `delete` y `single` | Sin eso, crear y borrar temas, respuestas y notas **no se podía probar**, y por eso nadie vio que el orden se calculaba con las filas de todos los hoteles | `src/test/supabaseStub.ts` |
+
+### Lo que NO hice, porque es decisión suya
+
+**Media recepción solo habla español.** El botón de idioma del menú promete inglés y lo cumplen
+tres pantallas: la puerta, Llegadas y Huéspedes. Spa, las dos del Concierge, la ficha del huésped
+y las siete de Admin tienen el texto escrito solo en español — no es un error de código, es texto
+que no existe: **628 líneas** en once archivos de `copy*.ts`, que habría que escribir en inglés y
+cablear a `Record<Idioma, …>` pantalla por pantalla.
+
+Son tres caminos y los tres son razonables:
+
+1. **Traducir todo.** Un recepcionista que no lee español puede trabajar un turno completo.
+2. **Traducir solo lo del turno** (Spa, Concierge, ficha) y dejar Admin en español, que lo usa el
+   dueño.
+3. **Dejarlo** y que el botón de idioma solo aparezca donde hay inglés, en vez de prometerlo en
+   todas.
+
+Hoy está en el peor de los tres: promete y no cumple. No lo elegí yo porque escribir 628 líneas de
+voz de marca en inglés no es una corrección, es una decisión de producto.

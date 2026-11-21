@@ -69,7 +69,7 @@ describe('lo que dejó la entrevista', () => {
     renderRoutes(routes, { route: VALERIA });
 
     expect(await screen.findByText('Entrevista completa')).toBeInTheDocument();
-    expect(screen.getByText('Protocolo pre-llegada')).toBeInTheDocument();
+    expect(screen.getByText('Preparación pre-llegada')).toBeInTheDocument();
     expect(screen.getByText('Seguimiento')).toBeInTheDocument();
   });
 

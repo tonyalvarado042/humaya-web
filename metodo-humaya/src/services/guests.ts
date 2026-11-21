@@ -107,7 +107,7 @@ export function timelineFor(stayId: string): TimelineEvent[] {
     },
     {
       id: 'prep',
-      label: 'Protocolo pre-llegada',
+      label: 'Preparación pre-llegada',
       when: stay.prepDay ? `día ${stay.prepDay} de 7` : '—',
       done: (stay.prepDay ?? 0) >= 7,
     },

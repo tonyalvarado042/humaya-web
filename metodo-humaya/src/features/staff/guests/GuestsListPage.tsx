@@ -118,7 +118,10 @@ export function GuestsListPage() {
 
   return (
     <Screen>
-      <ScreenHeading eyebrow={longDate(hoy)} title={copy.title} />
+      <ScreenHeading
+        eyebrow={longDate(hoy, idioma === 'es' ? 'es-CR' : 'en-US')}
+        title={copy.title}
+      />
       <p className="m-0 text-sm text-muted">{copy.subtitulo}</p>
 
       <SegmentedControl

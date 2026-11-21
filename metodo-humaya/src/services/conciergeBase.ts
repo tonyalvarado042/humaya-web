@@ -93,6 +93,7 @@ export async function crearTema(tema: string, contenido: string): Promise<TemaBa
   const { data: ultimos } = await db
     .from('humaya_concierge_base')
     .select('orden')
+    .eq('negocio_id', elNegocio())
     .order('orden', { ascending: false })
     .limit(1);
   const orden = ((ultimos?.[0] as { orden?: number } | undefined)?.orden ?? 0) + 10;
@@ -337,6 +338,7 @@ export async function crearRespuesta(titulo: string, texto: string): Promise<Res
   const { data: ultimas } = await db
     .from('humaya_concierge_respuestas')
     .select('orden')
+    .eq('negocio_id', elNegocio())
     .order('orden', { ascending: false })
     .limit(1);
   const orden = ((ultimas?.[0] as { orden?: number } | undefined)?.orden ?? 0) + 10;

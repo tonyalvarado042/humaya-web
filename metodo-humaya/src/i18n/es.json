@@ -33,7 +33,7 @@
     "protocolDay": "Día {{day}} de 7",
     "protocolLoading": "tus consejos del día",
     "protocolError": "No pudimos cargar tus consejos del día.",
-    "protocolEmptyTitle": "Todavía no arrancó tu protocolo",
+    "protocolEmptyTitle": "Todavía no arrancó tu preparación",
     "protocolEmptyBody": "Siete días antes de llegar te vamos a ir mandando algo simple para cada día.",
     "guestPicker": "Huésped de la demo",
     "demoArrivalToday": "{{name}} · llega hoy",
