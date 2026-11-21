@@ -1,6 +1,8 @@
 import { MARCA } from '@/marca';
 export const demoHomeCopy = {
-  eyebrow: `Demo de ${MARCA.experiencia}`,
+  get eyebrow() {
+    return `Demo de ${MARCA.experiencia}`;
+  },
   title: 'Become More Human',
   description:
     'Una experiencia conectada para acompañar al huésped y darle a recepción el contexto que necesita.',

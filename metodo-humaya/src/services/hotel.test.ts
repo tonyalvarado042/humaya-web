@@ -133,6 +133,35 @@ describe('el dominio compartido del producto', () => {
   });
 });
 
+describe('los textos siguen al hotel', () => {
+  it('un texto que lee la marca NO se queda con la del hotel anterior', async () => {
+    // El fallo que esto agarra: los objetos de `copy.ts` se construyen al
+    // CARGAR el modulo, y el hotel se resuelve despues. Con un valor normal
+    // en vez de un getter, el texto se congela. Comprobado en vivo el 20 de
+    // noviembre de 2026: /demo/entrada decia «HUMAYA EXPERIENCE».
+    const { entradaCopy } = await import('@/features/entrada/copy');
+
+    aplicarHotel({
+      negocioId: 'n-demo',
+      codigo: 'demo',
+      marcaExperiencia: 'Demo Experience',
+      marcaHotel: 'HOTEL DEMO',
+      correo: 'demo@liderax10.com',
+    });
+    expect(entradaCopy.es.eyebrow).toBe('Demo Experience');
+    expect(entradaCopy.en.contactEmail).toBe('demo@liderax10.com');
+
+    aplicarHotel({
+      negocioId: 'n-humaya',
+      codigo: 'humaya',
+      marcaExperiencia: 'HUMAYA Experience',
+      marcaHotel: 'HUMAYA',
+      correo: 'reservations@stayhumaya.com',
+    });
+    expect(entradaCopy.es.eyebrow).toBe('HUMAYA Experience');
+  });
+});
+
 describe('cuando la base no contesta', () => {
   it('no deja al huésped mirando una pantalla en blanco sin fin', async () => {
     // Esta consulta corre ANTES de pintar nada. Sin tope, una base colgada

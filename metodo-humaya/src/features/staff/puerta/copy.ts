@@ -44,7 +44,9 @@ export interface PuertaTextos {
 
 export const puertaCopy: Record<Idioma, PuertaTextos> = {
   en: {
-    eyebrow: MARCA.experiencia,
+    get eyebrow() {
+      return MARCA.experiencia;
+    },
     area: 'Front desk',
     title: 'Sign in',
     description: 'Use your CRM account — the same email and password.',
@@ -68,7 +70,9 @@ export const puertaCopy: Record<Idioma, PuertaTextos> = {
     cambiarIdioma: 'Español',
   },
   es: {
-    eyebrow: MARCA.experiencia,
+    get eyebrow() {
+      return MARCA.experiencia;
+    },
     area: 'Recepción',
     title: 'Entrá',
     description: 'Con tu cuenta del CRM — el mismo correo y la misma clave.',

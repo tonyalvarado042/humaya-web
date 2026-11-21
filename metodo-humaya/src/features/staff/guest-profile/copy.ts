@@ -10,7 +10,9 @@ export const profileCopy = {
   conciergeUnread: 'Le escribió al Concierge y todavía no se leyó',
 
   careTitle: 'Cómo quieren que los atendamos',
-  methodTitle: MARCA.experiencia,
+  get methodTitle() {
+    return MARCA.experiencia;
+  },
   notesLabel: 'Notas del equipo',
   notesPlaceholder: 'Ej.: llegaron cansados del vuelo, ofrecer la cena en la villa.',
   notesSaved: 'Notas guardadas',

@@ -59,6 +59,7 @@ export function aplicarHotel(hotel: Hotel | null): void {
     actual = { ...PORDEFECTO };
     negocio = null;
     codigo = null;
+    void avisarALosTextos(PORDEFECTO.experiencia);
     return;
   }
   actual = {
@@ -69,6 +70,24 @@ export function aplicarHotel(hotel: Hotel | null): void {
   };
   negocio = hotel.negocioId;
   codigo = hotel.codigo;
+  void avisarALosTextos(actual.experiencia);
+}
+
+/**
+ * Los archivos de traducción usan `{{experiencia}}`, y esa variable se fija
+ * al arrancar i18n — antes de que se sepa qué hotel es. Hay que volver a
+ * ponerla.
+ *
+ * El import es dinámico para no atar `marca.ts` a i18n: lo usa también la
+ * pantalla del TV, que no traduce nada.
+ */
+async function avisarALosTextos(experiencia: string): Promise<void> {
+  try {
+    const { aplicarMarcaEnTextos } = await import('@/i18n');
+    aplicarMarcaEnTextos(experiencia);
+  } catch {
+    // Sin i18n cargado no hay textos que avisar.
+  }
 }
 
 /**
