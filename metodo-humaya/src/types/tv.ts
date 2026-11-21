@@ -1,4 +1,11 @@
 /** Una villa en la pantalla de su televisor. */
+/** Quién está en la villa según Cloudbeds. */
+export interface ReservaDeVilla {
+  huesped: string;
+  llegada: string | null;
+  salida: string | null;
+}
+
 export interface VillaTv {
   id: string;
   /**
@@ -18,10 +25,20 @@ export interface VillaTv {
   /** El código del Wi-Fi queda en pantalla también entre huéspedes. */
   wifiSiempre: boolean;
 
+  /**
+   * Lo escrito A MANO. Es el respaldo, no la fuente: si hay reserva, manda
+   * `reserva`. Sirve para una entrada que todavía no está en Cloudbeds.
+   */
   huesped: string | null;
   /** YYYY-MM-DD, o null si la villa está vacía. */
   llegada: string | null;
   salida: string | null;
+  /**
+   * Quién está en la villa SEGÚN LAS RESERVAS, que es de donde tiene que
+   * salir. Tony, 21 de noviembre de 2026: «todo debe ser automatizado, tú
+   * tienes las reservas, ¿por qué me pides agregar nombre de huésped?».
+   */
+  reserva?: ReservaDeVilla | null;
   checkin: string;
   checkout: string;
 

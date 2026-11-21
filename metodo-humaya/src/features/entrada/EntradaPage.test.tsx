@@ -87,9 +87,12 @@ describe('Entrada', () => {
     expect(screen.getByText(/Dec 27, 2026 → Dec 31, 2026/)).toBeInTheDocument();
 
     const [, init] = vi.mocked(fetch).mock.calls[0];
+    // El hotel VIAJA. Sin el, la busqueda recorria las reservas de todos los
+    // hoteles y un codigo de HUMAYA entraba desde el /entrada de otro.
     expect(JSON.parse(String(init?.body))).toEqual({
       codigo: 'HMMS93AC2K',
       apellido: 'Galloway',
+      hotel: 'humaya',
     });
   });
 

@@ -730,7 +730,14 @@
     });
   }
   function refreshWeather() {
-    return fetch("/api/weather").then(function (r) { return r.json(); }).then(function (w) {
+    // El clima es el del hotel de ESTA villa, y viene con su estado. Sin eso
+    // el Worker usaba el de La Fortuna para todos.
+    var c = S && S.clima;
+    var q = c && c.lat != null && c.lon != null
+      ? "?lat=" + encodeURIComponent(c.lat) + "&lon=" + encodeURIComponent(c.lon) +
+        "&tz=" + encodeURIComponent(c.tz || "") + "&place=" + encodeURIComponent(c.place || "")
+      : "";
+    return fetch("/api/weather" + q).then(function (r) { return r.json(); }).then(function (w) {
       WX = w; dateLine();
       if (S && !sheet) { drawCards(); drawApps(); }
     });
@@ -793,7 +800,9 @@
     fakeGaps();
   }
 
-  refreshState().then(function () { refreshAircon(); refreshHub(); });
+  // El clima va DESPUES del estado, no en paralelo: hasta que el estado no
+  // llega no se sabe de que hotel es esta villa, y se pedia el de La Fortuna.
+  refreshState().then(function () { refreshWeather(); refreshAircon(); refreshHub(); });
   awake();
   document.addEventListener("mousemove", awake);
   refreshWeather();

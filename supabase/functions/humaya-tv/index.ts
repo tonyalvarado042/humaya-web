@@ -21,7 +21,15 @@
 // dentro de la direccion, y no la ve ningun huesped.
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 
-const NEGOCIO = "4cb80ad6-1004-4d06-9dfb-946a1718be87";
+// Sin uuid escrito a mano. Hasta el 21 de noviembre de 2026 habia uno, el de
+// HUMAYA, y con el el televisor de CUALQUIER hotel leia la guia de la casa,
+// las reglas, los telefonos de emergencia y el huso horario de HUMAYA. El
+// hotel demo ya tenia dos pantallas y una guia propia de una sola clave: la
+// de HUMAYA tiene seis, y eran esas seis las que habria mostrado.
+//
+// De que hotel es se saca de la VILLA, que es lo unico que el televisor
+// manda. `humaya_tv_villas` tiene el id como clave primaria, asi que una
+// villa pertenece a un solo hotel y no hay ambiguedad.
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -35,6 +43,7 @@ const json = (data: unknown, status = 200) =>
 
 interface Villa {
   id: string;
+  negocio_id: string;
   clave: string;
   nombre: string;
   tipo: string | null;
@@ -59,6 +68,13 @@ interface Villa {
 interface Ajustes {
   guia: Record<string, unknown>;
   utc_offset: number;
+  // El clima es de cada hotel y ya vivia en la tabla; lo que faltaba era
+  // devolverlo. El Worker lo tenia escrito a mano en La Fortuna, asi que un
+  // hotel en otra parte habria mostrado el clima de aca.
+  clima_lugar: string | null;
+  clima_lat: number | string | null;
+  clima_lon: number | string | null;
+  clima_tz: string | null;
 }
 
 /**
@@ -167,20 +183,51 @@ const CORRIMIENTO: Record<string, number> = { centro: 0, izquierda: -34, derecha
 async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | null) {
   const { data } = await db
     .from("humaya_tv_ajustes")
-    .select("guia,utc_offset")
-    .eq("negocio_id", NEGOCIO)
+    .select("guia,utc_offset,clima_lugar,clima_lat,clima_lon,clima_tz")
+    .eq("negocio_id", villa.negocio_id)
     .maybeSingle();
-  const ajustes = (data ?? { guia: {}, utc_offset: -6 }) as Ajustes;
+  const ajustes = (data ?? {
+    guia: {},
+    utc_offset: -6,
+    clima_lugar: null,
+    clima_lat: null,
+    clima_lon: null,
+    clima_tz: null,
+  }) as Ajustes;
 
-  const st = estadiaDe(villa, Number(ajustes.utc_offset ?? -6), faseForzada);
+  // Quien esta en la villa sale de las RESERVAS, no de lo que alguien haya
+  // escrito a mano. Tony, 21 de noviembre de 2026: «todo debe ser
+  // automatizado, tu tienes las reservas, por que me pides agregar nombre de
+  // huesped?». La vista `humaya_tv_ocupacion` casa el cuarto de Cloudbeds
+  // —«V1 - CAPI CAPI »— con la pantalla —«V1 · CAPI CAPI»— y parte por comas
+  // las reservas que ocupan varias villas.
+  //
+  // Lo escrito a mano queda como respaldo, para una entrada que todavia no
+  // esta en Cloudbeds. Si hay reserva, manda la reserva.
+  const { data: ocupa } = await db
+    .from("humaya_tv_ocupacion")
+    .select("huesped,llegada,salida")
+    .eq("villa_id", villa.id)
+    .maybeSingle();
+  const reserva = ocupa as
+    | { huesped: string | null; llegada: string | null; salida: string | null }
+    | null;
+  const quienEsta: Villa = reserva?.huesped
+    ? { ...villa, huesped: reserva.huesped, llegada: reserva.llegada, salida: reserva.salida }
+    : villa;
+
+  const st = estadiaDe(quienEsta, Number(ajustes.utc_offset ?? -6), faseForzada);
   // En un hotel el Wi-Fi queda en pantalla también entre huéspedes: quien
   // entra a limpiar o a revisar la villa también lo necesita.
   const mostrar = st.active || villa.wifi_siempre !== false;
   const g = guiaDe(villa, ajustes) as Record<string, unknown>;
 
+  // Las hermanas, para el menu que ofrece el televisor. Sin el filtro, el TV
+  // de un hotel listaba las villas de los otros por su nombre.
   const { data: otras } = await db
     .from("humaya_tv_villas")
     .select("id,nombre")
+    .eq("negocio_id", villa.negocio_id)
     .eq("habilitada", true)
     .order("orden", { ascending: true });
 
@@ -201,8 +248,10 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
     photos: { hero: villa.foto ?? "", inside: villa.foto ?? "", area: villa.foto ?? "" },
     scene: { clockTop: 13, clockSize: 14, clockX: CORRIMIENTO[villa.reloj_posicion] ?? -34, fg: false },
     stay: st,
-    checkin: villa.checkin,
-    checkout_time: villa.checkout,
+    checkin: quienEsta.checkin,
+    checkout_time: quienEsta.checkout,
+    // De donde salio quien aparece en pantalla, para que Admin lo diga.
+    ocupacion: reserva?.huesped ? "reserva" : villa.huesped ? "a_mano" : "vacia",
     wifi: mostrar && villa.wifi_ssid
       ? { ssid: villa.wifi_ssid, password: villa.wifi_clave ?? "" }
       : null,
@@ -216,6 +265,15 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
     notes: notas,
     remote_url: null,
     homes: (otras ?? []).map((o: { id: string; nombre: string }) => ({ id: o.id, name: o.nombre })),
+    // De donde es el clima que pinta el Worker. Null = que use el suyo.
+    clima: ajustes.clima_lugar
+      ? {
+        place: ajustes.clima_lugar,
+        lat: Number(ajustes.clima_lat),
+        lon: Number(ajustes.clima_lon),
+        tz: ajustes.clima_tz,
+      }
+      : null,
   };
 }
 

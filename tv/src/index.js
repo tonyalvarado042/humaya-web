@@ -25,9 +25,16 @@ import { guidePage } from "./guide.js";
 const FN_POR_DEFECTO = "https://mlhhhwbgymobcxiklnoz.supabase.co/functions/v1";
 
 /**
- * El clima de La Fortuna. Vive aqui y no en la base a proposito: el hotel no
- * se muda, y pedirlo por la Edge Function obligaria a mandar una clave de
- * villa para una respuesta que es igual para las diez.
+ * El clima por omision: La Fortuna, donde esta HUMAYA.
+ *
+ * Aca decia que vivia escrito «a proposito: el hotel no se muda». Cierto para
+ * UN hotel. Con mas de uno, el televisor de un hotel en otra parte mostraba
+ * el clima de La Fortuna — y el clima de cada hotel ya estaba en la base,
+ * en `humaya_tv_ajustes` (clima_lugar, clima_lat, clima_lon, clima_tz).
+ *
+ * Ahora la pantalla manda el suyo, que le llego con su estado, y esto queda
+ * solo para cuando todavia no lo tiene (el primer dibujo) o el hotel no lo
+ * configuro.
  */
 const CLIMA = { place: "La Fortuna", lat: 10.4678, lon: -84.6427, tz: "America/Costa_Rica" };
 
@@ -106,9 +113,20 @@ async function foto(env, request, nombre) {
 
 // ---------------------------------------------------------------- el clima
 
-async function weather(ctx) {
+async function weather(ctx, url) {
+  // De donde pedirlo: lo que mando la pantalla, o La Fortuna.
+  const lat = Number(url && url.searchParams.get("lat"));
+  const lon = Number(url && url.searchParams.get("lon"));
+  const donde = Number.isFinite(lat) && Number.isFinite(lon) && (lat !== 0 || lon !== 0)
+    ? {
+      lat, lon,
+      tz: (url.searchParams.get("tz") || CLIMA.tz),
+      place: (url.searchParams.get("place") || CLIMA.place),
+    }
+    : CLIMA;
+
   const q = new URLSearchParams({
-    latitude: CLIMA.lat, longitude: CLIMA.lon, timezone: CLIMA.tz, forecast_days: 7,
+    latitude: donde.lat, longitude: donde.lon, timezone: donde.tz, forecast_days: 7,
     current: "temperature_2m,weather_code,is_day",
     daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset",
   });
@@ -123,15 +141,15 @@ async function weather(ctx) {
     const r = await fetch("https://api.open-meteo.com/v1/forecast?" + q);
     if (!r.ok) {
       console.error("clima_http", r.status, (await r.text()).slice(0, 200));
-      return { place: CLIMA.place, ok: false };
+      return { place: donde.place, ok: false };
     }
     const d = await r.json(), dl = d.daily;
     if (!d.current || !dl) {
       console.error("clima_sin_datos", JSON.stringify(d).slice(0, 200));
-      return { place: CLIMA.place, ok: false };
+      return { place: donde.place, ok: false };
     }
     const out = {
-      ok: true, place: CLIMA.place,
+      ok: true, place: donde.place,
       now: { temp: Math.round(d.current.temperature_2m), code: d.current.weather_code, day: d.current.is_day },
       days: dl.time.map((t, i) => ({
         date: t, code: dl.weather_code[i], hi: Math.round(dl.temperature_2m_max[i]), lo: Math.round(dl.temperature_2m_min[i]),
@@ -143,7 +161,7 @@ async function weather(ctx) {
   } catch (e) {
     // Un clima que falla callado se ve igual que un clima nublado.
     console.error("clima_falla", String((e && e.message) || e));
-    return { place: CLIMA.place, ok: false };
+    return { place: donde.place, ok: false };
   }
 }
 
@@ -173,7 +191,7 @@ export default {
     if (p === "/" || p === "/tv") return Response.redirect(url.origin + "/tv/" + url.search, 302);
 
     if (p === "/api/health") return json({ ok: true, app: "humaya-tv" }, 200, { "access-control-allow-origin": "*" });
-    if (p === "/api/weather") return json(await weather(ctx));
+    if (p === "/api/weather") return json(await weather(ctx, url));
 
     // Lo que guest-tv pide y HUMAYA no tiene: se contesta vacio en vez de 404,
     // porque la pantalla los consulta en cada arranque.

@@ -1,4 +1,4 @@
-import type { CambiosVillaTv, VillaTv } from '@/types';
+import type { CambiosVillaTv, ReservaDeVilla, VillaTv } from '@/types';
 import { cliente, SUPABASE_URL } from './sesion';
 import { elNegocio } from './negocio';
 
@@ -22,6 +22,13 @@ export const TV_BASE = 'https://tv.stayhumaya.com';
 /** La dirección exacta que se escribe en el televisor de una villa. */
 export function direccionDelTv(villa: Pick<VillaTv, 'id' | 'clave'>): string {
   return `${TV_BASE}/tv/?home=${encodeURIComponent(villa.id)}&k=${encodeURIComponent(villa.clave)}`;
+}
+
+interface FilaOcupacion {
+  villa_id: string;
+  huesped: string | null;
+  llegada: string | null;
+  salida: string | null;
 }
 
 interface Fila {
@@ -72,6 +79,19 @@ function aVilla(fila: Fila): VillaTv {
   };
 }
 
+/**
+ * Las villas con su pantalla, y quién está hoy en cada una.
+ *
+ * ── POR QUÉ VIENEN DOS COSAS Y NO UNA ───────────────────────────────────
+ * Tony, 21 de noviembre de 2026: «todo debe ser automatizado, tú tienes las
+ * reservas, ¿por qué me pides agregar nombre de huésped?». Tenía razón. La
+ * vista `humaya_tv_ocupacion` casa el cuarto que manda Cloudbeds —«V1 - CAPI
+ * CAPI »— con el nombre de la pantalla —«V1 · CAPI CAPI»— y parte por comas
+ * las reservas que ocupan varias villas a la vez.
+ *
+ * Lo escrito a mano no se borra: queda de respaldo para una entrada que
+ * todavía no está en Cloudbeds. Si hay reserva, manda la reserva.
+ */
 export async function getVillasTv(): Promise<VillaTv[]> {
   const db = await cliente();
   const { data, error } = await db
@@ -81,7 +101,27 @@ export async function getVillasTv(): Promise<VillaTv[]> {
     .order('orden', { ascending: true });
 
   if (error) throw new Error(`tv_villas_${error.code ?? 'error'}`);
-  return ((data ?? []) as unknown as Fila[]).map(aVilla);
+
+  const { data: ocupadas } = await db
+    .from('humaya_tv_ocupacion')
+    .select('villa_id,huesped,llegada,salida')
+    .eq('negocio_id', elNegocio());
+
+  const porVilla = new Map<string, ReservaDeVilla>();
+  for (const fila of (ocupadas ?? []) as FilaOcupacion[]) {
+    if (fila.huesped) {
+      porVilla.set(fila.villa_id, {
+        huesped: fila.huesped,
+        llegada: fila.llegada,
+        salida: fila.salida,
+      });
+    }
+  }
+
+  return ((data ?? []) as unknown as Fila[]).map((fila) => ({
+    ...aVilla(fila),
+    reserva: porVilla.get(fila.id) ?? null,
+  }));
 }
 
 const COLUMNA: Record<keyof CambiosVillaTv, string> = {

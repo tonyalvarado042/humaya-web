@@ -26,6 +26,11 @@ export interface TvTextos {
 
   huespedTitulo: string;
   huespedCuerpo: string;
+  deLaReserva: (huesped: string) => string;
+  deLaReservaFechas: (desde: string, hasta: string) => string;
+  insigniaReserva: string;
+  sinReserva: string;
+  horarioTitulo: string;
   huespedLabel: string;
   huespedPlaceholder: string;
   llegadaLabel: string;
@@ -71,6 +76,13 @@ export interface TvTextos {
   cargando: string;
   vacio: string;
   vacioCuerpo: string;
+
+  /** Qué hay que hacerle al televisor. Siempre visible, no escondido. */
+  instructivoTitulo: string;
+  instructivoCuerpo: string;
+  instructivoPaso1: string;
+  instructivoPaso2: string;
+  instructivoPaso3: string;
 }
 
 export const tvCopy: Record<Idioma, TvTextos> = {
@@ -98,7 +110,13 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     // ── El huésped ────────────────────────────────────────────────────
     huespedTitulo: 'Quién está en la villa',
     huespedCuerpo:
-      'El televisor saluda por el nombre y cuenta en qué noche va. Si lo dejás vacío, la pantalla pasa a modo «entre huéspedes» y no muestra ningún nombre.',
+      'El televisor saluda por el nombre y cuenta en qué noche va. Esto se llena solo con las reservas: la pantalla toma el nombre y las fechas de quien tenga esta villa asignada en Cloudbeds.',
+    deLaReserva: (huesped) => `${huesped}, de la reserva de Cloudbeds.`,
+    deLaReservaFechas: (desde, hasta) => `Del ${desde} al ${hasta}.`,
+    insigniaReserva: 'Automático',
+    sinReserva:
+      'Hoy ninguna reserva tiene esta villa asignada. Si entró alguien que todavía no está en Cloudbeds, escribilo acá abajo; en cuanto la reserva aparezca, manda la reserva.',
+    horarioTitulo: 'Horario de la casa',
     huespedLabel: 'Nombre del huésped',
     huespedPlaceholder: 'Sarah Lovestad',
     llegadaLabel: 'Llegada',
@@ -152,6 +170,16 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     cargando: 'las pantallas del TV',
     vacio: 'Todavía no hay ninguna villa',
     vacioCuerpo: 'Las villas se crean en la base, en humaya_tv_villas.',
+
+    instructivoTitulo: 'Cómo se prepara un televisor',
+    instructivoCuerpo:
+      'Se hace una sola vez por televisor, y no hace falta ninguna computadora en el hotel.',
+    instructivoPaso1:
+      'En el televisor (Google TV o Android TV), abrir Downloader y bajar la app Guest TV con el código 1061533.',
+    instructivoPaso2:
+      'Abrir Guest TV y escribir la dirección de esa villa, la que aparece acá abajo al tocar Editar. Lleva la clave: se escribe una sola vez y no se deja a la vista del huésped.',
+    instructivoPaso3:
+      'Listo. Desde la pantalla se abren Netflix, YouTube y las demás apps, y el nombre del huésped entra solo con las reservas.',
   },
 
   en: {
@@ -175,7 +203,13 @@ export const tvCopy: Record<Idioma, TvTextos> = {
 
     huespedTitulo: 'Who is in the villa',
     huespedCuerpo:
-      'The television greets them by name and tells them which night they are on. If you leave it empty, the screen goes into “between guests” mode and shows no name.',
+      'The television greets them by name and tells them which night they are on. This fills itself from the bookings: the screen takes the name and the dates from whoever has this villa assigned in Cloudbeds.',
+    deLaReserva: (huesped) => `${huesped}, from the Cloudbeds booking.`,
+    deLaReservaFechas: (desde, hasta) => `From ${desde} to ${hasta}.`,
+    insigniaReserva: 'Automatic',
+    sinReserva:
+      'No booking has this villa assigned today. If someone checked in who is not in Cloudbeds yet, write it below; as soon as the booking shows up, the booking wins.',
+    horarioTitulo: 'House hours',
     huespedLabel: 'Guest name',
     huespedPlaceholder: 'Sarah Lovestad',
     llegadaLabel: 'Arrival',
@@ -225,5 +259,14 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     cargando: 'the TV screens',
     vacio: 'There are no villas yet',
     vacioCuerpo: 'Villas are created in the database, in humaya_tv_villas.',
+
+    instructivoTitulo: 'How to set up a television',
+    instructivoCuerpo: 'Done once per television, and no computer is needed in the hotel.',
+    instructivoPaso1:
+      'On the television (Google TV or Android TV), open Downloader and get the Guest TV app with code 1061533.',
+    instructivoPaso2:
+      'Open Guest TV and type that villa’s address, the one shown below when you press Edit. It carries the key: typed once, and never left where the guest can see it.',
+    instructivoPaso3:
+      'That is it. Netflix, YouTube and the other apps open from the screen, and the guest name arrives on its own from the bookings.',
   },
 };

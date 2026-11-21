@@ -35,6 +35,20 @@ export function PantallaTv() {
         <p className="m-0 text-sm text-muted">{copy.cuerpo}</p>
       </div>
 
+      {/* Qué hay que hacerle al televisor. Va SIEMPRE a la vista, no detrás
+          de un «ver más»: Tony lo pidió el 21 de noviembre de 2026, y es la
+          clase de cosa que se busca justo cuando se está parado frente a un
+          televisor nuevo, sin acordarse del código. */}
+      <Card>
+        <h3 className="m-0 font-display text-lg font-medium">{copy.instructivoTitulo}</h3>
+        <p className="m-0 text-[13px] leading-relaxed text-muted">{copy.instructivoCuerpo}</p>
+        <ol className="m-0 flex list-decimal flex-col gap-1.5 pl-5 text-[13px] leading-relaxed text-muted">
+          <li>{copy.instructivoPaso1}</li>
+          <li>{copy.instructivoPaso2}</li>
+          <li>{copy.instructivoPaso3}</li>
+        </ol>
+      </Card>
+
       {villas.data.length === 0 ? (
         <Card>
           <p className="m-0 font-display text-xl">{copy.vacio}</p>
@@ -199,29 +213,64 @@ function Editor({ villa }: { villa: VillaTv }) {
         </div>
       </div>
 
-      {/* ── Quién está ─────────────────────────────────────────────── */}
+      {/* ── Quién está ─────────────────────────────────────────────────
+          Si hay reserva, NO se pide nada: el nombre y las fechas salen de
+          Cloudbeds. Tony, 21 de noviembre de 2026: «todo debe ser
+          automatizado, tú tienes las reservas, ¿por qué me pides agregar
+          nombre de huésped?». Lo de escribir a mano queda solo para cuando
+          no hay reserva, que es el único caso donde hacía falta. */}
       <fieldset className="m-0 flex flex-col gap-2.5 border-0 p-0">
         <legend className="p-0 text-eyebrow text-muted">{copy.huespedTitulo}</legend>
         <p className="m-0 text-[13px] leading-relaxed text-muted">{copy.huespedCuerpo}</p>
-        <Input
-          label={copy.huespedLabel}
-          placeholder={copy.huespedPlaceholder}
-          value={huesped.valor}
-          onChange={(e) => huesped.setValor(e.target.value)}
-        />
+
+        {villa.reserva ? (
+          <div className="flex flex-col gap-1 rounded-card border border-line bg-surface-sunken px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[15px] font-medium text-text">
+                {copy.deLaReserva(villa.reserva.huesped)}
+              </span>
+              <Badge tone="success">{copy.insigniaReserva}</Badge>
+            </div>
+            {villa.reserva.llegada && villa.reserva.salida ? (
+              <span className="text-[13px] text-muted">
+                {copy.deLaReservaFechas(villa.reserva.llegada, villa.reserva.salida)}
+              </span>
+            ) : null}
+          </div>
+        ) : (
+          <>
+            <p className="m-0 text-[13px] leading-relaxed text-muted-soft">{copy.sinReserva}</p>
+            <Input
+              label={copy.huespedLabel}
+              placeholder={copy.huespedPlaceholder}
+              value={huesped.valor}
+              onChange={(e) => huesped.setValor(e.target.value)}
+            />
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              <Input
+                label={copy.llegadaLabel}
+                type="date"
+                value={llegada.valor}
+                onChange={(e) => llegada.setValor(e.target.value)}
+              />
+              <Input
+                label={copy.salidaLabel}
+                type="date"
+                value={salida.valor}
+                onChange={(e) => salida.setValor(e.target.value)}
+              />
+            </div>
+            {villa.huesped ? (
+              <Button type="button" variant="ghost" onClick={vaciar}>
+                {copy.vaciarVilla}
+              </Button>
+            ) : null}
+          </>
+        )}
+
+        {/* El horario es del hotel, no de la reserva: se edita siempre. */}
+        <span className="text-eyebrow text-muted-soft">{copy.horarioTitulo}</span>
         <div className="grid gap-2.5 sm:grid-cols-2">
-          <Input
-            label={copy.llegadaLabel}
-            type="date"
-            value={llegada.valor}
-            onChange={(e) => llegada.setValor(e.target.value)}
-          />
-          <Input
-            label={copy.salidaLabel}
-            type="date"
-            value={salida.valor}
-            onChange={(e) => salida.setValor(e.target.value)}
-          />
           <Input
             label={copy.checkinLabel}
             type="time"
@@ -235,11 +284,6 @@ function Editor({ villa }: { villa: VillaTv }) {
             onChange={(e) => checkout.setValor(e.target.value)}
           />
         </div>
-        {villa.huesped ? (
-          <Button type="button" variant="ghost" onClick={vaciar}>
-            {copy.vaciarVilla}
-          </Button>
-        ) : null}
       </fieldset>
 
       {/* ── Wi-Fi ──────────────────────────────────────────────────── */}
