@@ -19,7 +19,32 @@
 // Un código solo sería una contraseña de un solo factor para ver el nombre y
 // las fechas de otra persona. Con apellido + código hay que saber dos cosas
 // de la misma reserva. No es un banco, pero tampoco se regala.
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
+
+/**
+ * El uuid del hotel a partir de su codigo, o null.
+ *
+ * Igual que en `humaya-admin`: por el esquema PUBLIC, donde `cta_negocios`
+ * existe como vista. Pedirlo por `crm_tony_alvarado` devuelve vacio sin dar
+ * error, que se lee como "ese hotel no existe".
+ */
+async function negocioDe(db: SupabaseClient, codigo: string): Promise<string | null> {
+  const limpio = codigo.trim().toLowerCase().slice(0, 40);
+  if (!/^[a-z0-9][a-z0-9-]{0,39}$/.test(limpio)) return null;
+
+  const { data, error } = await db
+    .from("cta_negocios")
+    .select("id")
+    .eq("codigo", limpio)
+    .eq("activo", true)
+    .maybeSingle();
+
+  if (error) {
+    console.error("negocio_lookup_failed", limpio, error.message);
+    return null;
+  }
+  return (data as { id?: string } | null)?.id ?? null;
+}
 
 const INBOX_POR_DEFECTO = "reservations@stayhumaya.com";
 
@@ -27,18 +52,16 @@ const INBOX_POR_DEFECTO = "reservations@stayhumaya.com";
  *  la función `book` el 31 de octubre: cada «responder» caía al vacío. */
 const REMITENTE = "HUMAYA <reservations@stayhumaya.com>";
 
-const ALLOWED_EXACT = new Set([
-  "https://stayhumaya.com",
-  "https://www.stayhumaya.com",
-  "https://experience.stayhumaya.com",
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "http://localhost:4321",
-]);
+// Era una lista escrita a mano y le faltaban los dominios del producto
+// (hotelexp y guestexp.liderax10.com) y staff.stayhumaya.com. El mismo
+// descuido que ya habia costado dos veces en `humaya-admin`: desde fuera la
+// funcion contesta 200 y el navegador igual bloquea la respuesta.
+const ALLOWED_RE =
+  /^https:\/\/([a-z0-9-]+\.)?stayhumaya\.com$|^https:\/\/([a-z0-9-]+\.)?liderax10\.com$|^http:\/\/(localhost|127\.0\.0\.1):(5173|4321)$/;
 const DEFAULT_ORIGIN = "https://experience.stayhumaya.com";
 
 function cors(origin: string | null) {
-  const ok = !!origin && ALLOWED_EXACT.has(origin);
+  const ok = !!origin && ALLOWED_RE.test(origin);
   return {
     "Access-Control-Allow-Origin": ok ? origin! : DEFAULT_ORIGIN,
     Vary: "Origin",
@@ -131,8 +154,19 @@ Deno.serve(async (request) => {
   const codigo = soloCodigo(buscado);
   const esCorreo = EMAIL_RE.test(buscado);
 
+  // ── De que hotel se esta preguntando ──────────────────────────
+  // Sin esto la busqueda recorria las reservas de TODOS los hoteles: un
+  // codigo de HUMAYA entraba desde el /entrada de otro hotel y devolvia el
+  // nombre y las fechas de ese huesped. Apellido + codigo identifican una
+  // reserva, pero no dicen de que hotel es.
+  const negocio = await negocioDe(db, hotel);
+  if (!negocio) {
+    return new Response(JSON.stringify({ error: "falta_hotel" }), { status: 400, headers });
+  }
+
   let consulta = db.from("humaya_cloudbeds_reservas")
     .select("guest_name, email, checkin, checkout, estado, fuente, confirmacion_ota, cloudbeds_reservation_id, negocio_id")
+    .eq("negocio_id", negocio)
     .is("eliminada_en", null);
 
   consulta = esCorreo
@@ -151,7 +185,11 @@ Deno.serve(async (request) => {
   );
   const encontrada = candidatas.find((r) => plano(String(r.guest_name ?? "")).includes(apellido));
 
+  // El intento queda anotado CON su hotel. El techo por IP de arriba, en
+  // cambio, se cuenta entre todos a proposito: quien prueba a ciegas contra
+  // varios hoteles sigue siendo el mismo que prueba a ciegas.
   await db.from("humaya_entrada_intentos").insert({
+    negocio_id: negocio,
     email: esCorreo ? buscado.toLowerCase() : `codigo:${codigo}`,
     encontrada: Boolean(encontrada),
     ip,

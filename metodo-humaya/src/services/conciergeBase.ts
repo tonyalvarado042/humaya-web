@@ -78,6 +78,7 @@ export async function editarTema(id: string, cambios: CambiosTema): Promise<void
   const { data, error } = await db
     .from('humaya_concierge_base')
     .update(fila)
+    .eq('negocio_id', elNegocio())
     .eq('id', id)
     .select('id');
 
@@ -112,7 +113,12 @@ export async function crearTema(tema: string, contenido: string): Promise<TemaBa
 
 export async function borrarTema(id: string): Promise<void> {
   const db = await cliente();
-  const { data, error } = await db.from('humaya_concierge_base').delete().eq('id', id).select('id');
+  const { data, error } = await db
+    .from('humaya_concierge_base')
+    .delete()
+    .eq('negocio_id', elNegocio())
+    .eq('id', id)
+    .select('id');
 
   if (error) throw new Error(`base_${error.code ?? 'error'}`);
   if (!data || data.length === 0) throw new Error('base_sin_permiso');
@@ -326,6 +332,7 @@ export async function editarRespuesta(id: string, cambios: CambiosRespuesta): Pr
   const { data, error } = await db
     .from('humaya_concierge_respuestas')
     .update(fila)
+    .eq('negocio_id', elNegocio())
     .eq('id', id)
     .select('id');
 
@@ -360,6 +367,7 @@ export async function borrarRespuesta(id: string): Promise<void> {
   const { data, error } = await db
     .from('humaya_concierge_respuestas')
     .delete()
+    .eq('negocio_id', elNegocio())
     .eq('id', id)
     .select('id');
 

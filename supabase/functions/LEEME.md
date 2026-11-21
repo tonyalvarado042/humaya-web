@@ -49,28 +49,42 @@ está corriendo en Supabase. Antes de desplegar **desde acá**, correr:
 deno check supabase/functions/humaya-admin/index.ts
 ```
 
-## Dos cosas que hay que decidir, encontradas al traerlas
+## ⚠️ `verify_jwt` se manda SIEMPRE, y en estas cuatro va en `false`
 
-**`humaya-tv` es de un solo hotel.** Tiene el uuid de HUMAYA escrito adentro:
+La herramienta de despliegue lo pone en `true` si no se manda. El 21 de
+noviembre de 2026 se desplegó `humaya-tv` sin el parámetro y **todas las
+pantallas del hotel quedaron en 401 durante 75 segundos**: el televisor no
+tiene cuenta y no manda `Authorization`. Lo mismo vale para las otras tres: el
+huésped entra por código de confirmación, no tiene sesión.
 
-```ts
-const NEGOCIO = "4cb80ad6-1004-4d06-9dfb-946a1718be87";
-```
+Cada una decide adentro qué pide sesión y qué no — por eso `verify_jwt` va en
+`false` y la puerta está en el código, no en la plataforma.
 
-Con eso, el televisor de cualquier hotel leería la guía de la casa, las reglas,
-los teléfonos de emergencia y el `utc_offset` **de HUMAYA**. Y la lista de
-villas que el TV ofrece para cambiar de pantalla (`homes`) se arma sin filtro
-de hotel: incluiría las villas de los otros. Hoy solo HUMAYA tiene pantallas,
-así que no se ve; con el segundo hotel, sí.
+## Las dos fugas que se encontraron al traerlas, y cómo quedaron
 
-**`humaya-entrada` recibe el hotel y no lo usa.** Lee `body.hotel`, y la
-búsqueda en `humaya_cloudbeds_reservas` no lo filtra: un código de HUMAYA
-entraría desde el `/entrada` de otro hotel y devolvería el nombre y las fechas
-de ese huésped. El `hotel` solo vuelve en la respuesta de «no encontrada».
+**`humaya-tv` tenía el uuid de HUMAYA escrito adentro.** El televisor de
+cualquier otro hotel leía la guía de la casa, las reglas, los teléfonos de
+emergencia y el huso horario de HUMAYA, y la lista de villas para cambiar de
+pantalla incluía las de los otros. El hotel demo ya tiene dos pantallas, así
+que estaba viva.
 
-Las dos son el mismo error que ya apareció en `humaya-concierge` el 20 de
-noviembre y en los interruptores de Admin el 21: **una consulta sin filtro
-devuelve las filas de los dos hoteles, y con un solo hotel devolvía lo correcto
-por casualidad.** Arreglarlas pide desplegar la función y, en el caso del TV,
-también el Worker de `tv/` — así que se hace a propósito y verificando, no de
-pasada.
+**Arreglado (v5):** el hotel sale de la VILLA, que es lo único que el televisor
+manda. `humaya_tv_villas` tiene el id como clave primaria, así que una villa
+pertenece a un solo hotel. Comprobado en vivo: el demo recibe sus 2 villas y su
+guía de 0 reglas; HUMAYA sus 10 y sus 5 reglas.
+
+De paso, la función ahora devuelve `clima` —de `humaya_tv_ajustes`, por
+hotel—, porque el Worker lo tenía escrito a mano en La Fortuna. Y `ocupacion`,
+que dice si quien aparece en pantalla salió de una reserva o de lo que alguien
+escribió a mano.
+
+**`humaya-entrada` recibía el hotel y no lo usaba.** Un código de HUMAYA
+entraba desde el `/entrada` de otro hotel y devolvía el nombre y las fechas de
+ese huésped.
+
+**Arreglado:** la búsqueda filtra por `negocio_id`, resuelto del código igual
+que en `humaya-admin`. Sin hotel contesta `400 falta_hotel`. Se desplegó
+DESPUÉS de que el frontend que manda el hotel estuviera en vivo, para no
+romper el check-in de nadie en el medio. Y su lista de CORS —escrita a mano—
+dejaba fuera `staff.stayhumaya.com` y los dominios del producto; ahora es la
+misma expresión que usa `humaya-admin`.
