@@ -41,7 +41,20 @@ beforeEach(async () => {
     // Sin almacenamiento no hay nada que limpiar.
   }
 
-  const { resetSupabaseStub, stubSesionAbierta } = await import('./supabaseStub');
+  const { resetSupabaseStub, stubSesionAbierta, NEGOCIO_DE_PRUEBA } =
+    await import('./supabaseStub');
   resetSupabaseStub();
   stubSesionAbierta();
+
+  // Toda pantalla corre dentro de un hotel, igual que en produccion: ahi lo
+  // resuelve `resolverHotel()` antes de pintar. Sin esto, `elNegocio()` falla
+  // —a proposito— y ninguna consulta sabria de quien son los datos.
+  const { aplicarHotel } = await import('@/marca');
+  aplicarHotel({
+    negocioId: NEGOCIO_DE_PRUEBA,
+    codigo: 'humaya',
+    marcaExperiencia: 'HUMAYA Experience',
+    marcaHotel: 'HUMAYA',
+    correo: 'reservations@stayhumaya.com',
+  });
 });

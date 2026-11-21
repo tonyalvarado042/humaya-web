@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { routes } from '@/router';
 import { stubConciergeApi } from '@/test/conciergeApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
-import { supabaseStub } from '@/test/supabaseStub';
+import { NEGOCIO_DE_PRUEBA, supabaseStub } from '@/test/supabaseStub';
 
 /**
  * Llegadas dejó los datos de ejemplo: ahora muestra las reservas de Cloudbeds.
@@ -19,6 +19,7 @@ const HOY = '2026-11-15';
 
 const FILAS = [
   {
+    negocio_id: NEGOCIO_DE_PRUEBA,
     id: 'r-1',
     reserva_id: '100',
     huesped: 'Galloway',
@@ -32,6 +33,7 @@ const FILAS = [
     personas: '4',
   },
   {
+    negocio_id: NEGOCIO_DE_PRUEBA,
     id: 'r-2',
     reserva_id: '101',
     huesped: 'Nakamura',
@@ -45,6 +47,7 @@ const FILAS = [
     personas: '2',
   },
   {
+    negocio_id: NEGOCIO_DE_PRUEBA,
     id: 'r-3',
     reserva_id: '102',
     huesped: 'Pérez',
@@ -58,6 +61,7 @@ const FILAS = [
     personas: '3',
   },
   {
+    negocio_id: NEGOCIO_DE_PRUEBA,
     id: 'r-4',
     reserva_id: '103',
     huesped: 'Cancelada',

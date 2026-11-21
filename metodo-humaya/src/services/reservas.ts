@@ -1,4 +1,5 @@
 import { cliente } from './sesion';
+import { elNegocio } from './negocio';
 
 /**
  * Las reservas de verdad, las que vienen de Cloudbeds.
@@ -84,7 +85,7 @@ export async function getReservas(
   hoy: string = new Date().toISOString().slice(0, 10),
 ): Promise<Reserva[]> {
   const db = await cliente();
-  let consulta = db.from('humaya_llegadas').select('*');
+  let consulta = db.from('humaya_llegadas').select('*').eq('negocio_id', elNegocio());
 
   if (filtro !== 'todas') {
     consulta = consulta.neq('estado', 'canceled').gte('checkout', hoy);

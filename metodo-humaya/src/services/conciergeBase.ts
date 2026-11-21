@@ -1,4 +1,5 @@
 import { cabeceraDeRecepcion, cliente } from './sesion';
+import { elNegocio } from './negocio';
 
 /**
  * Lo que el Concierge sabe, y lo que cuesta.
@@ -48,6 +49,7 @@ export async function getTemas(): Promise<TemaBase[]> {
   const { data, error } = await db
     .from('humaya_concierge_base')
     .select('id,tema,contenido,activo,orden')
+    .eq('negocio_id', elNegocio())
     .order('orden', { ascending: true });
 
   if (error) throw new Error(`base_${error.code ?? 'error'}`);
@@ -98,7 +100,7 @@ export async function crearTema(tema: string, contenido: string): Promise<TemaBa
     .from('humaya_concierge_base')
     // Nace apagado a propósito: un texto que nadie leyó todavía no puede
     // salir por boca del hotel.
-    .insert({ tema, contenido, activo: false, orden })
+    .insert({ negocio_id: elNegocio(), tema, contenido, activo: false, orden })
     .select('id,tema,contenido,activo,orden')
     .single();
 
@@ -287,6 +289,7 @@ export async function getRespuestas(soloActivas = false): Promise<RespuestaGuard
   let consulta = db
     .from('humaya_concierge_respuestas')
     .select('id,titulo,texto,texto_en,activo,orden')
+    .eq('negocio_id', elNegocio())
     .order('orden', { ascending: true });
   if (soloActivas) consulta = consulta.eq('activo', true);
 
@@ -335,7 +338,7 @@ export async function crearRespuesta(titulo: string, texto: string): Promise<Res
     .from('humaya_concierge_respuestas')
     // Esta SI nace encendida: la escribio una persona para mandarla, a
     // diferencia de un tema de la base, que el bot va a afirmar solo.
-    .insert({ titulo, texto, activo: true, orden })
+    .insert({ negocio_id: elNegocio(), titulo, texto, activo: true, orden })
     .select('id,titulo,texto,texto_en,activo,orden')
     .single();
 

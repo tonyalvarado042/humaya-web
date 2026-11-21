@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { routes } from '@/router';
 import { diaSiguiente, hoyEnCostaRica } from '@/services/clock';
-import { supabaseStub } from '@/test/supabaseStub';
+import { NEGOCIO_DE_PRUEBA, supabaseStub } from '@/test/supabaseStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 const ENTRENADOR = '11111111-1111-1111-1111-111111111111';
@@ -24,6 +24,7 @@ beforeEach(() => {
 
   supabaseStub.tablas.humaya_servicios = [
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: ENTRENADOR,
       nombre: 'Entrenamiento personal',
       proveedor: 'Personal trainer',
@@ -32,6 +33,7 @@ beforeEach(() => {
       orden: 1,
     },
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: MASAJE,
       nombre: 'Masaje',
       proveedor: null,
@@ -43,6 +45,7 @@ beforeEach(() => {
 
   supabaseStub.tablas.humaya_servicio_reservas = [
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'r-hoy',
       servicio_id: ENTRENADOR,
       stay_id: 's-weber',
@@ -51,6 +54,7 @@ beforeEach(() => {
       hora_inicio: '16:00:00',
     },
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'r-manana',
       servicio_id: ENTRENADOR,
       stay_id: 's-mendez-rojas',
@@ -59,6 +63,7 @@ beforeEach(() => {
       hora_inicio: '08:00:00',
     },
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'r-de-la-fecha-fija',
       servicio_id: ENTRENADOR,
       stay_id: 's-keller',

@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { direccionDelTv, getVillasTv, guardarVillaTv, urlDeFoto } from './tv';
-import { supabaseStub } from '@/test/supabaseStub';
+import { NEGOCIO_DE_PRUEBA, supabaseStub } from '@/test/supabaseStub';
 
 function sembrar() {
   supabaseStub.tablas.humaya_tv_villas = [
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'v4-bruma',
       clave: 'abc123def456',
       nombre: 'V4 · BRUMA',
@@ -27,6 +28,7 @@ function sembrar() {
       orden: 4,
     },
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'v1-capi-capi',
       clave: 'otra-clave',
       nombre: 'V1 · CAPI CAPI',
@@ -69,6 +71,41 @@ describe('la dirección del televisor', () => {
 
     expect(url).toContain('home=villa%20rara');
     expect(url).toContain('k=a%2Fb%2Bc');
+  });
+});
+
+describe('otro hotel en la misma tabla', () => {
+  it('NO se le cuelan sus villas a este hotel', async () => {
+    // Comprobado contra la base el 20 de noviembre de 2026, con el hotel
+    // demo recién creado: las consultas sin filtro devolvían las filas de
+    // LOS DOS. Con un solo hotel nunca se iba a notar — devolvían lo
+    // correcto por casualidad.
+    supabaseStub.tablas.humaya_tv_villas = [
+      ...(supabaseStub.tablas.humaya_tv_villas ?? []),
+      {
+        ...(supabaseStub.tablas.humaya_tv_villas?.[0] ?? {}),
+        negocio_id: 'otro-hotel',
+        id: 'demo-1',
+        nombre: 'Demo 1',
+      },
+    ];
+
+    const villas = await getVillasTv();
+    expect(villas.map((v) => v.id)).not.toContain('demo-1');
+  });
+
+  it('tampoco se le puede escribir encima a una villa de otro hotel', async () => {
+    supabaseStub.tablas.humaya_tv_villas = [
+      {
+        ...(supabaseStub.tablas.humaya_tv_villas?.[0] ?? {}),
+        negocio_id: 'otro-hotel',
+        id: 'demo-1',
+      },
+    ];
+
+    await expect(guardarVillaTv('demo-1', { huesped: 'Intruso' })).rejects.toThrow(
+      'tv_villa_sin_permiso',
+    );
   });
 });
 

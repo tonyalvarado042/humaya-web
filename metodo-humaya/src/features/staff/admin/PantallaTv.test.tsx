@@ -1,7 +1,7 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { supabaseStub } from '@/test/supabaseStub';
+import { NEGOCIO_DE_PRUEBA, supabaseStub } from '@/test/supabaseStub';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { PantallaTv } from './PantallaTv';
 
@@ -9,6 +9,7 @@ const CLAVE = 'abc123def456';
 
 function villa(campos: Partial<Record<string, unknown>> = {}) {
   return {
+    negocio_id: NEGOCIO_DE_PRUEBA,
     id: 'v4-bruma',
     clave: CLAVE,
     nombre: 'V4 · BRUMA',

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { agendaPorServicio, enOrdenDeHora, laProxima } from './agenda';
-import { supabaseStub } from '@/test/supabaseStub';
+import { NEGOCIO_DE_PRUEBA, supabaseStub } from '@/test/supabaseStub';
 import type { ReservaDeServicio } from '@/types';
 
 const ENTRENADOR = '11111111-1111-1111-1111-111111111111';
@@ -10,6 +10,7 @@ const BORRADO = '33333333-3333-3333-3333-333333333333';
 function sembrar() {
   supabaseStub.tablas.humaya_servicios = [
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: ENTRENADOR,
       nombre: 'Entrenamiento personal',
       proveedor: 'Personal trainer',
@@ -18,6 +19,7 @@ function sembrar() {
       orden: 1,
     },
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: MASAJE,
       nombre: 'Masaje',
       proveedor: null,
@@ -29,6 +31,7 @@ function sembrar() {
 
   supabaseStub.tablas.humaya_servicio_reservas = [
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'r-tarde',
       servicio_id: ENTRENADOR,
       stay_id: 's-weber',
@@ -37,6 +40,7 @@ function sembrar() {
       hora_inicio: '16:00:00',
     },
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'r-manana',
       servicio_id: ENTRENADOR,
       stay_id: 's-mendez-rojas',
@@ -45,6 +49,7 @@ function sembrar() {
       hora_inicio: '08:00',
     },
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'r-otro-dia',
       servicio_id: ENTRENADOR,
       stay_id: 's-farah',
@@ -53,6 +58,7 @@ function sembrar() {
       hora_inicio: '07:00',
     },
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'r-fuera-del-rango',
       servicio_id: ENTRENADOR,
       stay_id: 's-lima',
@@ -61,6 +67,7 @@ function sembrar() {
       hora_inicio: '09:00',
     },
     {
+      negocio_id: NEGOCIO_DE_PRUEBA,
       id: 'r-huerfana',
       servicio_id: BORRADO,
       stay_id: 's-keller',
@@ -103,6 +110,39 @@ describe('la agenda de un día', () => {
     const consulta = supabaseStub.consultas.find((c) => c.tabla === 'humaya_servicio_reservas');
     expect(consulta?.filtros).toContain('gte:fecha');
     expect(consulta?.filtros).toContain('lte:fecha');
+  });
+});
+
+describe('otro hotel en la misma tabla', () => {
+  it('ni sus servicios ni sus reservas entran en esta agenda', async () => {
+    supabaseStub.tablas.humaya_servicios = [
+      ...(supabaseStub.tablas.humaya_servicios ?? []),
+      {
+        id: '99999999-9999-9999-9999-999999999999',
+        negocio_id: 'otro-hotel',
+        nombre: 'Masaje de prueba',
+        proveedor: null,
+        duracion_min: 50,
+        habilitado: true,
+        orden: 1,
+      },
+    ];
+    supabaseStub.tablas.humaya_servicio_reservas = [
+      ...(supabaseStub.tablas.humaya_servicio_reservas ?? []),
+      {
+        id: 'r-de-otro',
+        negocio_id: 'otro-hotel',
+        servicio_id: '99999999-9999-9999-9999-999999999999',
+        stay_id: 's-ajeno',
+        guest_name: 'Huésped De Otro Hotel',
+        fecha: '2026-11-17',
+        hora_inicio: '10:00',
+      },
+    ];
+
+    const grupos = await agendaPorServicio('2026-11-17', '2026-11-17');
+    expect(grupos.map((g) => g.nombre)).not.toContain('Masaje de prueba');
+    expect(enOrdenDeHora(grupos).map((r) => r.guestName)).not.toContain('Huésped De Otro Hotel');
   });
 });
 

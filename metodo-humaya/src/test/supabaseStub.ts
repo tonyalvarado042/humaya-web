@@ -11,6 +11,15 @@
  * que sirve para probar consultas y no solo el camino feliz.
  */
 
+/**
+ * El hotel de las pruebas.
+ *
+ * Desde el 20 de noviembre de 2026 las consultas van acotadas por hotel, asi
+ * que una fila sembrada SIN `negocio_id` no la devuelve nadie — igual que en
+ * produccion. `setup.ts` deja este hotel puesto antes de cada prueba.
+ */
+export const NEGOCIO_DE_PRUEBA = 'negocio-de-prueba';
+
 export interface FilaUsuario {
   id: string;
   email: string;

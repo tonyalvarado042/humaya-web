@@ -1,5 +1,6 @@
 import type { CambiosVillaTv, VillaTv } from '@/types';
 import { cliente, SUPABASE_URL } from './sesion';
+import { elNegocio } from './negocio';
 
 /**
  * Las pantallas de los televisores de las villas.
@@ -76,6 +77,7 @@ export async function getVillasTv(): Promise<VillaTv[]> {
   const { data, error } = await db
     .from('humaya_tv_villas')
     .select('*')
+    .eq('negocio_id', elNegocio())
     .order('orden', { ascending: true });
 
   if (error) throw new Error(`tv_villas_${error.code ?? 'error'}`);
@@ -118,7 +120,15 @@ export async function guardarVillaTv(id: string, cambios: CambiosVillaTv): Promi
     if (valor !== undefined) fila[columna] = valor;
   }
 
-  const { data, error } = await db.from('humaya_tv_villas').update(fila).eq('id', id).select('id');
+  // Acotado al hotel aunque el id ya sea unico: si manana dos hoteles
+  // llegaran a tener una villa con el mismo id, esto impide que uno le
+  // escriba encima al otro.
+  const { data, error } = await db
+    .from('humaya_tv_villas')
+    .update(fila)
+    .eq('id', id)
+    .eq('negocio_id', elNegocio())
+    .select('id');
 
   if (error) throw new Error(`tv_villa_${error.code ?? 'error'}`);
   if (!data || data.length === 0) throw new Error('tv_villa_sin_permiso');

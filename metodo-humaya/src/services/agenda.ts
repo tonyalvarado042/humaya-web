@@ -1,5 +1,6 @@
 import type { ReservaDeServicio, ServicioConReservas } from '@/types';
 import { cliente } from './sesion';
+import { elNegocio } from './negocio';
 
 /**
  * La agenda real de servicios reservados.
@@ -54,6 +55,7 @@ async function leerCatalogo(): Promise<FilaServicio[]> {
   const { data, error } = await db
     .from('humaya_servicios')
     .select('id,nombre,proveedor,duracion_min,habilitado,orden')
+    .eq('negocio_id', elNegocio())
     .order('orden', { ascending: true });
 
   if (error) throw new Error(`agenda_catalogo_${error.code ?? 'error'}`);
@@ -69,6 +71,7 @@ async function leerReservas(
   const { data, error } = await db
     .from('humaya_servicio_reservas')
     .select('id,servicio_id,stay_id,guest_name,fecha,hora_inicio')
+    .eq('negocio_id', elNegocio())
     .gte('fecha', desde)
     .lte('fecha', hasta);
 

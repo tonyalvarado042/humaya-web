@@ -87,6 +87,15 @@ La rama que publica es `main`: Pages y el Worker construyen desde ahí. Conserv�
 y no mezcles cambios de la landing con cambios de la aplicación salvo que sea indispensable y
 quede explicado.
 
-**No crear commits ni ejecutar `git push` por iniciativa propia.** Para cualquier tarea futura, dejá
-los cambios verificados en el working tree y esperá una instrucción explícita del usuario antes de
-commitear o publicar la rama. Que una tarea esté terminada no implica autorización para commit o push.
+> **Corregido el 20 de noviembre de 2026.** Esta sección decía lo contrario: que no se commiteara
+> ni se empujara por iniciativa propia. Tony la cambió ese día, textual: *«siempre push tú solo,
+> preguntame y hazlo»*. Venía de que tres commits se quedaron dos días sin publicar mientras él
+> veía las pantallas viejas en vivo y creía que estaban rotas.
+
+**El push lo hace quien trabaja, avisando.** No se le pasa el comando a Tony: se le dice en una
+línea qué va en el push y se empuja en el mismo turno. No hay que esperar un «dale».
+
+Lo que NO cambia: **un push a `main` publica**, así que se verifica ANTES —prettier, lint,
+typecheck, test y build— y las pruebas nuevas se rompen a propósito antes de creerles. Y sigue
+haciendo falta autorización explícita para lo que no es publicar código ya probado: borrar datos,
+mandar correos, tocar la bóveda.

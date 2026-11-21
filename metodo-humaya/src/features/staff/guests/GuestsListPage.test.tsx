@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { routes } from '@/router';
 import { diaSiguiente, hoyEnCostaRica } from '@/services/clock';
-import { supabaseStub } from '@/test/supabaseStub';
+import { NEGOCIO_DE_PRUEBA, supabaseStub } from '@/test/supabaseStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 
 /** Una fila de `humaya_llegadas`, como la devuelve la vista. */
@@ -17,6 +17,7 @@ function llegada(campos: {
   estado?: string;
 }) {
   return {
+    negocio_id: NEGOCIO_DE_PRUEBA,
     id: campos.id,
     reserva_id: `R-${campos.id}`,
     huesped: campos.huesped,

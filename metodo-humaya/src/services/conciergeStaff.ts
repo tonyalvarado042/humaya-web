@@ -1,4 +1,5 @@
 import { cliente } from './sesion';
+import { elNegocio } from './negocio';
 
 /**
  * Lo que recepción necesita alrededor del chat: a quién le toca y qué se
@@ -55,7 +56,13 @@ export async function crearNota(
   const db = await cliente();
   const { data, error } = await db
     .from('humaya_concierge_notas')
-    .insert({ stay_id: stayId, texto, autor_id: autor.id, autor: autor.nombre })
+    .insert({
+      negocio_id: elNegocio(),
+      stay_id: stayId,
+      texto,
+      autor_id: autor.id,
+      autor: autor.nombre,
+    })
     .select('id');
 
   if (error) throw new Error(`notas_${error.code ?? 'error'}`);
@@ -86,6 +93,7 @@ export async function getAsignacion(stayId: string): Promise<Asignacion> {
   const { data, error } = await db
     .from('humaya_concierge_estado')
     .select('asignado_id,asignado,actualizado_en')
+    .eq('negocio_id', elNegocio())
     .eq('stay_id', stayId)
     .maybeSingle();
 
@@ -113,12 +121,15 @@ export async function asignar(
     .from('humaya_concierge_estado')
     .upsert(
       {
+        negocio_id: elNegocio(),
         stay_id: stayId,
         asignado_id: quien?.id ?? null,
         asignado: quien?.nombre ?? null,
         actualizado_en: new Date().toISOString(),
       },
-      { onConflict: 'stay_id' },
+      // La llave primaria paso a ser (negocio_id, stay_id): dos hoteles con
+      // una estadia del mismo codigo se pisaban la asignacion.
+      { onConflict: 'negocio_id,stay_id' },
     )
     .select('stay_id');
 
