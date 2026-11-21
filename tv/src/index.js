@@ -79,8 +79,18 @@ async function estadoDe(env, url) {
   const hero = (cuerpo.photos && cuerpo.photos.hero) || FOTO_POR_DEFECTO;
   cuerpo.photos = { hero, inside: hero, area: hero };
 
+  // La direccion que termina dentro del QR. Si la villa esta ocupada ahora,
+  // lleva ADEMAS la llave de la estadia: eso es lo que deja que el huesped
+  // entre a la app sin escribir su codigo. Ver `supabase/functions/*/llave.ts`.
+  //
+  // La llave de la villa (`k`) no cambia nunca, asi que una foto vieja del
+  // televisor abre esta pagina para siempre; la de la estadia se vence con
+  // ella, y la pantalla dibuja una nueva sola en el siguiente refresco.
   const conClave = `?home=${encodeURIComponent(home)}&k=${encodeURIComponent(clave)}`;
-  cuerpo.phone_url = url.origin + "/g" + conClave;
+  const conLlave = cuerpo.llave_estadia
+    ? `${conClave}&s=${encodeURIComponent(cuerpo.llave_estadia)}`
+    : conClave;
+  cuerpo.phone_url = url.origin + "/g" + conLlave;
   return { estado: cuerpo, status: 200 };
 }
 
@@ -224,7 +234,11 @@ export default {
     if (p === "/g" || p === "/g/") {
       const r = await estadoDe(env, url);
       if (!r.estado) return new Response("not found", { status: r.status === 400 ? 400 : 404 });
-      return new Response(guidePage(r.estado), {
+      // La llave que entra por la direccion, NO la que la funcion acaba de
+      // firmar. Si la pagina usara la fresca, la foto que el huesped de
+      // diciembre le tomo al televisor abriria en enero la estadia del
+      // huesped de enero — justo lo que esta llave viene a evitar.
+      return new Response(guidePage(r.estado, url.searchParams.get("s")), {
         headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" },
       });
     }

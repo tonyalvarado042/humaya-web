@@ -63,6 +63,28 @@ function codigoDelEnlace(): string {
   }
 }
 
+/**
+ * La llave de estadía que venía en el QR del televisor, si venía.
+ *
+ * ── POR QUÉ NO SE LE PIDE NADA AL HUÉSPED ─────────────────────────
+ * Tony, 21 de noviembre de 2026: «si ya la villa está ocupada y tienen los
+ * datos de la reservación, ¿no es mejor que automáticamente, cuando le hace
+ * QR, ya venga con los datos precargados?». El QR está dentro de la villa,
+ * en la pantalla: el código de Airbnb no agrega nada que la villa no diga.
+ *
+ * No es una sesión ni una contraseña: es una afirmación firmada que el
+ * servidor vuelve a comprobar contra las reservas. Si la estadía terminó o
+ * la foto del televisor es de otro huésped, no abre. Ver
+ * `supabase/functions/humaya-entrada/llave.ts`.
+ */
+function llaveDelEnlace(): string {
+  try {
+    return new URLSearchParams(window.location.search).get('s')?.trim().slice(0, 200) ?? '';
+  } catch {
+    return '';
+  }
+}
+
 export function EntradaPage() {
   const [idioma, setIdioma] = useState<Idioma>(idiomaGuardado);
   const [codigo, setCodigo] = useState(codigoDelEnlace);
@@ -72,7 +94,29 @@ export function EntradaPage() {
   // de la villa: el huesped lo abre mas de una vez, y hasta hoy cada vez
   // tenia que volver a buscar su codigo de Airbnb.
   const [guardada, setGuardada] = useState(miEstadia);
+  const [llave] = useState(llaveDelEnlace);
   const check = useCheckReservation();
+
+  // Si lo ultimo que se pregunto fue con la llave del QR. Sale de la
+  // pregunta, no de un estado aparte: despues de que la llave rebota el
+  // huesped escribe su codigo en el mismo formulario, y lo que la pantalla
+  // tiene que decirle entonces ya no es «ese enlace no abre».
+  const conLlave = check.variables !== undefined && 'llave' in check.variables;
+  const llaveNoAbrio = conLlave && check.data !== undefined && !check.data.found;
+
+  // Se abre sola, una sola vez por visita.
+  //
+  // `abrir` es `check.mutate`, que React Query mantiene estable. Si en su
+  // lugar la dependencia fuera `check`, el efecto se volveria a disparar en
+  // cada cambio de estado de la mutacion y la pantalla pediria la llave en
+  // bucle: probado a proposito, 25.087 veces en diez segundos. El techo por
+  // IP de la funcion leeria al huesped como alguien probando a ciegas y lo
+  // dejaria afuera. Tiene prueba propia.
+  const abrir = check.mutate;
+  useEffect(() => {
+    if (!llave) return;
+    abrir({ llave });
+  }, [llave, abrir]);
 
   // Encontrada una vez, no se vuelve a preguntar. No es una sesion con
   // permisos: es su nombre y sus fechas, que el ya vio en esta pantalla.
@@ -134,7 +178,14 @@ export function EntradaPage() {
         <LogoDelHotel className="w-40 max-w-full" />
 
         <div aria-live="polite" className="flex w-full flex-col items-center gap-7">
-          {check.data?.found ? (
+          {conLlave && check.isPending ? (
+            /* Entrando con la llave del QR: no se le pone un formulario
+               delante para quitarselo medio segundo despues. */
+            <div className="flex flex-col items-center gap-3">
+              <span className="text-eyebrow text-gold">{copy.eyebrow}</span>
+              <p className="m-0 text-base text-muted">{copy.conLlaveBuscando}</p>
+            </div>
+          ) : check.data?.found ? (
             /*
               El huesped que se identifica NO puede quedar en una pantalla sin
               salida. Hasta el 20 de noviembre de 2026 esto terminaba en las
@@ -214,7 +265,7 @@ export function EntradaPage() {
                 {copy.noSoyYo}
               </button>
             </div>
-          ) : check.data && !check.data.found ? (
+          ) : check.data && !check.data.found && !llaveNoAbrio ? (
             <div className="flex flex-col items-center gap-4">
               <span className="text-eyebrow text-gold">{copy.eyebrow}</span>
               <h1 className="m-0 font-display text-3xl font-medium">{copy.notFoundTitle}</h1>
@@ -236,7 +287,9 @@ export function EntradaPage() {
               <div className="flex flex-col items-center gap-3">
                 <span className="text-eyebrow text-gold">{copy.eyebrow}</span>
                 <h1 className="m-0 font-display text-4xl leading-none font-medium">{copy.title}</h1>
-                <p className="m-0 text-base leading-relaxed text-muted">{copy.description}</p>
+                <p className="m-0 text-base leading-relaxed text-muted">
+                  {llaveNoAbrio ? copy.llaveVencida : copy.description}
+                </p>
               </div>
 
               <form className="flex w-full flex-col gap-4" onSubmit={submit} noValidate>

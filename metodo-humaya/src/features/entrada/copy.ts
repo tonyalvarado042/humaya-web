@@ -37,6 +37,11 @@ export interface EntradaTextos {
   volvisteTitle: (quien: string) => string;
   volvisteBody: string;
   noSoyYo: string;
+  /** Mientras se abre la llave que venia en el QR del televisor. */
+  conLlaveBuscando: string;
+  /** Cuando esa llave ya no sirve: la estadia termino, o la foto del
+   *  televisor es de otro huesped. No es un error del huesped. */
+  llaveVencida: string;
   /** Que es HUMAYA Experience, dicho al huesped. */
   queEsTitulo: string;
   queEsCuerpo: string;
@@ -95,6 +100,8 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     volvisteBody:
       'We remembered your stay on this phone, so you do not have to look for your code again.',
     noSoyYo: 'Not you? Look up another booking',
+    conLlaveBuscando: 'Opening your stay…',
+    llaveVencida: 'That link is no longer open. Look up your stay here.',
     queEsTitulo: 'HUMAYA Experience',
     queEsCuerpo:
       'Your stay, on the television in your villa and here on your phone. It is not here to replace anyone: it is here so that when we talk, we already know what you need.',
@@ -137,6 +144,8 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     volvisteBody:
       'Nos acordamos de tu estadía en este teléfono, así que no tenés que volver a buscar tu código.',
     noSoyYo: '¿No sos vos? Buscar otra reserva',
+    conLlaveBuscando: 'Abriendo tu estadía…',
+    llaveVencida: 'Ese enlace ya no está abierto. Buscá tu estadía acá.',
     queEsTitulo: 'HUMAYA Experience',
     queEsCuerpo:
       'Tu estadía, en el televisor de tu villa y acá en tu teléfono. No está para reemplazar a nadie: está para que, cuando hablemos, ya sepamos qué necesitás.',

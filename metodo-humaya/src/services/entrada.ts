@@ -21,13 +21,38 @@ export interface EntradaResult {
    *  El formulario de check-in lo aprovecha para pedírselo: es el único
    *  momento del viaje en que el huésped está dispuesto a darlo. */
   pedir_correo?: boolean;
+  /** Por que no se pudo abrir la llave del QR: `llave_invalida` (no la
+   *  firmamos nosotros, o se vencio) o `llave_vencida` (esa reserva ya no
+   *  esta en esa villa). La pantalla no los distingue: los dos quieren decir
+   *  «este enlace ya no abre, busca tu reserva». */
+  error?: string;
 }
 
-export interface EntradaBusqueda {
-  /** Código de la OTA, número de reserva de Cloudbeds, o correo. */
-  codigo: string;
-  apellido: string;
-}
+/**
+ * Las dos formas de entrar.
+ *
+ * Es una union y no un objeto con campos opcionales a proposito: asi no se
+ * puede mandar media busqueda —un codigo sin apellido, o una llave con un
+ * apellido que nadie va a mirar— y el compilador lo dice antes que el
+ * servidor.
+ */
+export type EntradaBusqueda =
+  | {
+      /** Código de la OTA, número de reserva de Cloudbeds, o correo. */
+      codigo: string;
+      apellido: string;
+    }
+  | {
+      /**
+       * La llave que venía dentro del QR del televisor de la villa.
+       *
+       * No lleva apellido ni código porque quien la tiene está dentro de la
+       * villa, y la pantalla ya sabe quién duerme ahí. El servidor igual
+       * vuelve a comprobar contra la base que esa reserva siga en esa villa
+       * hoy: la llave es una afirmación firmada, no un permiso.
+       */
+      llave: string;
+    };
 
 import { codigoActual } from '@/marca';
 import { actualizarLaApp, esPantallaVieja } from './actualizar';
@@ -50,16 +75,21 @@ const FN_BASE =
  */
 export async function checkReservation(busqueda: EntradaBusqueda): Promise<EntradaResult> {
   const hotel = codigoActual();
-  if (!hotel) throw new Error('entrada_sin_hotel');
+
+  // Con llave, el hotel lo decide el servidor mirando de que villa es: por
+  // eso esta entrada funciona hasta en el dominio compartido del producto,
+  // donde el navegador no tiene como saber de que hotel se trata.
+  const conLlave = 'llave' in busqueda;
+  if (!hotel && !conLlave) throw new Error('entrada_sin_hotel');
+
+  const cuerpo = conLlave
+    ? { llave: busqueda.llave, hotel }
+    : { codigo: busqueda.codigo.trim(), apellido: busqueda.apellido.trim(), hotel };
 
   const response = await fetch(`${FN_BASE}/humaya-entrada`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      codigo: busqueda.codigo.trim(),
-      apellido: busqueda.apellido.trim(),
-      hotel,
-    }),
+    body: JSON.stringify(cuerpo),
   });
   if (!response.ok) {
     // Igual que en `admin.ts`: un `falta_hotel` quiere decir que esta

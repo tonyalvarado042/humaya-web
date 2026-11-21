@@ -3,7 +3,15 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const t12 = (hhmm) => { const [h, m] = String(hhmm || "0:00").split(":").map(Number); return (h % 12 || 12) + (m ? ":" + String(m).padStart(2, "0") : "") + (h < 12 ? "am" : "pm"); };
 const day = (iso) => iso ? new Date(iso + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }) : "";
 
-export function guidePage(S) {
+/**
+ * `llave` es la llave de estadia que venia en la direccion del QR, o null.
+ *
+ * Con ella el boton entra directo: la villa esta ocupada y la pantalla ya
+ * sabe por quien, asi que pedirle el codigo de Airbnb al que esta durmiendo
+ * adentro es friccion y nada mas. Sin ella —villa vacia, o una foto vieja
+ * del televisor— el boton lleva al formulario de siempre.
+ */
+export function guidePage(S, llave) {
   const st = S.stay || {};
   const hero = (S.photos && S.photos.hero) || "";
   const section = (title, body) => body ? `<section><h2>${esc(title)}</h2>${body}</section>` : "";
@@ -17,6 +25,12 @@ export function guidePage(S) {
   const local = (S.local || []).map((c) => `<h3>${esc(c.category)}</h3>` + (c.items || []).map((i) =>
     `<div class="place"><div><b>${esc(i.name)}</b><p>${esc(i.note)}</p></div><span>${esc(i.distance || "")}</span></div>`).join("")).join("");
   const steps = (S.checkout && S.checkout.steps || []).map((x) => `<li>${esc(x)}</li>`).join("");
+  // La puerta de la app. El dominio viene de la base porque este Worker
+  // sirve los televisores de todos los hoteles; antes estaba escrito el de
+  // HUMAYA y el segundo hotel habria mandado a sus huespedes al primero.
+  const casa = S.dominio_huesped || "experience.stayhumaya.com";
+  const puerta = `https://${casa}/entrada` +
+    (llave ? `?s=${encodeURIComponent(llave)}` : "");
   const sos = (S.emergency || []).map((e) => `<a class="sos" href="tel:${esc(e.phone)}">${esc(e.name)} <b>${esc(e.phone)}</b></a>`).join("");
   const notes = items(S.notes);
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -51,8 +65,10 @@ footer{text-align:center;color:#a99a8c;font-size:12px;margin-top:30px;letter-spa
      know what you need: the Wi-Fi, your villa, what is worth doing nearby and how
      to reach us, all within reach — so that nothing gets between you and being here.</p>
   <p><b>Whatever you ask, a person answers.</b></p>
-  <a class="btn" href="https://experience.stayhumaya.com/entrada">Find my stay</a>
-  <small class="pie">Your last name and your booking code, once.</small>
+  <a class="btn" href="${esc(puerta)}">${llave ? "Open my stay" : "Find my stay"}</a>
+  <small class="pie">${llave
+    ? "Nothing to type: this screen is in your villa."
+    : "Your last name and your booking code, once."}</small>
 </div>
 ${wifi}${stay}
 ${S.welcome ? `<p class="lead">${esc(S.welcome)}</p>` : ""}

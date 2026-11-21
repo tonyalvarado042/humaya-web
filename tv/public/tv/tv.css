@@ -74,10 +74,16 @@ body.mouse { cursor: default; }
 .eyebrow { font-size: 1.4375rem; line-height: 1.75rem; font-weight: 640; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.78); }
 .hello h1 { margin-top: 0.5rem; font-size: 3.5rem; line-height: 4rem; font-weight: 680; letter-spacing: -0.025em; }
 .hello .sub { margin-top: 0.5rem; font-size: 1.75rem; line-height: 2.25rem; color: rgba(255, 255, 255, 0.86); }
-.phone-chip { display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 0.875rem; border-radius: 1.5rem; }
-.phone-chip .qr { width: 6.25rem; height: 6.25rem; border-radius: 0.75rem; overflow: hidden; background: #fff; }
+/* El QR se escanea desde el sofa, a tres metros de la pantalla, y con el
+   telefono en la mano. A 6.25rem (100px en un 1920) el codigo de la estadia
+   caia en ~2px por modulo: habia que pararse al lado del televisor. Y la
+   etiqueta estaba en 1.125rem, por debajo del minimo que este mismo archivo
+   se puso arriba —23px, "porque se lee desde el sofa"—. Tony, 21 de
+   noviembre de 2026: «ese QR debe ser mas visible». */
+.phone-chip { display: flex; align-items: flex-start; gap: 1.5rem; padding: 1rem 1.125rem; border-radius: 1.5rem; }
+.phone-chip .qr { width: 10.5rem; height: 10.5rem; padding: 0.4rem; border-radius: 1rem; overflow: hidden; background: #fff; }
 .phone-chip .step { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-.phone-chip .step span { font-size: 1.125rem; line-height: 1.5rem; color: var(--text); font-weight: 600; max-width: none; white-space: nowrap; }
+.phone-chip .step span { font-size: 1.4375rem; line-height: 1.875rem; color: var(--text); font-weight: 600; max-width: none; white-space: nowrap; }
 .phone-chip .qr svg, .qr svg { display: block; width: 100%; height: 100%; }
 .phone-chip b { display: block; font-size: 1.5rem; line-height: 1.875rem; font-weight: 650; }
 .phone-chip span { display: block; font-size: 1.4375rem; line-height: 1.875rem; color: var(--text-2); max-width: 15rem; }

@@ -88,3 +88,42 @@ DESPUÉS de que el frontend que manda el hotel estuviera en vivo, para no
 romper el check-in de nadie en el medio. Y su lista de CORS —escrita a mano—
 dejaba fuera `staff.stayhumaya.com` y los dominios del producto; ahora es la
 misma expresión que usa `humaya-admin`.
+
+## La llave de estadía (21 de noviembre de 2026)
+
+Tony: *«si ya la villa está ocupada y tienen los datos de la reservación, ¿no
+es mejor que automáticamente, cuando le hace QR, ya venga con los datos
+precargados?»*. Ahora sí: el QR del televisor lleva una llave que abre la
+estadía sin que el huésped escriba nada.
+
+**`llave.ts` está DOS VECES, a propósito.** `humaya-tv` la firma y
+`humaya-entrada` la abre; son dos funciones desplegables y cada una viaja con
+lo suyo. **Si se toca una, hay que tocar y desplegar las dos.** Si se separan,
+las llaves dejan de abrir y el huésped ve «ese enlace ya no está abierto» sin
+que nada se vea roto. `src/test/llaveDeEstadia.copias.test.ts` firma con una y
+abre con la otra en cada `npm test`, justo para que eso no pase callado.
+
+Lo que hay que saber:
+
+- **Se firma con una llave derivada de `SUPABASE_SERVICE_ROLE_KEY`**, no con
+  ella directamente (HMAC con la etiqueta `humaya.llave-estadia.v1`). No hay
+  ningún secreto nuevo que configurar — y por lo mismo, **si algún día se rota
+  la llave de servicio, las llaves de estadía vivas dejan de abrir**. Duran
+  días, así que lo peor que pasa es que un huésped escriba su código.
+- **No se guarda en ninguna tabla.** Es una afirmación firmada: «en la villa X
+  está la reserva Y, hasta el día Z». Quien la abre NO le cree: vuelve a
+  preguntarle a la base si esa reserva sigue en esa villa hoy. Por eso una
+  reserva cancelada o movida deja de abrir en el acto, sin revocar nada.
+  Comprobado en vivo con una reserva de prueba en el hotel demo: cancelarla
+  dejó la misma llave en `llave_vencida` y el televisor dejó de firmarla.
+- **Solo se firma si el huésped está AHORA** (`esta_ahora` de
+  `humaya_tv_ocupacion`). Con la villa vacía la vista devuelve la reserva que
+  sigue, y esa llave la tendría quien entre a limpiar.
+- **El dominio del huésped sale de `humaya_dominios`**, no de una constante:
+  el Worker del TV sirve a todos los hoteles. HUMAYA recibe
+  `experience.stayhumaya.com` y el demo `guestexp.liderax10.com`, el del
+  producto — que funciona porque con llave el hotel lo decide el servidor
+  mirando de qué villa es, no el navegador mirando el dominio.
+- **Orden de despliegue:** primero las funciones (el frontend viejo no manda
+  llave y nada cambia para él), después la app, y de último el Worker del TV,
+  que es el único que no publica solo.

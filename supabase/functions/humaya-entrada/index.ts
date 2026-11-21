@@ -20,6 +20,7 @@
 // las fechas de otra persona. Con apellido + código hay que saber dos cosas
 // de la misma reserva. No es un banco, pero tampoco se regala.
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { abrirLlave } from "./llave.ts";
 
 /**
  * El uuid del hotel a partir de su codigo, o null.
@@ -107,6 +108,101 @@ function avisoHtml(buscado: string, apellido: string) {
 </td></tr></table></td></tr></table></body></html>`;
 }
 
+/**
+ * Entrar con la llave que venia en el QR del televisor.
+ *
+ * ── POR QUE SE PUEDE ENTRAR SIN CODIGO ────────────────────────────
+ * Porque el QR esta dentro de la villa, en la pantalla, y la pantalla sabe
+ * quien duerme ahi: el codigo de Airbnb no agrega nada que la villa no diga
+ * ya. Tony, 21 de noviembre de 2026: «si ya la villa esta ocupada y tienen
+ * los datos de la reservacion, por que no viene con los datos precargados?».
+ *
+ * ── A LA LLAVE NO SE LE CREE ──────────────────────────────────────
+ * Dice «en la villa X esta la reserva Y»: es una afirmacion firmada, no un
+ * permiso. Aca se vuelve a preguntar a la base si esa reserva SIGUE en esa
+ * villa y si el huesped esta hoy. Por eso una reserva cancelada, movida o
+ * que ya se fue deja de abrir en el acto, sin revocar nada en ninguna parte.
+ *
+ * El hotel sale de la villa y no de quien pregunta: la misma razon por la
+ * que el camino de codigo + apellido lo exige. Y ademas asi la llave sirve
+ * igual desde el dominio compartido del producto, donde el navegador no
+ * puede saber de que hotel se trata.
+ */
+async function entrarConLlave(
+  db: SupabaseClient,
+  llave: string,
+  ip: string | null,
+  userAgent: string,
+  headers: HeadersInit,
+) {
+  const no = (error: string) =>
+    new Response(JSON.stringify({ found: false, error }), { status: 200, headers });
+
+  const abierta = await abrirLlave(Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, llave);
+  if (!abierta) return no("llave_invalida");
+
+  const { data: villa } = await db
+    .from("humaya_tv_villas")
+    .select("negocio_id")
+    .eq("id", abierta.villa)
+    .maybeSingle();
+  const negocio = (villa as { negocio_id?: string } | null)?.negocio_id;
+  if (!negocio) return no("llave_invalida");
+
+  // Que siga siendo cierto HOY, no cuando se firmo.
+  const { data: ocupa } = await db
+    .from("humaya_tv_ocupacion")
+    .select("reserva_id,esta_ahora")
+    .eq("villa_id", abierta.villa)
+    .maybeSingle();
+  const ahi = ocupa as { reserva_id: string | null; esta_ahora: boolean | null } | null;
+  if (!ahi?.esta_ahora || ahi.reserva_id !== abierta.reserva) return no("llave_vencida");
+
+  const { data: fila } = await db
+    .from("humaya_cloudbeds_reservas")
+    .select("guest_name, email, checkin, checkout, estado, fuente, cloudbeds_reservation_id")
+    .eq("negocio_id", negocio)
+    .eq("cloudbeds_reservation_id", abierta.reserva)
+    .is("eliminada_en", null)
+    .maybeSingle();
+  const r = fila as
+    | {
+      guest_name: string | null;
+      email: string | null;
+      checkin: string | null;
+      checkout: string | null;
+      estado: string | null;
+      fuente: string | null;
+      cloudbeds_reservation_id: string;
+    }
+    | null;
+  const viva = r && (!r.estado || !CANCELADAS.has(String(r.estado).toLowerCase()));
+
+  await db.from("humaya_entrada_intentos").insert({
+    negocio_id: negocio,
+    email: `llave:${abierta.reserva}`,
+    encontrada: Boolean(viva),
+    ip,
+    user_agent: userAgent,
+  });
+
+  if (!viva) return no("llave_vencida");
+
+  return new Response(
+    JSON.stringify({
+      found: true,
+      guestName: r!.guest_name,
+      checkin: r!.checkin,
+      checkout: r!.checkout,
+      fuente: r!.fuente,
+      reserva: r!.cloudbeds_reservation_id,
+      pedir_correo: !r!.email ||
+        /@(m\.expediapartnercentral\.com|guest\.booking\.com)$/i.test(String(r!.email)),
+    }),
+    { headers },
+  );
+}
+
 Deno.serve(async (request) => {
   const origin = request.headers.get("origin");
   const headers = { ...cors(origin), "Content-Type": "application/json" };
@@ -124,11 +220,17 @@ Deno.serve(async (request) => {
   const apellido = plano(String(body.apellido ?? "").slice(0, 80));
   const hotel = String(body.hotel ?? "").trim().slice(0, 40);
 
-  if (!buscado) {
-    return new Response(JSON.stringify({ error: "falta_codigo" }), { status: 400, headers });
-  }
-  if (apellido.length < 2) {
-    return new Response(JSON.stringify({ error: "falta_apellido" }), { status: 400, headers });
+  // La llave del QR de la villa: con ella no hace falta codigo ni apellido,
+  // porque quien la tiene esta dentro de la villa. Ver `entrarConLlave`.
+  const llave = String(body.llave ?? "").trim().slice(0, 200);
+
+  if (!llave) {
+    if (!buscado) {
+      return new Response(JSON.stringify({ error: "falta_codigo" }), { status: 400, headers });
+    }
+    if (apellido.length < 2) {
+      return new Response(JSON.stringify({ error: "falta_apellido" }), { status: 400, headers });
+    }
   }
 
   const db = createClient(
@@ -148,6 +250,16 @@ Deno.serve(async (request) => {
     if ((count ?? 0) >= 12) {
       return new Response(JSON.stringify({ error: "rate_limited" }), { status: 429, headers });
     }
+  }
+
+  if (llave) {
+    return await entrarConLlave(
+      db,
+      llave,
+      ip,
+      (request.headers.get("user-agent") ?? "").slice(0, 300),
+      headers,
+    );
   }
 
   // ── La búsqueda: código de la OTA, número de Cloudbeds, o correo ────────

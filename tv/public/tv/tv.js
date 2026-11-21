@@ -163,7 +163,13 @@
     $("wifi-step").style.display = S.wifi && S.wifi.ssid ? "" : "none";
     if (S.wifi && S.wifi.ssid) loadSvg($("wifi-qr"), "wifi");
     loadSvg($("phone-qr"), S.remote_url ? "remote" : "qr");
-    $("phone-what").textContent = S.remote_url ? (S.wifi && S.wifi.ssid ? "2 · " : "") + "Guest remote" : "On your phone";
+    // Que diga lo que da. "On your phone" no dice nada; y cuando la villa
+    // esta ocupada el QR lleva la llave de la estadia y entra sin pedir
+    // codigo, que es lo unico que vale la pena anunciar en una pantalla.
+    var paso = S.wifi && S.wifi.ssid ? "2 · " : "";
+    $("phone-what").textContent = S.remote_url
+      ? paso + "Guest remote"
+      : paso + (S.llave_estadia ? "Open your stay" : "House guide");
   }
   var svgCache = {};
   function loadSvg(el, what) {

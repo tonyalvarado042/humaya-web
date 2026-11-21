@@ -20,6 +20,7 @@
 // noche en esa villa. La clave se escribe una sola vez en el televisor,
 // dentro de la direccion, y no la ve ningun huesped.
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { diaDe, firmarLlave } from "./llave.ts";
 
 // Sin uuid escrito a mano. Hasta el 21 de noviembre de 2026 habia uno, el de
 // HUMAYA, y con el el televisor de CUALQUIER hotel leia la guia de la casa,
@@ -219,11 +220,17 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
   // esta en Cloudbeds. Si hay reserva, manda la reserva.
   const { data: ocupa } = await db
     .from("humaya_tv_ocupacion")
-    .select("huesped,llegada,salida")
+    .select("huesped,llegada,salida,reserva_id,esta_ahora")
     .eq("villa_id", villa.id)
     .maybeSingle();
   const reserva = ocupa as
-    | { huesped: string | null; llegada: string | null; salida: string | null }
+    | {
+      huesped: string | null;
+      llegada: string | null;
+      salida: string | null;
+      reserva_id: string | null;
+      esta_ahora: boolean | null;
+    }
     | null;
   const quienEsta: Villa = reserva?.huesped
     ? { ...villa, huesped: reserva.huesped, llegada: reserva.llegada, salida: reserva.salida }
@@ -252,6 +259,44 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
     .eq("habilitada", true)
     .order("orden", { ascending: true });
 
+  // ── La llave de estadia: que el QR entre sin que escriban nada ──
+  // Tony, 21 de noviembre de 2026: «si ya la villa esta ocupada y tienen los
+  // datos de la reservacion, por que no viene con los datos precargados?».
+  // Esto es lo que lo permite: una afirmacion firmada —«en esta villa esta
+  // esta reserva, hasta este dia»— que el QR lleva adentro. Ver `llave.ts`.
+  //
+  // Solo cuando el huesped esta AHORA. Con la villa vacia la vista devuelve
+  // la reserva que SIGUE, para que la pantalla pueda prepararse; esa persona
+  // todavia no llego, y su llave la tendria quien entre a limpiar.
+  const llaveEstadia = reserva?.esta_ahora && reserva.reserva_id && reserva.salida
+    ? await firmarLlave(
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      villa.id,
+      reserva.reserva_id,
+      diaDe(reserva.salida) + 1,
+    )
+    : null;
+
+  // ── A que dominio manda el QR ───────────────────────────────────
+  // Sale de la base y no de una constante: este Worker sirve los televisores
+  // de TODOS los hoteles, y el boton del QR llevaba escrito el de HUMAYA.
+  // `localhost` y `127.0.0.1` estan en la tabla para el desarrollo local y
+  // dentro de un QR no llevan a ninguna parte.
+  const { data: puertas } = await db
+    .from("humaya_dominios")
+    .select("dominio,negocio_id,lado")
+    .in("lado", ["huesped", "ambos"]);
+  const candidatas = (puertas ?? []).filter((d: { dominio: string }) =>
+    d.dominio !== "localhost" && d.dominio !== "127.0.0.1"
+  ) as { dominio: string; negocio_id: string | null; lado: string }[];
+  const dominioHuesped =
+    // el suyo, y si tiene varios el que es solo de huespedes
+    candidatas.find((d) => d.negocio_id === villa.negocio_id && d.lado === "huesped")?.dominio ??
+      candidatas.find((d) => d.negocio_id === villa.negocio_id)?.dominio ??
+      // el del producto, que sirve a cualquier hotel: la llave dice cual es
+      candidatas.find((d) => !d.negocio_id && d.lado === "huesped")?.dominio ??
+      "experience.stayhumaya.com";
+
   const notas = villa.nota_titulo || villa.nota_texto
     ? [{ title: villa.nota_titulo ?? "", body: villa.nota_texto ?? "" }]
     : [];
@@ -273,6 +318,9 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
     checkout_time: quienEsta.checkout,
     // De donde salio quien aparece en pantalla, para que Admin lo diga.
     ocupacion: reserva?.huesped ? "reserva" : villa.huesped ? "a_mano" : "vacia",
+    // Lo que el Worker mete dentro del QR, y a donde apunta el boton.
+    llave_estadia: llaveEstadia,
+    dominio_huesped: dominioHuesped,
     wifi: mostrar && ssid ? { ssid, password: claveWifi ?? "" } : null,
     access: [],
     welcome: villa.bienvenida || (g.welcome ?? ""),
