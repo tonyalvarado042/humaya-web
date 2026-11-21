@@ -1,6 +1,6 @@
 # Humaya Web — contrato del repositorio
 
-Este repositorio contiene dos productos con ciclos de trabajo distintos:
+Este repositorio contiene tres productos con ciclos de trabajo distintos:
 
 - `sitio/` es la landing productiva de `stayhumaya.com`, construida con HTML, CSS y JavaScript.
   **Se publica sola:** es un proyecto de Cloudflare Pages (`humaya-web`) conectado a este
@@ -8,7 +8,13 @@ Este repositorio contiene dos productos con ciclos de trabajo distintos:
 - `metodo-humaya/` es el frontend React/Vite del Método Humaya: app del huésped, recepción y PWA.
   Se publica igual de solo, por el Worker `humaya-experience`.
 
-Leé también `metodo-humaya/AGENTS.md` antes de modificar la aplicación.
+- `tv/` es la pantalla del televisor de cada villa, un Cloudflare Worker en
+  `tv.stayhumaya.com`. **Esta NO se publica sola:** se publica con
+  `npx wrangler deploy` desde esa carpeta. Lee su configuración de Supabase y no
+  administra nada: lo que ve el huésped se edita en `/staff/admin`.
+
+Leé también `metodo-humaya/AGENTS.md` antes de modificar la aplicación, y
+`tv/LEEME.md` antes de tocar la pantalla del televisor.
 
 ## Regla principal
 
@@ -62,6 +68,9 @@ npx prettier --write "src/**/*.{ts,tsx,css}"
   publicar»: lo que se commitea sale al aire. Se verifica antes, no después.
 - No se configura Vercel.
 - La landing: Cloudflare Pages, proyecto `humaya-web`, publica `sitio/`.
+- La pantalla del TV: el Worker `humaya-tv`, en `tv.stayhumaya.com`. **Es la
+  única pieza que no publica sola**: un push a `main` no la mueve. Se publica
+  a mano con `npx wrangler deploy` desde `tv/`.
 - La app: un solo Worker, `humaya-experience`, sirviendo los dos dominios —
   `experience.stayhumaya.com` (huésped) y `staff.stayhumaya.com` (recepción, agregado el 16 de
   noviembre de 2026). Quién ve qué lo decide `ladoDe()` en `src/marca.ts`, no la infraestructura.

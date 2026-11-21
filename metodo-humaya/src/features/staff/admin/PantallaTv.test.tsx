@@ -1,0 +1,80 @@
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { supabaseStub } from '@/test/supabaseStub';
+import { renderWithProviders } from '@/test/renderWithProviders';
+import { PantallaTv } from './PantallaTv';
+
+const CLAVE = 'abc123def456';
+
+function villa(campos: Partial<Record<string, unknown>> = {}) {
+  return {
+    id: 'v4-bruma',
+    clave: CLAVE,
+    nombre: 'V4 · BRUMA',
+    tipo: 'Wellness villa',
+    anfitrion: 'Tony',
+    wifi_ssid: 'HUMAYA_Villas',
+    wifi_clave: 'temporal-2026',
+    wifi_siempre: true,
+    huesped: 'Sarah Lovestad',
+    llegada: '2026-11-20',
+    salida: '2026-11-23',
+    checkin: '15:00',
+    checkout: '11:00',
+    bienvenida: null,
+    nota_titulo: null,
+    nota_texto: null,
+    foto: null,
+    reloj_posicion: 'izquierda',
+    habilitada: true,
+    orden: 4,
+    ...campos,
+  };
+}
+
+beforeEach(() => {
+  supabaseStub.tablas.humaya_tv_villas = [
+    villa(),
+    villa({ id: 'v1-capi-capi', nombre: 'V1 · CAPI CAPI', huesped: null, orden: 1 }),
+  ];
+});
+
+describe('las pantallas del TV en Admin', () => {
+  it('lista las villas y dice cuál está vacía', async () => {
+    renderWithProviders(<PantallaTv />);
+
+    expect(await screen.findByText('V1 · CAPI CAPI')).toBeInTheDocument();
+    expect(screen.getByText('V4 · BRUMA')).toBeInTheDocument();
+    expect(screen.getByText('Con Sarah Lovestad')).toBeInTheDocument();
+    expect(screen.getByText('Vacía')).toBeInTheDocument();
+  });
+
+  it('la dirección del televisor trae la clave, que es lo único que hay que escribir', async () => {
+    renderWithProviders(<PantallaTv />);
+    await screen.findByText('V4 · BRUMA');
+
+    // El editor arranca cerrado: diez villas abiertas a la vez son ilegibles.
+    expect(screen.queryByText(new RegExp(CLAVE))).not.toBeInTheDocument();
+
+    const fila = screen.getByText('V4 · BRUMA').closest('div')?.parentElement as HTMLElement;
+    await userEvent.click(within(fila).getByRole('button', { name: 'Editar' }));
+
+    expect(await screen.findByText(new RegExp(`k=${CLAVE}`))).toBeInTheDocument();
+  });
+
+  it('avisa que la guía es la misma para las diez pantallas', async () => {
+    // Sin decirlo, alguien la editaría villa por villa y terminaría con diez
+    // versiones distintas de la misma regla.
+    renderWithProviders(<PantallaTv />);
+
+    expect(await screen.findByText(/Es la misma para las diez pantallas/)).toBeInTheDocument();
+  });
+
+  it('cuando no hay ninguna villa, dice dónde se crean', async () => {
+    supabaseStub.tablas.humaya_tv_villas = [];
+    renderWithProviders(<PantallaTv />);
+
+    expect(await screen.findByText('Todavía no hay ninguna villa')).toBeInTheDocument();
+  });
+});

@@ -1,5 +1,6 @@
 export type { AdminOpcion, Servicio, ServicioSlot } from './admin';
 export type { ReservaDeServicio, ServicioConReservas } from './agenda';
+export type { CambiosVillaTv, VillaTv } from './tv';
 export type { Locale, LocalizedText, Pillar } from './common';
 export type { ChatMessage, ChatSender, ConciergeConversation } from './chat';
 export type {

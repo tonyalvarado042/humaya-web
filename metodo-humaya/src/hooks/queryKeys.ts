@@ -43,6 +43,9 @@ export const queryKeys = {
   servicioSlots: (servicioId: string, fecha: string) =>
     ['servicio-slots', servicioId, fecha] as const,
 
+  /** Las pantallas de los televisores de las villas. */
+  villasTv: () => ['villas-tv'] as const,
+
   /** La agenda real de recepción: lo que hay reservado entre dos fechas. */
   agendaPorServicio: (desde: string, hasta: string) =>
     ['agenda-por-servicio', desde, hasta] as const,

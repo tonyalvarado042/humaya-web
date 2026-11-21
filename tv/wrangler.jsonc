@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "humaya-tv",
+  "main": "src/index.js",
+  "compatibility_date": "2025-09-01",
+  // Sin KV: la configuracion vive en Supabase y se edita en
+  // staff.stayhumaya.com/staff/admin. Este Worker solo pinta.
+  //
+  // Los archivos de la pantalla los sirve Cloudflare directamente desde
+  // public/. Antes se empaquetaban en base64 dentro de src/static.js —1.2 MB
+  // generados— y habia que acordarse de regenerarlos cada vez que cambiara un
+  // archivo. Un paso manual que se olvida es un archivo viejo en produccion.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+  "observability": { "enabled": true },
+  "routes": [
+    { "pattern": "tv.stayhumaya.com", "custom_domain": true }
+  ]
+}

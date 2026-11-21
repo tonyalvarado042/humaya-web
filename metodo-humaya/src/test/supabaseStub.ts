@@ -64,6 +64,7 @@ class Consulta implements PromiseLike<{ data: Fila[] | Fila | null; error: null 
   private filas: Fila[];
   private readonly filtros: string[] = [];
   private uno = false;
+  private cambios: Fila | null = null;
 
   private readonly nombreTabla: string;
 
@@ -142,6 +143,20 @@ class Consulta implements PromiseLike<{ data: Fila[] | Fila | null; error: null 
     return this;
   }
 
+  /**
+   * Como PostgREST: el cambio se guarda y se aplica DESPUES de los filtros.
+   *
+   * En la cadena real, `.update(x).eq('id', 1)` cambia la fila 1 y no todas:
+   * el update se escribe primero pero manda el filtro. Si el stub aplicara el
+   * cambio al llamarlo, pisaria la tabla entera y una prueba de permisos
+   * pasaria por el motivo equivocado.
+   */
+  update(cambios: Fila) {
+    this.cambios = cambios;
+    this.filtros.push('update');
+    return this;
+  }
+
   maybeSingle() {
     this.uno = true;
     return this;
@@ -152,6 +167,15 @@ class Consulta implements PromiseLike<{ data: Fila[] | Fila | null; error: null 
       ((valor: { data: Fila[] | Fila | null; error: null }) => R1 | PromiseLike<R1>) | null,
     alFallar?: ((razon: unknown) => R2 | PromiseLike<R2>) | null,
   ): PromiseLike<R1 | R2> {
+    if (this.cambios) {
+      const tabla = supabaseStub.tablas[this.nombreTabla] ?? [];
+      for (const fila of this.filas) {
+        const i = tabla.indexOf(fila);
+        if (i >= 0) tabla[i] = { ...fila, ...this.cambios };
+      }
+      supabaseStub.tablas[this.nombreTabla] = tabla;
+      this.filas = this.filas.map((fila) => ({ ...fila, ...this.cambios }));
+    }
     const data = this.uno ? (this.filas[0] ?? null) : this.filas;
     return Promise.resolve({ data, error: null }).then(alCumplir, alFallar);
   }
