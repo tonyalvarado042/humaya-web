@@ -120,4 +120,15 @@ export function createRoutes({
 /** Rutas de la app. Se exportan aparte para poder montarlas en memoria en los tests. */
 export const routes = createRoutes();
 
-export const router = createBrowserRouter(routes);
+/**
+ * El router de verdad, armado despues de saber que hotel es.
+ *
+ * `basename` es lo que hace que un solo despliegue sirva a varios hoteles sin
+ * tocar una sola ruta: en guestexp.liderax10.com vale `/humaya` y React
+ * Router le pone ese prefijo a cada enlace solo. En el dominio propio de un
+ * hotel vale vacio y todo queda exactamente como estaba.
+ */
+export function crearRouter(opciones: CreateRoutesOptions & { base?: string } = {}) {
+  const { base = '', ...resto } = opciones;
+  return createBrowserRouter(createRoutes(resto), base ? { basename: base } : undefined);
+}

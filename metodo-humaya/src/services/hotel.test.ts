@@ -1,0 +1,179 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { codigoDeLaRuta, ladoDe, resolverHotel } from './hotel';
+import { aplicarHotel, MARCA } from '@/marca';
+
+const HUMAYA = {
+  dominio: 'experience.stayhumaya.com',
+  lado: 'huesped',
+  compartido: false,
+  negocio_id: '4cb80ad6-1004-4d06-9dfb-946a1718be87',
+  codigo: 'humaya',
+  marca_experiencia: 'HUMAYA Experience',
+  marca_hotel: 'HUMAYA',
+  correo: 'reservations@stayhumaya.com',
+};
+
+const COMPARTIDO_HUESPED = {
+  dominio: 'guestexp.liderax10.com',
+  lado: 'huesped',
+  compartido: true,
+  negocio_id: null,
+  codigo: null,
+  marca_experiencia: null,
+  marca_hotel: null,
+  correo: null,
+};
+
+/** Contesta a las dos funciones de la base según el cuerpo del pedido. */
+function stubBase(porDominio: unknown[], porCodigo: unknown[] = []) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((url: string, init?: RequestInit) => {
+      const cual = String(url).includes('de_dominio') ? porDominio : porCodigo;
+      void init;
+      return Promise.resolve(new Response(JSON.stringify(cual), { status: 200 }));
+    }),
+  );
+}
+
+beforeEach(() => aplicarHotel(null));
+afterEach(() => {
+  vi.unstubAllGlobals();
+  aplicarHotel(null);
+});
+
+describe('de qué lado es un dominio', () => {
+  it('conoce los dos del producto y los dos de un hotel propio', () => {
+    expect(ladoDe('hotelexp.liderax10.com')).toBe('personal');
+    expect(ladoDe('guestexp.liderax10.com')).toBe('huesped');
+    expect(ladoDe('staff.stayhumaya.com')).toBe('personal');
+    expect(ladoDe('experience.stayhumaya.com')).toBe('huesped');
+  });
+
+  it('en local no separa, para poder probar los dos lados', () => {
+    expect(ladoDe('localhost')).toBe('ambos');
+  });
+});
+
+describe('el código de hotel en la ruta', () => {
+  it('lo saca del primer pedazo', () => {
+    expect(codigoDeLaRuta('/humaya/app/bookings')).toBe('humaya');
+    expect(codigoDeLaRuta('/bike-and-bed/entrada')).toBe('bike-and-bed');
+  });
+
+  it('NO confunde una ruta nuestra con un hotel', () => {
+    // Sin esto, entrar a /app en el dominio compartido buscaría un hotel
+    // llamado «app» y la pantalla quedaría sin marca.
+    expect(codigoDeLaRuta('/app')).toBeNull();
+    expect(codigoDeLaRuta('/staff/concierge')).toBeNull();
+    expect(codigoDeLaRuta('/entrada')).toBeNull();
+    expect(codigoDeLaRuta('/')).toBeNull();
+  });
+});
+
+describe('un hotel con dominio propio', () => {
+  it('se resuelve con la dirección sola, sin prefijo en las rutas', async () => {
+    // Es lo que mantiene vivos los enlaces de HUMAYA: experience.stayhumaya.com
+    // sigue sirviendo /app, no /humaya/app.
+    stubBase([HUMAYA]);
+    const donde = await resolverHotel('experience.stayhumaya.com', '/app');
+
+    expect(donde.hotel?.codigo).toBe('humaya');
+    expect(donde.base).toBe('');
+    expect(donde.compartido).toBe(false);
+    expect(donde.lado).toBe('huesped');
+  });
+
+  it('deja la marca puesta para todas las pantallas', async () => {
+    stubBase([HUMAYA]);
+    const donde = await resolverHotel('experience.stayhumaya.com', '/app');
+    aplicarHotel(donde.hotel);
+
+    expect(MARCA.hotel).toBe('HUMAYA');
+    expect(MARCA.correo).toBe('reservations@stayhumaya.com');
+  });
+});
+
+describe('el dominio compartido del producto', () => {
+  it('saca el hotel de la ruta y se lo pone de prefijo a todo', async () => {
+    stubBase(
+      [COMPARTIDO_HUESPED],
+      [
+        {
+          negocio_id: 'otro-id',
+          codigo: 'bike-and-bed',
+          marca_experiencia: 'Bike & Bed Experience',
+          marca_hotel: 'Bike & Bed',
+          correo: 'hola@bikeandbed.test',
+        },
+      ],
+    );
+
+    const donde = await resolverHotel('guestexp.liderax10.com', '/bike-and-bed/app');
+    expect(donde.hotel?.codigo).toBe('bike-and-bed');
+    expect(donde.base).toBe('/bike-and-bed');
+    expect(donde.compartido).toBe(true);
+  });
+
+  it('sin hotel en la ruta se queda sin hotel, no agarra uno cualquiera', async () => {
+    // Mostrarle la marca de otro hotel a un huésped sería peor que no
+    // mostrarle ninguna.
+    stubBase([COMPARTIDO_HUESPED]);
+    const donde = await resolverHotel('guestexp.liderax10.com', '/');
+
+    expect(donde.hotel).toBeNull();
+    expect(donde.base).toBe('');
+  });
+
+  it('un código que no existe tampoco agarra uno cualquiera', async () => {
+    stubBase([COMPARTIDO_HUESPED], []);
+    const donde = await resolverHotel('guestexp.liderax10.com', '/no-existe/app');
+
+    expect(donde.hotel).toBeNull();
+  });
+});
+
+describe('cuando la base no contesta', () => {
+  it('no deja al huésped mirando una pantalla en blanco sin fin', async () => {
+    // Esta consulta corre ANTES de pintar nada. Sin tope, una base colgada
+    // cuelga la app entera.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        (_url: string, init?: RequestInit) =>
+          new Promise((_listo, falla) => {
+            init?.signal?.addEventListener('abort', () => falla(new Error('abortado')));
+          }),
+      ),
+    );
+    vi.useFakeTimers();
+
+    const promesa = resolverHotel('experience.stayhumaya.com', '/app');
+    await vi.advanceTimersByTimeAsync(4000);
+    const donde = await promesa;
+    vi.useRealTimers();
+
+    expect(donde.lado).toBe('huesped');
+    expect(donde.hotel).toBeNull();
+  });
+
+  it('la app abre igual, deduciendo el lado del dominio', async () => {
+    // No abrir porque no se pudo preguntar la marca sería mucho peor que
+    // abrir con la marca por defecto.
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('sin red')));
+
+    const donde = await resolverHotel('staff.stayhumaya.com', '/staff');
+    expect(donde.lado).toBe('personal');
+    expect(donde.hotel).toBeNull();
+    expect(donde.base).toBe('');
+  });
+
+  it('y la marca cae en la de respaldo, no en vacío', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('sin red')));
+    const donde = await resolverHotel('experience.stayhumaya.com', '/app');
+    aplicarHotel(donde.hotel);
+
+    expect(MARCA.hotel).toBe('HUMAYA');
+    expect(MARCA.experiencia).toBe('HUMAYA Experience');
+  });
+});

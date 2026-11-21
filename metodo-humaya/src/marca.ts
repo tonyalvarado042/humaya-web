@@ -1,14 +1,23 @@
+import type { Hotel, Lado } from './services/hotel';
+
 /**
- * La marca de esta instalación de la app.
+ * La marca del hotel que está sirviendo esta pantalla.
  *
- * ── POR QUÉ ESTO EXISTE ─────────────────────────────────────────────────
- * Tony, 15 de noviembre de 2026: «más adelante venderemos esta app, así que
- * cada hotel puede configurar el nombre del app y el domain».
+ * ── CÓMO LLEGA ACÁ ──────────────────────────────────────────────────────
+ * La resuelve `resolverHotel()` antes de que la app pinte nada, y
+ * `aplicarHotel()` la deja puesta. Las pantallas siguen leyendo `MARCA.hotel`
+ * igual que siempre: ninguna cambió cuando esto dejó de salir de variables de
+ * entorno.
  *
- * Por eso el nombre NO se escribe suelto en diez pantallas. Vive acá, y acá
- * es donde se va a enchufar la configuración por hotel cuando llegue: hoy
- * sale de variables de entorno (una por despliegue), mañana de la base.
- * Las pantallas ya no van a tener que cambiar.
+ * ── POR QUÉ YA NO SON VARIABLES DE ENTORNO ──────────────────────────────
+ * Lo eran, fijadas al compilar. Con eso, «crear un hotel nuevo» significaba
+ * un despliegue nuevo con otras variables — no era crearlo desde un panel.
+ * Decisión de Tony del 20 de noviembre de 2026: un solo producto, como
+ * vision.liderax10.com. Crear un hotel pasa a ser una fila.
+ *
+ * Las variables quedan como RESPALDO, para local, los previews y el momento
+ * en que la base no contesta. Una app que no abre porque no pudo preguntar
+ * la marca es mucho peor que una que abre con la marca por defecto.
  *
  * ── EL NOMBRE ───────────────────────────────────────────────────────────
  * Se llama **HUMAYA Experience**. Decisión de Tony del 11 de noviembre:
@@ -26,66 +35,96 @@
  * eso entra en los archivos de traducción como la variable {{experiencia}}
  * en vez de estar escrito dos veces.
  */
-export const MARCA = {
-  /** El marco de la estadía. Nombre propio, no se traduce. */
+
+const PORDEFECTO = {
   experiencia:
     (import.meta.env.VITE_MARCA_EXPERIENCIA as string | undefined) ?? 'HUMAYA Experience',
-  /** El hotel. El día que esto se venda, cada uno pone el suyo. */
   hotel: (import.meta.env.VITE_MARCA_HOTEL as string | undefined) ?? 'HUMAYA',
-  /** De dónde sale el correo y a dónde escribe el huésped si algo falla. */
   correo:
     (import.meta.env.VITE_MARCA_CORREO as string | undefined) ?? 'reservations@stayhumaya.com',
-
-  /**
-   * Los dos dominios de esta instalación. El huésped y el personal viven
-   * separados a pedido de Tony (15 de noviembre de 2026): la app del huésped en
-   * experience.stayhumaya.com, recepción en staff.stayhumaya.com.
-   *
-   * Sirven para mandar a cada quien a su casa: quien pida /staff en el dominio
-   * del huésped sale para el del personal, y al revés. Un hotel que compre la
-   * app pone sus dos dominios acá y no toca una pantalla.
-   */
   dominioHuesped:
     (import.meta.env.VITE_DOMINIO_HUESPED as string | undefined) ??
     'https://experience.stayhumaya.com',
   dominioPersonal:
     (import.meta.env.VITE_DOMINIO_PERSONAL as string | undefined) ?? 'https://staff.stayhumaya.com',
+};
 
-  /**
-   * ¿El dominio del personal ya existe de verdad?
-   *
-   * **Sí, desde el 16 de noviembre de 2026.** Ese día se agregó
-   * staff.stayhumaya.com como dominio personalizado del Worker
-   * `humaya-experience` en Cloudflare, y se comprobó desde fuera:
-   *
-   *   nslookup  → 104.21.5.31 / 172.67.132.218 (+ IPv6)
-   *   curl      → 200 text/html, sirviendo el mismo bundle
-   *
-   * El 15 de noviembre esto estaba APAGADO porque el nombre no resolvía:
-   * mandar a alguien para allá habría sido mandarlo a un error del navegador.
-   * Ahora resuelve, así que la separación va ENCENDIDA por defecto.
-   *
-   * Lo que protege los datos sigue siendo la puerta, no el subdominio: /staff
-   * exige cuenta y clave del CRM en cualquiera de los dos dominios.
-   *
-   * Para apagarla otra vez (si el dominio se cayera): VITE_DOMINIOS_SEPARADOS=false.
-   */
-  dominiosSeparados: import.meta.env.VITE_DOMINIOS_SEPARADOS !== 'false',
-} as const;
+let actual = { ...PORDEFECTO };
+let negocio: string | null = null;
+let codigo: string | null = null;
 
-/** Qué lado de la app sirve este dominio. */
-export type Lado = 'huesped' | 'personal' | 'ambos';
+/** Deja puesto el hotel resuelto. Lo llama `main.tsx` antes de pintar. */
+export function aplicarHotel(hotel: Hotel | null): void {
+  if (!hotel) {
+    actual = { ...PORDEFECTO };
+    negocio = null;
+    codigo = null;
+    return;
+  }
+  actual = {
+    ...PORDEFECTO,
+    experiencia: hotel.marcaExperiencia || PORDEFECTO.experiencia,
+    hotel: hotel.marcaHotel || PORDEFECTO.hotel,
+    correo: hotel.correo || PORDEFECTO.correo,
+  };
+  negocio = hotel.negocioId;
+  codigo = hotel.codigo;
+}
 
 /**
- * El huésped y el personal comparten código pero no dominio. Quien entre por
- * el dominio equivocado se manda al correcto en vez de ver una pantalla que no
- * le toca. En local y en los previews no se separa: ahí se prueban los dos.
+ * De qué hotel son los datos que se van a leer y escribir.
  *
- * Mira el subdominio y no el dominio completo, para que siga funcionando
- * cuando la app se venda y los dominios sean otros.
+ * Null mientras no se haya resuelto. Quien escriba una fila tiene que
+ * mandarlo: las tablas dejaron de tener HUMAYA como valor por defecto justo
+ * para que una fila sin hotel se note en vez de caer callada en Humaya.
  */
-export function ladoDe(hostname: string): Lado {
-  if (hostname.startsWith('staff.')) return 'personal';
-  if (hostname.startsWith('experience.')) return 'huesped';
-  return 'ambos';
+export function negocioActual(): string | null {
+  return negocio;
 }
+
+export function codigoActual(): string | null {
+  return codigo;
+}
+
+export const MARCA = {
+  /** El marco de la estadía. Nombre propio, no se traduce. */
+  get experiencia() {
+    return actual.experiencia;
+  },
+  /** El hotel que sirve esta pantalla. */
+  get hotel() {
+    return actual.hotel;
+  },
+  /** De dónde sale el correo y a dónde escribe el huésped si algo falla. */
+  get correo() {
+    return actual.correo;
+  },
+  /**
+   * Los dos dominios de este hotel. El huésped y el personal viven separados
+   * a pedido de Tony (15 de noviembre de 2026).
+   *
+   * Sirven para mandar a cada quien a su casa: quien pida /staff en el
+   * dominio del huésped sale para el del personal, y al revés.
+   */
+  get dominioHuesped() {
+    return actual.dominioHuesped;
+  },
+  get dominioPersonal() {
+    return actual.dominioPersonal;
+  },
+  /**
+   * ¿Se manda a cada quien a su dominio?
+   *
+   * Sí desde el 16 de noviembre de 2026, cuando staff.stayhumaya.com empezó
+   * a resolver. Lo que protege los datos sigue siendo la puerta, no el
+   * subdominio: /staff exige cuenta y clave del CRM en cualquiera de los dos.
+   *
+   * Para apagarlo: VITE_DOMINIOS_SEPARADOS=false.
+   */
+  get dominiosSeparados() {
+    return import.meta.env.VITE_DOMINIOS_SEPARADOS !== 'false';
+  },
+};
+
+export type { Lado };
+export { ladoDe } from './services/hotel';
