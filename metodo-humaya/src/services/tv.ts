@@ -228,8 +228,13 @@ export async function prepararFoto(archivo: File): Promise<{ foto: Blob; vidrio:
  * guardan en caché— y nadie entendería por qué.
  */
 export async function subirFotoTv(villaId: string, archivo: File): Promise<string> {
+  return subirFoto(villaId, archivo);
+}
+
+/** El trabajo de subir, igual para la villa y para el hotel. */
+async function subirFoto(prefijo: string, archivo: File): Promise<string> {
   const { foto, vidrio } = await prepararFoto(archivo);
-  const nombre = `${villaId}-${Date.now()}`;
+  const nombre = `${prefijo}-${Date.now()}`;
 
   const db = await cliente();
   const subir = async (ruta: string, blob: Blob) => {
@@ -242,6 +247,73 @@ export async function subirFotoTv(villaId: string, archivo: File): Promise<strin
   await subir(`${nombre}.jpg`, foto);
   await subir(`${nombre}-glass.jpg`, vidrio);
   return nombre;
+}
+
+/**
+ * Lo que es del HOTEL y no de cada villa: el Wi-Fi y la foto de fondo.
+ *
+ * ── POR QUÉ SUBIERON DE NIVEL ───────────────────────────────────────────
+ * Tony, 21 de noviembre de 2026: «la wifi y la foto deben ser para todo, no
+ * por villa, ¿por qué lo hiciste así sin preguntar?». Los datos le dieron la
+ * razón: las diez villas de HUMAYA tenían el MISMO `wifi_ssid` y la MISMA
+ * clave, y las diez tenían la foto vacía. Cambiar la clave del Wi-Fi eran
+ * diez ediciones, y a la tercera habría diez versiones de lo mismo — que es
+ * exactamente el argumento que ya estaba escrito para la guía de la casa, y
+ * que no se aplicó acá.
+ *
+ * La columna de la villa no se borró: la función usa la de la villa si la
+ * tiene y si no la del hotel, igual que con la guía. Lo que cambia es que
+ * Admin no lo PIDE por villa.
+ */
+export interface AjustesTv {
+  wifiSsid: string | null;
+  wifiClave: string | null;
+  wifiSiempre: boolean;
+  foto: string | null;
+}
+
+export async function getAjustesTv(): Promise<AjustesTv> {
+  const db = await cliente();
+  const { data, error } = await db
+    .from('humaya_tv_ajustes')
+    .select('wifi_ssid,wifi_clave,wifi_siempre,foto')
+    .eq('negocio_id', elNegocio())
+    .maybeSingle();
+
+  if (error) throw new Error(`tv_ajustes_${error.code ?? 'error'}`);
+  const fila = (data ?? {}) as Record<string, unknown>;
+  return {
+    wifiSsid: (fila.wifi_ssid as string | null) ?? null,
+    wifiClave: (fila.wifi_clave as string | null) ?? null,
+    wifiSiempre: (fila.wifi_siempre as boolean | null) ?? true,
+    foto: (fila.foto as string | null) ?? null,
+  };
+}
+
+export async function guardarAjustesTv(cambios: Partial<AjustesTv>): Promise<void> {
+  const fila: Record<string, unknown> = { actualizado_en: new Date().toISOString() };
+  if (cambios.wifiSsid !== undefined) fila.wifi_ssid = cambios.wifiSsid;
+  if (cambios.wifiClave !== undefined) fila.wifi_clave = cambios.wifiClave;
+  if (cambios.wifiSiempre !== undefined) fila.wifi_siempre = cambios.wifiSiempre;
+  if (cambios.foto !== undefined) fila.foto = cambios.foto;
+
+  const db = await cliente();
+  // `select()` para contar lo que de verdad cambió: sin él, una fila que RLS
+  // no deja tocar devuelve éxito con cero filas y la pantalla diría que
+  // guardó algo que no guardó.
+  const { data, error } = await db
+    .from('humaya_tv_ajustes')
+    .update(fila)
+    .eq('negocio_id', elNegocio())
+    .select('negocio_id');
+
+  if (error) throw new Error(`tv_ajustes_${error.code ?? 'error'}`);
+  if (!data || data.length === 0) throw new Error('tv_ajustes_sin_permiso');
+}
+
+/** La foto del hotel. Mismo recorte y misma copia desenfocada que la de villa. */
+export async function subirFotoDelHotel(archivo: File): Promise<string> {
+  return subirFoto(`hotel-${elNegocio()}`, archivo);
 }
 
 /** Cómo se ve esa foto, para mostrarla en el admin. */

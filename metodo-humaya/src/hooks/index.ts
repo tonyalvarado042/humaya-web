@@ -53,7 +53,14 @@ export {
   useSaveAnswer,
 } from './useInterview';
 export { useAgendaPorServicio } from './useAgenda';
-export { useGuardarVillaTv, useSubirFotoTv, useVillasTv } from './useTv';
+export {
+  useAjustesTv,
+  useGuardarAjustesTv,
+  useGuardarVillaTv,
+  useSubirFotoDelHotel,
+  useSubirFotoTv,
+  useVillasTv,
+} from './useTv';
 export { queryKeys } from './queryKeys';
 export { useCheckReservation } from './useEntrada';
 export { useBookSlot, useDaySchedule, useSpaSlots, useStayBookings } from './useSpa';

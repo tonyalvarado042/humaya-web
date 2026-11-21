@@ -39,6 +39,9 @@ export interface TvTextos {
   checkoutLabel: string;
   vaciarVilla: string;
 
+  /** El bloque del hotel, que antes era de cada villa. */
+  delHotelTitulo: string;
+  delHotelCuerpo: string;
   wifiTitulo: string;
   wifiCuerpo: string;
   wifiSsidLabel: string;
@@ -126,6 +129,9 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     vaciarVilla: 'Vaciar la villa',
 
     // ── Wi-Fi ─────────────────────────────────────────────────────────
+    delHotelTitulo: 'Wi-Fi y foto, para todas las pantallas',
+    delHotelCuerpo:
+      'Se llena una sola vez y vale para las villas del hotel. Antes estaba en cada una: diez copias del mismo dato, y cambiar la clave del Wi-Fi eran diez ediciones.',
     wifiTitulo: 'Wi-Fi',
     wifiCuerpo:
       'Sale en la pantalla y en el código QR que el huésped escanea para conectarse sin escribir nada.',
@@ -140,7 +146,7 @@ export const tvCopy: Record<Idioma, TvTextos> = {
       'Se recorta a 16:9 por el centro, sin deformarla. También se guarda una copia desenfocada: es la que rellena los números del reloj.',
     fotoElegir: 'Subir una foto',
     fotoSubiendo: 'Subiendo…',
-    fotoPorDefecto: 'Está usando la foto que viene con la pantalla.',
+    fotoPorDefecto: 'Están usando la foto que viene con la pantalla.',
     fotoError: 'No se pudo subir la foto. Probá de nuevo.',
     relojTitulo: 'Dónde va el reloj',
     relojCuerpo: 'Si la foto trae el logo en el centro, el reloj se corre para no taparlo.',
@@ -218,6 +224,9 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     checkoutLabel: 'Check-out time',
     vaciarVilla: 'Empty the villa',
 
+    delHotelTitulo: 'Wi-Fi and photo, for every screen',
+    delHotelCuerpo:
+      'Filled once and it applies to the hotel’s villas. It used to be on each one: ten copies of the same thing, and changing the Wi-Fi password meant ten edits.',
     wifiTitulo: 'Wi-Fi',
     wifiCuerpo:
       'It shows on the screen and in the QR code the guest scans to connect without typing anything.',
@@ -231,7 +240,7 @@ export const tvCopy: Record<Idioma, TvTextos> = {
       'It is cropped to 16:9 from the center, without distorting it. A blurred copy is also stored: that is the one that fills the numbers on the clock.',
     fotoElegir: 'Upload a photo',
     fotoSubiendo: 'Uploading…',
-    fotoPorDefecto: 'It is using the photo that ships with the screen.',
+    fotoPorDefecto: 'They are using the photo that ships with the screen.',
     fotoError: 'The photo could not be uploaded. Try again.',
     relojTitulo: 'Where the clock goes',
     relojCuerpo:

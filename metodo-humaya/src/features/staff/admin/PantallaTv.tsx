@@ -1,7 +1,14 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { Badge, Button, Card, Input, Textarea } from '@/components/ui';
-import { useGuardarVillaTv, useSubirFotoTv, useVillasTv } from '@/hooks';
+import {
+  useAjustesTv,
+  useGuardarAjustesTv,
+  useGuardarVillaTv,
+  useSubirFotoDelHotel,
+  useVillasTv,
+} from '@/hooks';
 import { direccionDelTv, urlDeFoto } from '@/services/tv';
+import type { AjustesTv } from '@/services/tv';
 import type { CambiosVillaTv, VillaTv } from '@/types';
 import { useIdiomaRecepcion } from '../puerta/contexto';
 import { tvCopy } from './copyTv';
@@ -48,6 +55,8 @@ export function PantallaTv() {
           <li>{copy.instructivoPaso3}</li>
         </ol>
       </Card>
+
+      <WifiYFotoDelHotel />
 
       {villas.data.length === 0 ? (
         <Card>
@@ -133,12 +142,149 @@ function useCampo(inicial: string | null) {
   return { valor, setValor, oNull: () => (valor.trim() ? valor.trim() : null) };
 }
 
+/**
+ * El Wi-Fi y la foto: UNA vez, para todas las pantallas del hotel.
+ *
+ * ── POR QUÉ NO ESTÁN EN CADA VILLA ──────────────────────────────────────
+ * Estaban, y Tony lo vio el 21 de noviembre de 2026: «la wifi y la foto
+ * deben ser para todo, no por villa, ¿por qué lo hiciste así sin
+ * preguntar?». Los datos le daban la razón sin discusión: las diez villas de
+ * HUMAYA tenían el MISMO Wi-Fi y la MISMA clave, y las diez tenían la foto
+ * vacía. Cambiar la clave del Wi-Fi eran diez ediciones.
+ *
+ * Es el mismo argumento que ya estaba escrito acá al lado para la guía de la
+ * casa —«copiada diez veces, a la tercera habría diez versiones de lo
+ * mismo»— y que no se había aplicado a esto.
+ */
+function WifiYFotoDelHotel() {
+  const ajustes = useAjustesTv();
+  // Sin datos no se monta el formulario: los campos se inicializan con lo
+  // guardado y nacerían vacíos.
+  if (!ajustes.data) return null;
+  return <FormularioDelHotel ajustes={ajustes.data} />;
+}
+
+function FormularioDelHotel({ ajustes }: { ajustes: AjustesTv }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = tvCopy[idioma];
+  const guardar = useGuardarAjustesTv();
+  const subir = useSubirFotoDelHotel();
+  const archivo = useRef<HTMLInputElement>(null);
+
+  const ssid = useCampo(ajustes.wifiSsid);
+  const claveWifi = useCampo(ajustes.wifiClave);
+  const [siempre, setSiempre] = useState(ajustes.wifiSiempre);
+
+  function enviar(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    guardar.mutate({
+      wifiSsid: ssid.oNull(),
+      wifiClave: claveWifi.oNull(),
+      wifiSiempre: siempre,
+    });
+  }
+
+  return (
+    <Card>
+      <form className="flex flex-col gap-4" onSubmit={enviar}>
+        <div>
+          <h3 className="m-0 font-display text-lg font-medium">{copy.delHotelTitulo}</h3>
+          <p className="m-0 text-[13px] leading-relaxed text-muted">{copy.delHotelCuerpo}</p>
+        </div>
+
+        <fieldset className="m-0 flex flex-col gap-2.5 border-0 p-0">
+          <legend className="p-0 text-eyebrow text-muted">{copy.wifiTitulo}</legend>
+          <p className="m-0 text-[13px] leading-relaxed text-muted">{copy.wifiCuerpo}</p>
+          <div className="grid gap-2.5 sm:grid-cols-2">
+            <Input
+              label={copy.wifiSsidLabel}
+              value={ssid.valor}
+              onChange={(e) => ssid.setValor(e.target.value)}
+            />
+            <Input
+              label={copy.wifiClaveLabel}
+              value={claveWifi.valor}
+              onChange={(e) => claveWifi.setValor(e.target.value)}
+            />
+          </div>
+          <label className="flex items-start gap-2 text-sm text-text">
+            <input
+              type="checkbox"
+              checked={siempre}
+              onChange={(e) => setSiempre(e.target.checked)}
+              className="mt-1"
+            />
+            <span>
+              {copy.wifiSiempreLabel}
+              <span className="block text-[13px] text-muted">{copy.wifiSiempreAyuda}</span>
+            </span>
+          </label>
+        </fieldset>
+
+        <fieldset className="m-0 flex flex-col gap-2.5 border-0 p-0">
+          <legend className="p-0 text-eyebrow text-muted">{copy.fotoTitulo}</legend>
+          <p className="m-0 text-[13px] leading-relaxed text-muted">{copy.fotoCuerpo}</p>
+
+          {ajustes.foto ? (
+            <img
+              src={urlDeFoto(ajustes.foto)}
+              alt=""
+              className="aspect-video w-full max-w-md rounded-card object-cover"
+            />
+          ) : (
+            <p className="m-0 text-[13px] text-muted-soft">{copy.fotoPorDefecto}</p>
+          )}
+
+          <input
+            ref={archivo}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) subir.mutate(f);
+              e.target.value = '';
+            }}
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={subir.isPending}
+              onClick={() => archivo.current?.click()}
+            >
+              {subir.isPending ? copy.fotoSubiendo : copy.fotoElegir}
+            </Button>
+            {subir.isError ? (
+              <span role="alert" className="text-[13px] text-on-alert">
+                {copy.fotoError}
+              </span>
+            ) : null}
+          </div>
+        </fieldset>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="submit" disabled={guardar.isPending}>
+            {guardar.isPending ? copy.guardando : copy.guardar}
+          </Button>
+          {guardar.isSuccess ? (
+            <span className="text-[13px] text-muted">{copy.guardado}</span>
+          ) : null}
+          {guardar.isError ? (
+            <span role="alert" className="text-[13px] text-on-alert">
+              {copy.errorGuardar}
+            </span>
+          ) : null}
+        </div>
+      </form>
+    </Card>
+  );
+}
+
 function Editor({ villa }: { villa: VillaTv }) {
   const [idioma] = useIdiomaRecepcion();
   const copy = tvCopy[idioma];
   const guardar = useGuardarVillaTv();
-  const subir = useSubirFotoTv();
-  const archivo = useRef<HTMLInputElement>(null);
   const [copiada, setCopiada] = useState(false);
 
   const huesped = useCampo(villa.huesped);
@@ -146,12 +292,9 @@ function Editor({ villa }: { villa: VillaTv }) {
   const salida = useCampo(villa.salida);
   const checkin = useCampo(villa.checkin);
   const checkout = useCampo(villa.checkout);
-  const ssid = useCampo(villa.wifiSsid);
-  const claveWifi = useCampo(villa.wifiClave);
   const bienvenida = useCampo(villa.bienvenida);
   const notaTitulo = useCampo(villa.notaTitulo);
   const notaTexto = useCampo(villa.notaTexto);
-  const [siempre, setSiempre] = useState(villa.wifiSiempre);
   const [reloj, setReloj] = useState(villa.relojPosicion);
 
   const direccion = direccionDelTv(villa);
@@ -164,9 +307,6 @@ function Editor({ villa }: { villa: VillaTv }) {
       salida: salida.oNull(),
       checkin: checkin.valor.trim() || '15:00',
       checkout: checkout.valor.trim() || '11:00',
-      wifiSsid: ssid.oNull(),
-      wifiClave: claveWifi.oNull(),
-      wifiSiempre: siempre,
       bienvenida: bienvenida.oNull(),
       notaTitulo: notaTitulo.oNull(),
       notaTexto: notaTexto.oNull(),
@@ -286,79 +426,12 @@ function Editor({ villa }: { villa: VillaTv }) {
         </div>
       </fieldset>
 
-      {/* ── Wi-Fi ──────────────────────────────────────────────────── */}
+      {/* ── Dónde va el reloj ──────────────────────────────────────────
+          Esto SÍ sigue siendo de cada villa: es cómo queda el reloj sobre la
+          foto en ESA pantalla. El Wi-Fi y la foto subieron al hotel, porque
+          eran el mismo dato repetido diez veces. */}
       <fieldset className="m-0 flex flex-col gap-2.5 border-0 p-0">
-        <legend className="p-0 text-eyebrow text-muted">{copy.wifiTitulo}</legend>
-        <p className="m-0 text-[13px] leading-relaxed text-muted">{copy.wifiCuerpo}</p>
-        <div className="grid gap-2.5 sm:grid-cols-2">
-          <Input
-            label={copy.wifiSsidLabel}
-            value={ssid.valor}
-            onChange={(e) => ssid.setValor(e.target.value)}
-          />
-          <Input
-            label={copy.wifiClaveLabel}
-            value={claveWifi.valor}
-            onChange={(e) => claveWifi.setValor(e.target.value)}
-          />
-        </div>
-        <label className="flex items-start gap-2 text-sm text-text">
-          <input
-            type="checkbox"
-            checked={siempre}
-            onChange={(e) => setSiempre(e.target.checked)}
-            className="mt-1"
-          />
-          <span>
-            {copy.wifiSiempreLabel}
-            <span className="block text-[13px] text-muted">{copy.wifiSiempreAyuda}</span>
-          </span>
-        </label>
-      </fieldset>
-
-      {/* ── La foto ────────────────────────────────────────────────── */}
-      <fieldset className="m-0 flex flex-col gap-2.5 border-0 p-0">
-        <legend className="p-0 text-eyebrow text-muted">{copy.fotoTitulo}</legend>
-        <p className="m-0 text-[13px] leading-relaxed text-muted">{copy.fotoCuerpo}</p>
-
-        {villa.foto ? (
-          <img
-            src={urlDeFoto(villa.foto)}
-            alt=""
-            className="aspect-video w-full max-w-md rounded-card object-cover"
-          />
-        ) : (
-          <p className="m-0 text-[13px] text-muted-soft">{copy.fotoPorDefecto}</p>
-        )}
-
-        <input
-          ref={archivo}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) subir.mutate({ id: villa.id, archivo: f });
-            e.target.value = '';
-          }}
-        />
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={subir.isPending}
-            onClick={() => archivo.current?.click()}
-          >
-            {subir.isPending ? copy.fotoSubiendo : copy.fotoElegir}
-          </Button>
-          {subir.isError ? (
-            <span role="alert" className="text-[13px] text-on-alert">
-              {copy.fotoError}
-            </span>
-          ) : null}
-        </div>
-
-        <p className="m-0 text-eyebrow text-muted">{copy.relojTitulo}</p>
+        <legend className="p-0 text-eyebrow text-muted">{copy.relojTitulo}</legend>
         <p className="m-0 text-[13px] text-muted">{copy.relojCuerpo}</p>
         <div className="flex flex-wrap gap-2">
           {(['izquierda', 'centro', 'derecha'] as const).map((donde) => (

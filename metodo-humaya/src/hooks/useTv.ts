@@ -1,7 +1,50 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getVillasTv, guardarVillaTv, subirFotoTv } from '@/services/tv';
+import {
+  getAjustesTv,
+  getVillasTv,
+  guardarAjustesTv,
+  guardarVillaTv,
+  subirFotoDelHotel,
+  subirFotoTv,
+} from '@/services/tv';
+import type { AjustesTv } from '@/services/tv';
 import type { CambiosVillaTv } from '@/types';
 import { queryKeys } from './queryKeys';
+
+/** El Wi-Fi y la foto, que son del hotel y no de cada villa. */
+export function useAjustesTv() {
+  return useQuery({
+    queryKey: queryKeys.ajustesTv(),
+    queryFn: getAjustesTv,
+  });
+}
+
+export function useGuardarAjustesTv() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (cambios: Partial<AjustesTv>) => guardarAjustesTv(cambios),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.ajustesTv() });
+    },
+  });
+}
+
+/** Subirla y dejarla puesta son una sola cosa para quien la sube. */
+export function useSubirFotoDelHotel() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (archivo: File) => {
+      const nombre = await subirFotoDelHotel(archivo);
+      await guardarAjustesTv({ foto: nombre });
+      return nombre;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.ajustesTv() });
+    },
+  });
+}
 
 export function useVillasTv() {
   return useQuery({

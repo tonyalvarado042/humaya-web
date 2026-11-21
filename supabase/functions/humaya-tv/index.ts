@@ -75,6 +75,13 @@ interface Ajustes {
   clima_lat: number | string | null;
   clima_lon: number | string | null;
   clima_tz: string | null;
+  // El Wi-Fi y la foto son del HOTEL. Estaban por villa, repetidos diez
+  // veces identicos, y cambiar la clave eran diez ediciones. Tony, 21 de
+  // noviembre de 2026: «la wifi y la foto deben ser para todo, no por villa».
+  wifi_ssid: string | null;
+  wifi_clave: string | null;
+  wifi_siempre: boolean | null;
+  foto: string | null;
 }
 
 /**
@@ -183,7 +190,9 @@ const CORRIMIENTO: Record<string, number> = { centro: 0, izquierda: -34, derecha
 async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | null) {
   const { data } = await db
     .from("humaya_tv_ajustes")
-    .select("guia,utc_offset,clima_lugar,clima_lat,clima_lon,clima_tz")
+    .select(
+      "guia,utc_offset,clima_lugar,clima_lat,clima_lon,clima_tz,wifi_ssid,wifi_clave,wifi_siempre,foto",
+    )
     .eq("negocio_id", villa.negocio_id)
     .maybeSingle();
   const ajustes = (data ?? {
@@ -193,6 +202,10 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
     clima_lat: null,
     clima_lon: null,
     clima_tz: null,
+    wifi_ssid: null,
+    wifi_clave: null,
+    wifi_siempre: true,
+    foto: null,
   }) as Ajustes;
 
   // Quien esta en la villa sale de las RESERVAS, no de lo que alguien haya
@@ -219,7 +232,15 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
   const st = estadiaDe(quienEsta, Number(ajustes.utc_offset ?? -6), faseForzada);
   // En un hotel el Wi-Fi queda en pantalla también entre huéspedes: quien
   // entra a limpiar o a revisar la villa también lo necesita.
-  const mostrar = st.active || villa.wifi_siempre !== false;
+  // El Wi-Fi y la foto salen del hotel; si la villa tiene los suyos, ganan.
+  // Mismo patron que la guia, ver `guiaDe`. La clave y el «mostrarlo siempre»
+  // siguen al SSID: si la villa tiene su propia red, son los de esa red.
+  const ssid = villa.wifi_ssid ?? ajustes.wifi_ssid;
+  const claveWifi = villa.wifi_ssid ? villa.wifi_clave : ajustes.wifi_clave;
+  const siempre = villa.wifi_ssid ? villa.wifi_siempre : ajustes.wifi_siempre;
+  const foto = villa.foto ?? ajustes.foto ?? "";
+
+  const mostrar = st.active || siempre !== false;
   const g = guiaDe(villa, ajustes) as Record<string, unknown>;
 
   // Las hermanas, para el menu que ofrece el televisor. Sin el filtro, el TV
@@ -245,16 +266,14 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
     // Solo el nombre: el Worker lo convierte en /tv/homes/<nombre>.jpg y, si
     // la villa no tiene foto propia, usa la que viene dentro del Worker.
     // La version desenfocada para el reloj se deriva pegandole "-glass".
-    photos: { hero: villa.foto ?? "", inside: villa.foto ?? "", area: villa.foto ?? "" },
+    photos: { hero: foto, inside: foto, area: foto },
     scene: { clockTop: 13, clockSize: 14, clockX: CORRIMIENTO[villa.reloj_posicion] ?? -34, fg: false },
     stay: st,
     checkin: quienEsta.checkin,
     checkout_time: quienEsta.checkout,
     // De donde salio quien aparece en pantalla, para que Admin lo diga.
     ocupacion: reserva?.huesped ? "reserva" : villa.huesped ? "a_mano" : "vacia",
-    wifi: mostrar && villa.wifi_ssid
-      ? { ssid: villa.wifi_ssid, password: villa.wifi_clave ?? "" }
-      : null,
+    wifi: mostrar && ssid ? { ssid, password: claveWifi ?? "" } : null,
     access: [],
     welcome: villa.bienvenida || (g.welcome ?? ""),
     rules: g.rules ?? [],
