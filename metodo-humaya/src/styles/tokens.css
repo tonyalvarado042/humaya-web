@@ -80,6 +80,30 @@
     --on-celebration: #6e5321;
   }
 
+  /*
+   * Las dos familias tipográficas, como variables propias.
+   *
+   * ── POR QUÉ NO VIVEN DENTRO DE @theme ───────────────────────────────────
+   * Porque Tailwind INCRUSTA el valor literal de `--font-*` en la utilidad:
+   * genera `.font-display{font-family:Cormorant Garamond,…}`, no
+   * `var(--font-display)`. Con los colores hace lo contrario —`.bg-bg` sí
+   * emite `var(--bg)`— y por eso un hotel podía cambiar su paleta y no sus
+   * letras: pisar `--font-display` no tocaba ninguna utilidad.
+   *
+   * Comprobado en vivo el 20 de noviembre de 2026 en
+   * guestexp.liderax10.com/demo: los colores del hotel demo salían verdes y
+   * los títulos seguían en Cormorant.
+   *
+   * Con la familia acá y `@theme inline` apuntándole, la utilidad emite
+   * `var(--typeface-display)` y pisarla sí cambia la pantalla. El nombre
+   * queda FUERA del espacio `--font-*` a propósito: adentro, Tailwind lo
+   * trataría como una fuente más del tema y volvería a incrustarlo.
+   */
+  :root {
+    --typeface-sans: 'Jost Variable', ui-sans-serif, system-ui, sans-serif;
+    --typeface-display: 'Cormorant Garamond', ui-serif, Georgia, serif;
+  }
+
   /* Tonos de estado: iguales en los dos temas salvo celebration, que arriba
      se redefine para que se lea sobre el fondo oscuro de la app del huésped. */
   [data-theme] {
@@ -138,8 +162,9 @@
   --color-neutral: var(--neutral);
   --color-on-neutral: var(--on-neutral);
 
-  --font-sans: 'Jost Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Cormorant Garamond', ui-serif, Georgia, serif;
+  /* Referencias, no literales: ver el comentario de `--typeface-*` arriba. */
+  --font-sans: var(--typeface-sans);
+  --font-display: var(--typeface-display);
 
   --radius-card: 14px;
   --radius-bubble: 18px;

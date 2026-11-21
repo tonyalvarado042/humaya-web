@@ -192,12 +192,20 @@ export function cssDelTema(tema: Tema): string {
   const sobre = color(tema, 'sobreAcento');
   if (sobre) reglas.push(`[data-theme]{--on-gold:${sobre};}`);
 
+  // Se pisa `--typeface-*` y NO `--font-*`. Tailwind incrusta el valor
+  // literal de `--font-*` en cada utilidad al compilar —genera
+  // `.font-display{font-family:Cormorant Garamond,…}`, no un `var()`—, así
+  // que pisar `--font-display` no cambia una sola pantalla. Comprobado en
+  // vivo el 20 de noviembre de 2026: los colores del hotel demo salían
+  // verdes y los títulos seguían en Cormorant. Ver `styles/tokens.css`.
   const fuentes: string[] = [];
   if (esFuente(tema.fuenteTitulos)) {
-    fuentes.push(`--font-display:'${tema.fuenteTitulos.trim()}',ui-serif,Georgia,serif;`);
+    fuentes.push(`--typeface-display:'${tema.fuenteTitulos.trim()}',ui-serif,Georgia,serif;`);
   }
   if (esFuente(tema.fuenteTexto)) {
-    fuentes.push(`--font-sans:'${tema.fuenteTexto.trim()}',ui-sans-serif,system-ui,sans-serif;`);
+    fuentes.push(
+      `--typeface-sans:'${tema.fuenteTexto.trim()}',ui-sans-serif,system-ui,sans-serif;`,
+    );
   }
   if (fuentes.length > 0) reglas.push(`:root{${fuentes.join('')}}`);
 

@@ -610,3 +610,61 @@ Mostrarle esto a Anthony (probar el reproductor completo, comparar los 4 estilos
 punto 24 de `docs/FEEDBACK.md`) antes de: escribir un recorrido de Playwright para Move, y — recién
 cuando él lo autorice — el primer commit de este trabajo y, más adelante, la conexión a tablas reales
 del CRM con nomenclatura clara (ej. `appejercicios_tabla`) en vez de mocks.
+
+---
+
+## 20 de noviembre de 2026 — La marca se configura desde Admin, y Admin se parte en seis
+
+> **Ojo con lo de más arriba.** Las secciones anteriores dicen que no se hace
+> `git commit` ni `git push` sin autorización de Anthony. **Eso cambió el 20 de
+> noviembre de 2026**, textual de Tony: *«siempre push tú solo, preguntame y
+> hazlo»*. La regla vigente está en `AGENTS.md`. Lo de arriba era cierto cuando
+> se escribió y se deja como registro, no como instrucción.
+
+### Qué se hizo
+
+Pedido de Tony: *«todos debe ser configurables colores font y etiquetas en
+admin»* y *«debes mejorar Admin y separar por función, ejemplo: Admin - página
+TV, todo de TV»*.
+
+**Admin dejó de ser una pantalla.** Son seis, cada una con su dirección:
+`/staff/admin/{marca,menu,servicios,concierge,tv,ajustes}`, más una portada con
+fichas. La lista vive en `features/staff/admin/secciones.ts` y la usan el menú,
+la portada y los títulos — un solo lugar.
+
+**Lo que ahora se configura por hotel:**
+
+| Qué | Dónde |
+| --- | --- |
+| Nombres: experiencia, hotel, correo | `humaya_hoteles` |
+| Colores: 2 acentos, texto sobre acento, fondos y textos de cada lado | `humaya_hoteles.tema` (jsonb) |
+| Fuentes: títulos, texto, y si se bajan de Google | idem |
+| Etiquetas del menú del huésped, por idioma | `humaya_admin_opciones.etiquetas` / `.descripciones` (jsonb) |
+
+### Un fallo que estaba escondido
+
+**Las etiquetas del menú no eran configurables, solo lo parecían.** La app del
+huésped hacía `t('nav.' + clave, etiqueta)`, así que para las seis opciones
+sembradas ganaba siempre la traducción del archivo y la etiqueta de la base no
+se veía nunca. Se guardaba bien y no cambiaba nada. Ahora se guarda por idioma
+y lo del hotel le gana a la traducción; donde no escribió, la traducción sigue
+valiendo (ver `src/i18n/opciones.ts`).
+
+### Archivos nuevos que conviene conocer
+
+- `src/services/tema.ts` — arma el CSS del tema y lo aplica **antes de pintar**.
+- `src/services/contraste.ts` — WCAG 2, para avisar que un color no se lee.
+- `src/services/marcaHotel.ts` — leer y guardar la marca (RLS: `administrador`).
+- `src/i18n/opciones.ts` — qué texto ve cada huésped, en su idioma.
+
+### Verificación hecha
+
+`prettier`, `lint`, `typecheck`, **431 tests en 52 archivos** (eran 341 en 43) y
+`build`, todo en limpio. Cada test nuevo se rompió a propósito antes de creerle
+—incluido volver a poner el `t()` viejo, que deja tres tests en rojo—. En un
+navegador de verdad se comprobó el motor del tema: `--gold` distinto en cada
+tema, `color-mix` resolviendo a color real, y quitar el tema devolviendo la
+paleta de `tokens.css`.
+
+**No verificado en navegador:** las seis pantallas de Admin. Piden la cuenta del
+CRM y quien trabajó no pide ni escribe claves. Las tiene que abrir Tony.

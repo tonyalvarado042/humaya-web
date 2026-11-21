@@ -109,3 +109,21 @@ De `docs/PLAN.md`, sin responder todavía:
 - [ ] ¿Dónde reservan los huéspedes hoy? ¿El sistema tiene API?
 - [ ] ¿Qué CRM usan y tiene API?
 - [ ] ¿Tienen WhatsApp Business con API oficial?
+
+---
+
+## Decisiones tomadas sin Anthony — 20 de noviembre de 2026
+
+Del pedido *«todos debe ser configurables colores font y etiquetas en admin»*.
+Ninguna es irreversible; si alguna no le gusta, se cambia.
+
+| Decisión | Por qué | Cómo se deshace |
+| --- | --- | --- |
+| El acento son **dos** campos (fondo oscuro / fondo claro), no uno | `--gold` vale `#c8a565` sobre negro y `#87672e` sobre blanco: un solo hex deja un lado ilegible | Dejar `acentoStaff` vacío y se usa el mismo |
+| Las variantes del acento (bright, dim, track) **se derivan** con `color-mix`, no se piden | Pedir cuatro dorados para elegir uno no lo llena nadie; dejarlos quietos daría bordes dorados en un hotel verde | Agregar campos al formulario |
+| Las etiquetas se guardan **por idioma** en un jsonb, no una columna por idioma | La app tiene dos idiomas y la landing cuatro; así no cambia de forma | — |
+| Orden del texto: idioma del huésped → traducción de la app → otro idioma | Renombrar solo el español no debe hacer que un huésped en inglés lea español | `src/i18n/opciones.ts` |
+| Admin se parte en **seis** secciones con esos nombres | Que cada función tenga su dirección, y que se pueda mandar un enlace a una sola | `features/staff/admin/secciones.ts` |
+| Los botones que necesitan rol `administrador` **no se muestran** a los demás roles | Regla de la casa: lo que se sabe que va a rebotar se explica, no se ofrece | `useEsAdministrador()` |
+| Encender y apagar **sí** se muestra a todo recepción | Pasa por la función `humaya-admin`, que acepta los cuatro roles: esconderlo sería romper algo que funciona | — |
+| El formulario **mide el contraste** y avisa | Un color bonito que no se lee no se descubre hasta que un huésped no encuentra el botón | `src/services/contraste.ts` |

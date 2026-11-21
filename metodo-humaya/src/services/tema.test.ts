@@ -89,10 +89,22 @@ describe('cssDelTema', () => {
     expect(css).toContain('[data-theme]{--on-gold:#071210;}');
   });
 
-  it('las fuentes van en :root porque no dependen del lado', () => {
+  /**
+   * Las que se pisan son `--typeface-*`, NO `--font-*`.
+   *
+   * Tailwind incrusta el valor literal de `--font-*` en cada utilidad al
+   * compilar: genera `.font-display{font-family:Cormorant Garamond,…}` y no
+   * un `var()`. Pisar `--font-display` no cambia una sola pantalla, y eso no
+   * se ve en jsdom —acá no hay Tailwind compilado—: se vio en vivo, con los
+   * colores del hotel demo ya en verde y los títulos todavía en Cormorant.
+   */
+  it('las fuentes pisan --typeface-*, que es lo que las utilidades leen', () => {
     const css = cssDelTema({ fuenteTitulos: 'Playfair Display', fuenteTexto: 'Inter' });
-    expect(css).toContain(":root{--font-display:'Playfair Display',ui-serif,Georgia,serif;");
-    expect(css).toContain("--font-sans:'Inter',ui-sans-serif,system-ui,sans-serif;");
+    expect(css).toContain(":root{--typeface-display:'Playfair Display',ui-serif,Georgia,serif;");
+    expect(css).toContain("--typeface-sans:'Inter',ui-sans-serif,system-ui,sans-serif;");
+    // Pisar `--font-display` seria no hacer nada: que no vuelva a aparecer.
+    expect(css).not.toContain('--font-display');
+    expect(css).not.toContain('--font-sans');
   });
 
   it('un campo suelto no arrastra a los demás', () => {
