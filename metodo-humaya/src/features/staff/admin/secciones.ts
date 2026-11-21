@@ -29,8 +29,6 @@ export interface SeccionAdmin {
   /** Qué se hace acá, para la ficha de la portada. */
   cuerpo: string;
   Icon: typeof LayoutGrid;
-  /** Si hace falta rol `administrador` para cambiar algo de esta sección. */
-  soloAdmin: boolean;
 }
 
 export const SECCIONES_ADMIN: SeccionAdmin[] = [
@@ -40,7 +38,6 @@ export const SECCIONES_ADMIN: SeccionAdmin[] = [
     cuerpo:
       'Cómo se llama el hotel, a dónde escribe el huésped, y con qué colores y letras se ve la app.',
     Icon: Image,
-    soloAdmin: true,
   },
   {
     ruta: 'menu',
@@ -48,40 +45,29 @@ export const SECCIONES_ADMIN: SeccionAdmin[] = [
     cuerpo:
       'Qué opciones ve el huésped en el Home y en la barra de abajo, y cómo se llama cada una en español y en inglés.',
     Icon: LayoutGrid,
-    soloAdmin: true,
   },
   {
     ruta: 'servicios',
     titulo: 'Servicios',
     cuerpo: 'El catálogo que el huésped puede reservar: precio, con quién, duración y horario.',
     Icon: SprayCan,
-    soloAdmin: true,
   },
   {
     ruta: 'concierge',
     titulo: 'Concierge',
     cuerpo: 'El bot que contesta de noche: su llave, lo que sabe y las respuestas guardadas.',
     Icon: Sparkles,
-    soloAdmin: true,
   },
   {
     ruta: 'tv',
     titulo: 'Pantalla del TV',
     cuerpo: 'El televisor de cada villa: su nombre, su foto, su mensaje y su dirección.',
     Icon: MonitorPlay,
-    soloAdmin: true,
   },
   {
     ruta: 'ajustes',
     titulo: 'Ajustes',
     cuerpo: 'Los datos de ejemplo de la demo, y lo que no es de ninguna de las otras secciones.',
     Icon: Settings2,
-    soloAdmin: true,
   },
 ];
-
-/** El título de la sección que corresponde a esta dirección, o null. */
-export function seccionDe(pathname: string): SeccionAdmin | null {
-  const resto = pathname.replace(/^.*\/staff\/admin\/?/, '').split('/')[0];
-  return SECCIONES_ADMIN.find((seccion) => seccion.ruta === resto) ?? null;
-}
