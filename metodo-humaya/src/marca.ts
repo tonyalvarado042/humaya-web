@@ -1,4 +1,5 @@
 import type { Hotel, Lado } from './services/hotel';
+import { aplicarTema, type Tema } from './services/tema';
 
 /**
  * La marca del hotel que está sirviendo esta pantalla.
@@ -52,6 +53,7 @@ const PORDEFECTO = {
 let actual = { ...PORDEFECTO };
 let negocio: string | null = null;
 let codigo: string | null = null;
+let tema: Tema | null = null;
 
 /** Deja puesto el hotel resuelto. Lo llama `main.tsx` antes de pintar. */
 export function aplicarHotel(hotel: Hotel | null): void {
@@ -59,6 +61,8 @@ export function aplicarHotel(hotel: Hotel | null): void {
     actual = { ...PORDEFECTO };
     negocio = null;
     codigo = null;
+    tema = null;
+    aplicarTema(null);
     void avisarALosTextos(PORDEFECTO.experiencia);
     return;
   }
@@ -70,6 +74,11 @@ export function aplicarHotel(hotel: Hotel | null): void {
   };
   negocio = hotel.negocioId;
   codigo = hotel.codigo;
+  tema = hotel.tema;
+  // Los colores se ponen acá, en el mismo momento que el nombre, y por la
+  // misma razón: esto corre antes de pintar. Ponerlos después haría que el
+  // huésped viera la paleta de OTRO hotel durante un instante.
+  aplicarTema(tema);
   void avisarALosTextos(actual.experiencia);
 }
 
@@ -103,6 +112,27 @@ export function negocioActual(): string | null {
 
 export function codigoActual(): string | null {
   return codigo;
+}
+
+/**
+ * Los colores y las fuentes de este hotel, o null si usa la paleta de siempre.
+ *
+ * Lo lee el formulario de marca para nacer con lo que ya está guardado, en vez
+ * de nacer vacío y borrar al guardar lo que nadie tocó.
+ */
+export function temaActual(): Tema | null {
+  return tema;
+}
+
+/**
+ * Deja puesto un tema recién guardado, sin recargar.
+ *
+ * Lo llama la pantalla de marca después de guardar: cambiar un color y tener
+ * que recargar para verlo convierte elegir una paleta en adivinar.
+ */
+export function aplicarTemaNuevo(nuevo: Tema | null): void {
+  tema = nuevo;
+  aplicarTema(nuevo);
 }
 
 export const MARCA = {

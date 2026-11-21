@@ -14,7 +14,14 @@ import { MovePage } from '@/features/guest-app/move/MovePage';
 import { SessionPlayerPage } from '@/features/guest-app/move/SessionPlayerPage';
 import { MyDataPage } from '@/features/guest-app/resumen/MyDataPage';
 import { VillaPage } from '@/features/guest-app/villa/VillaPage';
-import { AdminPage } from '@/features/staff/admin/AdminPage';
+import { AdminIndexPage } from '@/features/staff/admin/AdminIndexPage';
+import { AdminLayout } from '@/features/staff/admin/AdminLayout';
+import { AjustesPage } from '@/features/staff/admin/AjustesPage';
+import { BotPage } from '@/features/staff/admin/BotPage';
+import { MarcaPage } from '@/features/staff/admin/MarcaPage';
+import { MenuPage } from '@/features/staff/admin/MenuPage';
+import { ServiciosPage } from '@/features/staff/admin/ServiciosPage';
+import { TvPage } from '@/features/staff/admin/TvPage';
 import { ArrivalsPage } from '@/features/staff/arrivals/ArrivalsPage';
 import { ConciergeInboxPage } from '@/features/staff/concierge/ConciergeInboxPage';
 import { ConciergeThreadPage } from '@/features/staff/concierge/ConciergeThreadPage';
@@ -66,7 +73,23 @@ export function createRoutes({
             { path: 'spa', element: <SpaPage /> },
             { path: 'concierge', element: <ConciergeInboxPage /> },
             { path: 'concierge/:stayId', element: <ConciergeThreadPage /> },
-            { path: 'admin', element: <AdminPage /> },
+            // Admin dejo de ser una pantalla y paso a ser seis, cada una con
+            // su direccion. Tony, 20 de noviembre de 2026: «debes mejorar
+            // Admin y separar por funcion, ejemplo: Admin - pagina TV, todo
+            // de TV». Ver features/staff/admin/secciones.ts.
+            {
+              path: 'admin',
+              element: <AdminLayout />,
+              children: [
+                { index: true, element: <AdminIndexPage /> },
+                { path: 'marca', element: <MarcaPage /> },
+                { path: 'menu', element: <MenuPage /> },
+                { path: 'servicios', element: <ServiciosPage /> },
+                { path: 'concierge', element: <BotPage /> },
+                { path: 'tv', element: <TvPage /> },
+                { path: 'ajustes', element: <AjustesPage /> },
+              ],
+            },
           ],
         };
 

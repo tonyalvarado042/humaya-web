@@ -147,6 +147,7 @@ describe('los textos siguen al hotel', () => {
       marcaExperiencia: 'Demo Experience',
       marcaHotel: 'HOTEL DEMO',
       correo: 'demo@liderax10.com',
+      tema: null,
     });
     expect(entradaCopy.es.eyebrow).toBe('Demo Experience');
     expect(entradaCopy.en.contactEmail).toBe('demo@liderax10.com');
@@ -157,8 +158,38 @@ describe('los textos siguen al hotel', () => {
       marcaExperiencia: 'HUMAYA Experience',
       marcaHotel: 'HUMAYA',
       correo: 'reservations@stayhumaya.com',
+      tema: null,
     });
     expect(entradaCopy.es.eyebrow).toBe('HUMAYA Experience');
+  });
+
+  /**
+   * Los colores son de la misma clase que los textos: si se quedaran puestos
+   * al cambiar de hotel, un huesped veria la paleta de OTRA marca. Y a
+   * diferencia de un texto, una paleta vieja no se nota como un error: se ve
+   * como una decision de diseño.
+   */
+  it('la paleta tampoco se queda con la del hotel anterior', async () => {
+    aplicarHotel({
+      negocioId: 'n-demo',
+      codigo: 'demo',
+      marcaExperiencia: 'Demo Experience',
+      marcaHotel: 'HOTEL DEMO',
+      correo: 'demo@liderax10.com',
+      tema: { acento: '#4a9d7f' },
+    });
+    expect(document.getElementById('humaya-tema')?.textContent).toContain('#4a9d7f');
+
+    aplicarHotel({
+      negocioId: 'n-humaya',
+      codigo: 'humaya',
+      marcaExperiencia: 'HUMAYA Experience',
+      marcaHotel: 'HUMAYA',
+      correo: 'reservations@stayhumaya.com',
+      tema: null,
+    });
+    // Sin tema propio no queda nada puesto: vale la paleta de `tokens.css`.
+    expect(document.getElementById('humaya-tema')).toBeNull();
   });
 });
 

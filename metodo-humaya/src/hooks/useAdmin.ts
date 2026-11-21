@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   crearServicio,
+  editarOpcion,
   editarServicio,
   getOpciones,
   getServicios,
@@ -8,6 +9,7 @@ import {
   reservarServicio,
   toggleOpcion,
   toggleServicio,
+  type CambiosOpcion,
   type CambiosServicio,
   type NuevoServicio,
 } from '@/services/admin';
@@ -26,6 +28,24 @@ export function useToggleOpcion() {
   return useMutation({
     mutationFn: ({ id, habilitada }: { id: string; habilitada: boolean }) =>
       toggleOpcion(id, habilitada),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin-opciones'] });
+    },
+  });
+}
+
+/**
+ * Cambiarle el nombre a una opcion del menu.
+ *
+ * Invalida las dos listas —la completa de admin y la de habilitadas que lee
+ * el huesped— porque el nombre nuevo tiene que aparecer en las dos.
+ */
+export function useEditarOpcion() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, cambios }: { id: string; cambios: CambiosOpcion }) =>
+      editarOpcion(id, cambios),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin-opciones'] });
     },

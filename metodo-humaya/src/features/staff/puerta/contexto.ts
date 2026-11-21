@@ -37,6 +37,23 @@ export function useQuienEntro(): Persona {
   return useRecepcion().persona;
 }
 
+/**
+ * Si quien entró puede cambiar la configuración del hotel.
+ *
+ * ── PARA QUÉ SE PREGUNTA ANTES ──────────────────────────────────────────
+ * Regla de la casa: si se sabe de antemano que un botón va a rebotar, no se
+ * ofrece el botón — se explica por qué no está. Las tablas `humaya_*` dejan
+ * LEER a todo recepción y escribir solo al rol `administrador`, así que sin
+ * esto el formulario de marca se llenaría entero para terminar en «solo un
+ * administrador puede cambiar esto» al apretar Guardar.
+ *
+ * Esto NO es lo que protege los datos: eso lo hace RLS en la base, y sigue
+ * haciéndolo. Esto es para no hacerle perder el tiempo a nadie.
+ */
+export function useEsAdministrador(): boolean {
+  return useRecepcion().persona.rol === 'administrador';
+}
+
 /** El idioma de recepción y el botón para cambiarlo. */
 export function useIdiomaRecepcion(): [Idioma, () => void] {
   const { idioma, cambiarIdioma } = useRecepcion();

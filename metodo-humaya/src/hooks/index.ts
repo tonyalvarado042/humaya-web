@@ -5,6 +5,7 @@ export {
   useReservarServicio,
   useServicioSlots,
   useEditarServicio,
+  useEditarOpcion,
   useToggleOpcion,
   useToggleServicio,
 } from './useAdmin';
@@ -59,6 +60,7 @@ export { useBookSlot, useDaySchedule, useSpaSlots, useStayBookings } from './use
 export { useArrivals, useStay, useVillaStatus } from './useStays';
 export { useReservas } from './useReservas';
 export { useAjustes, useCambiarDemo } from './useAjustes';
+export { useGuardarMarca, useMarcaDelHotel } from './useMarcaHotel';
 export { useProtocolTips } from './useProtocol';
 export { useVillaInfo } from './useVilla';
 export { useWeeklyProgram, useWorkoutSession } from './useWorkout';

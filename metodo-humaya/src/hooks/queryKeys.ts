@@ -8,6 +8,8 @@ export const queryKeys = {
   arrivals: (range: ArrivalRange) => ['arrivals', range] as const,
   /** Los ajustes del hotel: hoy, el interruptor del demo. */
   ajustes: () => ['ajustes'] as const,
+  /** La marca del hotel: nombres, colores y letras. */
+  marcaDelHotel: () => ['marca-del-hotel'] as const,
   /** Las reservas reales de Cloudbeds, no las llegadas de la demo. */
   reservas: (filtro: string, hoy: string) => ['reservas', filtro, hoy] as const,
   stay: (stayId: string) => ['stay', stayId] as const,

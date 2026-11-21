@@ -56,5 +56,8 @@ beforeEach(async () => {
     marcaExperiencia: 'HUMAYA Experience',
     marcaHotel: 'HUMAYA',
     correo: 'reservations@stayhumaya.com',
+    // Sin tema propio: los tests comprueban la paleta de siempre. El tema de
+    // un hotel se prueba aparte, en tema.test.ts.
+    tema: null,
   });
 });

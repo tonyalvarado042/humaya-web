@@ -1,38 +1,30 @@
 import { useState, type FormEvent } from 'react';
 import { Badge, Button, Card, Input, Textarea } from '@/components/ui';
-import {
-  useAdminOpciones,
-  useAjustes,
-  useCambiarDemo,
-  useAdminServicios,
-  useCrearServicio,
-  useEditarServicio,
-  useToggleOpcion,
-  useToggleServicio,
-} from '@/hooks';
+import { useAdminServicios, useCrearServicio, useEditarServicio, useToggleServicio } from '@/hooks';
 import type { CambiosServicio } from '@/services/admin';
 import type { Servicio } from '@/types';
-import { Screen, ScreenError, ScreenHeading, ScreenLoading } from '../layout/ScreenState';
+import { ScreenError, ScreenLoading } from '../layout/ScreenState';
+import { useEsAdministrador } from '../puerta/contexto';
 import { adminCopy as copy } from './copy';
-import { ConciergeBot } from './ConciergeBot';
-import { PantallaTv } from './PantallaTv';
 
 /**
- * Lo que se configura acá maneja, en el mismo momento, el Home del huésped
- * (las fichas) y el menú de abajo (GuestLayout): las dos leen
- * humaya_admin_opciones. Sauna y Cold Plunge no están acá porque siguen
- * siendo datos de ejemplo (src/mocks/spa.ts); esto agrega servicios más allá
- * de esos dos.
+ * El catálogo de servicios reservables.
+ *
+ * Esto vivía dentro de una sola pantalla de Admin que tenía además el
+ * interruptor del demo, el menú del huésped, el bot del Concierge y las
+ * pantallas de los televisores. Se separó el 20 de noviembre de 2026 a pedido
+ * de Tony: para cambiarle el precio a un servicio había que pasar de largo
+ * por la llave de la API de Anthropic.
+ *
+ * Sauna y Cold Plunge no están acá porque siguen siendo datos de ejemplo
+ * (src/mocks/spa.ts); esto agrega servicios más allá de esos dos.
  */
-export function AdminPage() {
-  const opciones = useAdminOpciones();
+export function ServiciosPage() {
   const servicios = useAdminServicios();
-  const ajustes = useAjustes();
-  const cambiarDemo = useCambiarDemo();
-  const toggleOpcion = useToggleOpcion();
   const toggleServicio = useToggleServicio();
   const crearServicio = useCrearServicio();
   const editarServicio = useEditarServicio();
+  const esAdmin = useEsAdministrador();
 
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -46,19 +38,9 @@ export function AdminPage() {
   /** El servicio que se esta editando, o null. Solo uno a la vez. */
   const [editando, setEditando] = useState<string | null>(null);
 
-  if (opciones.isPending || servicios.isPending) {
-    return <ScreenLoading label={copy.title} />;
-  }
-
-  if (opciones.isError || servicios.isError || !opciones.data || !servicios.data) {
-    return (
-      <ScreenError
-        onRetry={() => {
-          void opciones.refetch();
-          void servicios.refetch();
-        }}
-      />
-    );
+  if (servicios.isPending) return <ScreenLoading label={copy.serviciosTitle} />;
+  if (servicios.isError || !servicios.data) {
+    return <ScreenError onRetry={() => void servicios.refetch()} />;
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -92,192 +74,126 @@ export function AdminPage() {
     );
   }
 
-  const demoVisible = ajustes.data?.demoVisible ?? false;
-
   return (
-    <Screen>
-      <ScreenHeading eyebrow="Recepción" title={copy.title} />
+    <section className="flex flex-col gap-3">
+      <div>
+        <h2 className="m-0 font-display text-2xl font-medium">{copy.serviciosTitle}</h2>
+        <p className="m-0 max-w-prose text-sm leading-relaxed text-muted">{copy.serviciosBody}</p>
+      </div>
 
-      <section className="flex flex-col gap-3">
-        <Card>
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <h2 className="m-0 font-display text-xl text-text">{copy.demoTitulo}</h2>
-              <Badge tone={demoVisible ? 'success' : 'neutral'}>
-                {demoVisible ? copy.demoEncendido : copy.demoApagado}
-              </Badge>
-            </div>
-            <p className="m-0 text-sm leading-relaxed text-muted">{copy.demoCuerpo}</p>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                variant="ghost"
-                disabled={cambiarDemo.isPending}
-                onClick={() => cambiarDemo.mutate(!demoVisible)}
-              >
-                {demoVisible ? copy.demoApagar : copy.demoEncender}
-              </Button>
-              {cambiarDemo.isError ? (
-                <span role="alert" className="text-[13px] text-on-alert">
-                  {copy.demoSoloAdmin}
-                </span>
-              ) : null}
-            </div>
-          </div>
-        </Card>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <div>
-          <h2 className="m-0 font-display text-2xl font-medium">{copy.opcionesTitle}</h2>
-          <p className="m-0 text-sm text-muted">{copy.opcionesBody}</p>
-        </div>
+      {servicios.data.length === 0 ? (
+        <p className="m-0 text-sm text-muted-soft">{copy.serviciosEmpty}</p>
+      ) : (
         <ul className="m-0 flex list-none flex-col gap-2 p-0">
-          {opciones.data.map((opcion) => (
-            <li key={opcion.id}>
-              <Card className="flex items-center justify-between gap-3">
-                <div className="flex flex-col gap-0.5">
-                  <h3 className="m-0 font-medium text-text">{opcion.etiqueta}</h3>
-                  {opcion.descripcion ? (
-                    <span className="text-[13px] text-muted">{opcion.descripcion}</span>
-                  ) : null}
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <Badge tone={opcion.habilitada ? 'success' : 'neutral'}>
-                    {opcion.habilitada ? copy.habilitada : copy.deshabilitada}
-                  </Badge>
-                  <Button
-                    variant="outline"
-                    disabled={toggleOpcion.isPending}
-                    onClick={() =>
-                      toggleOpcion.mutate({ id: opcion.id, habilitada: !opcion.habilitada })
-                    }
-                  >
-                    {opcion.habilitada ? copy.deshabilitar : copy.habilitar}
-                  </Button>
-                </div>
-              </Card>
+          {servicios.data.map((servicio) => (
+            <li key={servicio.id}>
+              <FilaServicio
+                servicio={servicio}
+                esAdmin={esAdmin}
+                editando={editando === servicio.id}
+                guardando={editarServicio.isPending}
+                fallo={editarServicio.isError}
+                toggleando={toggleServicio.isPending}
+                onEditar={() => {
+                  editarServicio.reset();
+                  setEditando(servicio.id);
+                }}
+                onCancelar={() => setEditando(null)}
+                onGuardar={(cambios) =>
+                  editarServicio.mutate(
+                    { id: servicio.id, cambios },
+                    { onSuccess: () => setEditando(null) },
+                  )
+                }
+                onToggle={() =>
+                  toggleServicio.mutate({ id: servicio.id, habilitado: !servicio.habilitado })
+                }
+              />
             </li>
           ))}
         </ul>
-      </section>
+      )}
 
-      <ConciergeBot />
-
-      <section className="flex flex-col gap-3">
-        <div>
-          <h2 className="m-0 font-display text-2xl font-medium">{copy.serviciosTitle}</h2>
-          <p className="m-0 text-sm text-muted">{copy.serviciosBody}</p>
-        </div>
-
-        {servicios.data.length === 0 ? (
-          <p className="m-0 text-sm text-muted-soft">{copy.serviciosEmpty}</p>
-        ) : (
-          <ul className="m-0 flex list-none flex-col gap-2 p-0">
-            {servicios.data.map((servicio) => (
-              <li key={servicio.id}>
-                <FilaServicio
-                  servicio={servicio}
-                  editando={editando === servicio.id}
-                  guardando={editarServicio.isPending}
-                  fallo={editarServicio.isError}
-                  toggleando={toggleServicio.isPending}
-                  onEditar={() => {
-                    editarServicio.reset();
-                    setEditando(servicio.id);
-                  }}
-                  onCancelar={() => setEditando(null)}
-                  onGuardar={(cambios) =>
-                    editarServicio.mutate(
-                      { id: servicio.id, cambios },
-                      { onSuccess: () => setEditando(null) },
-                    )
-                  }
-                  onToggle={() =>
-                    toggleServicio.mutate({ id: servicio.id, habilitado: !servicio.habilitado })
-                  }
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <Card>
-          <form onSubmit={submit} className="flex flex-col gap-3">
-            <h3 className="m-0 font-display text-lg font-medium">{copy.nuevoServicio}</h3>
+      {/* Crear un servicio y encenderlo pasan por la funcion `humaya-admin`,
+          que acepta cualquier rol de recepcion. EDITARLO va directo a la
+          tabla, y ahi RLS exige `administrador`: por eso el boton de editar
+          sí se esconde y estos no. Comprobado leyendo las dos puertas, no
+          supuesto. */}
+      <Card>
+        <form onSubmit={submit} className="flex flex-col gap-3">
+          <h3 className="m-0 font-display text-lg font-medium">{copy.nuevoServicio}</h3>
+          <Input
+            label={copy.nombreLabel}
+            placeholder={copy.nombrePlaceholder}
+            value={nombre}
+            onChange={(event) => setNombre(event.target.value)}
+            error={nombreError ? copy.nombreRequerido : undefined}
+          />
+          <Textarea
+            label={copy.descripcionLabel}
+            placeholder={copy.descripcionPlaceholder}
+            value={descripcion}
+            onChange={(event) => setDescripcion(event.target.value)}
+          />
+          <Input
+            label={copy.proveedorLabel}
+            placeholder={copy.proveedorPlaceholder}
+            value={proveedor}
+            onChange={(event) => setProveedor(event.target.value)}
+          />
+          <div className="grid grid-cols-2 gap-3">
             <Input
-              label={copy.nombreLabel}
-              placeholder={copy.nombrePlaceholder}
-              value={nombre}
-              onChange={(event) => setNombre(event.target.value)}
-              error={nombreError ? copy.nombreRequerido : undefined}
-            />
-            <Textarea
-              label={copy.descripcionLabel}
-              placeholder={copy.descripcionPlaceholder}
-              value={descripcion}
-              onChange={(event) => setDescripcion(event.target.value)}
+              label={copy.precioLabel}
+              type="number"
+              min="0"
+              value={precio}
+              onChange={(event) => setPrecio(event.target.value)}
             />
             <Input
-              label={copy.proveedorLabel}
-              placeholder={copy.proveedorPlaceholder}
-              value={proveedor}
-              onChange={(event) => setProveedor(event.target.value)}
+              label={copy.unidadLabel}
+              value={unidad}
+              onChange={(event) => setUnidad(event.target.value)}
             />
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label={copy.precioLabel}
-                type="number"
-                min="0"
-                value={precio}
-                onChange={(event) => setPrecio(event.target.value)}
-              />
-              <Input
-                label={copy.unidadLabel}
-                value={unidad}
-                onChange={(event) => setUnidad(event.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <Input
-                label={copy.duracionLabel}
-                type="number"
-                min="15"
-                step="15"
-                value={duracion}
-                onChange={(event) => setDuracion(event.target.value)}
-              />
-              <Input
-                label={copy.horaInicioLabel}
-                type="time"
-                value={horaInicio}
-                onChange={(event) => setHoraInicio(event.target.value)}
-              />
-              <Input
-                label={copy.horaFinLabel}
-                type="time"
-                value={horaFin}
-                onChange={(event) => setHoraFin(event.target.value)}
-              />
-            </div>
-            {crearServicio.isError ? (
-              <p role="alert" className="m-0 text-sm text-on-alert">
-                {copy.error}
-              </p>
-            ) : null}
-            <Button type="submit" disabled={crearServicio.isPending}>
-              {crearServicio.isPending ? copy.guardando : copy.guardar}
-            </Button>
-          </form>
-        </Card>
-      </section>
-
-      <PantallaTv />
-    </Screen>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <Input
+              label={copy.duracionLabel}
+              type="number"
+              min="15"
+              step="15"
+              value={duracion}
+              onChange={(event) => setDuracion(event.target.value)}
+            />
+            <Input
+              label={copy.horaInicioLabel}
+              type="time"
+              value={horaInicio}
+              onChange={(event) => setHoraInicio(event.target.value)}
+            />
+            <Input
+              label={copy.horaFinLabel}
+              type="time"
+              value={horaFin}
+              onChange={(event) => setHoraFin(event.target.value)}
+            />
+          </div>
+          {crearServicio.isError ? (
+            <p role="alert" className="m-0 text-sm text-on-alert">
+              {copy.error}
+            </p>
+          ) : null}
+          <Button type="submit" disabled={crearServicio.isPending}>
+            {crearServicio.isPending ? copy.guardando : copy.guardar}
+          </Button>
+        </form>
+      </Card>
+    </section>
   );
 }
 
 interface FilaServicioProps {
   servicio: Servicio;
+  esAdmin: boolean;
   editando: boolean;
   guardando: boolean;
   fallo: boolean;
@@ -298,6 +214,7 @@ interface FilaServicioProps {
  */
 function FilaServicio({
   servicio,
+  esAdmin,
   editando,
   guardando,
   fallo,
@@ -338,9 +255,12 @@ function FilaServicio({
         <Badge tone={servicio.habilitado ? 'success' : 'neutral'}>
           {servicio.habilitado ? copy.habilitada : copy.deshabilitada}
         </Badge>
-        <Button variant="ghost" onClick={onEditar}>
-          {copy.editar}
-        </Button>
+        {/* Editar va directo a la tabla: `administrador` o nada. */}
+        {esAdmin ? (
+          <Button variant="ghost" onClick={onEditar}>
+            {copy.editar}
+          </Button>
+        ) : null}
         <Button variant="outline" disabled={toggleando} onClick={onToggle}>
           {servicio.habilitado ? copy.deshabilitar : copy.habilitar}
         </Button>
@@ -360,8 +280,8 @@ interface FormularioServicioProps {
 /**
  * El formulario existe SOLO mientras se edita, y eso no es casualidad: asi
  * cada vez que se abre, el estado se siembra con lo que esta guardado. Si
- * viviera en AdminPage, cancelar y volver a entrar mostraria lo que alguien
- * tecleo y descarto — lo contrario de cancelar.
+ * viviera en ServiciosPage, cancelar y volver a entrar mostraria lo que
+ * alguien tecleo y descarto — lo contrario de cancelar.
  */
 function FormularioServicio({
   servicio,

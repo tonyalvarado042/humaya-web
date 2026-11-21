@@ -28,42 +28,17 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('opciones del menú', () => {
-  it('lista las seis opciones con su estado', async () => {
-    stubAdminApi();
-    renderRoutes(routes, { route: '/staff/admin' });
-
-    expect(await screen.findByRole('heading', { name: 'Mis datos' })).toBeInTheDocument();
-    for (const label of ['Entrevista', 'Concierge', 'Mi villa', 'Reservas', 'Move']) {
-      expect(screen.getByRole('heading', { name: label })).toBeInTheDocument();
-    }
-    expect(screen.getAllByText('Habilitada')).toHaveLength(6);
-  });
-
-  it('deshabilitar una opción la saca de la lista del Home del huésped', async () => {
-    stubAdminApi();
-    renderRoutes(routes, { route: '/staff/admin' });
-
-    const moveHeading = await screen.findByRole('heading', { name: 'Move' });
-    const moveCard = moveHeading.closest('li') as HTMLElement;
-    await userEvent.click(within(moveCard).getByRole('button', { name: 'Deshabilitar' }));
-
-    expect(await within(moveCard).findByText('Deshabilitada')).toBeInTheDocument();
-    expect(within(moveCard).getByRole('button', { name: 'Habilitar' })).toBeInTheDocument();
-  });
-});
-
 describe('servicios de Reservas', () => {
   it('dice que todavía no hay ninguno', async () => {
     stubAdminApi();
-    renderRoutes(routes, { route: '/staff/admin' });
+    renderRoutes(routes, { route: '/staff/admin/servicios' });
 
     expect(await screen.findByText('Todavía no agregaste ningún servicio.')).toBeInTheDocument();
   });
 
   it('lista los que ya existen, con precio y proveedor', async () => {
     stubAdminApi({ servicios: [ENTRENAMIENTO] });
-    renderRoutes(routes, { route: '/staff/admin' });
+    renderRoutes(routes, { route: '/staff/admin/servicios' });
 
     expect(
       await screen.findByRole('heading', { name: 'Entrenamiento personal' }),
@@ -74,7 +49,7 @@ describe('servicios de Reservas', () => {
 
   it('agregar un servicio nuevo lo suma a la lista', async () => {
     stubAdminApi();
-    renderRoutes(routes, { route: '/staff/admin' });
+    renderRoutes(routes, { route: '/staff/admin/servicios' });
 
     await screen.findByText('Todavía no agregaste ningún servicio.');
 
@@ -90,7 +65,7 @@ describe('servicios de Reservas', () => {
 
   it('no deja guardar sin nombre', async () => {
     stubAdminApi();
-    renderRoutes(routes, { route: '/staff/admin' });
+    renderRoutes(routes, { route: '/staff/admin/servicios' });
 
     await screen.findByText('Todavía no agregaste ningún servicio.');
     await userEvent.click(screen.getByRole('button', { name: 'Guardar servicio' }));
@@ -100,7 +75,7 @@ describe('servicios de Reservas', () => {
 
   it('deshabilitar un servicio lo saca de las opciones de Reservas', async () => {
     stubAdminApi({ servicios: [ENTRENAMIENTO] });
-    renderRoutes(routes, { route: '/staff/admin' });
+    renderRoutes(routes, { route: '/staff/admin/servicios' });
 
     const heading = await screen.findByRole('heading', { name: 'Entrenamiento personal' });
     const card = heading.closest('li') as HTMLElement;

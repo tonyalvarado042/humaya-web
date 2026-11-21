@@ -1,4 +1,4 @@
-import type { AdminOpcion, Servicio, ServicioSlot } from '@/types';
+import type { AdminOpcion, PorIdioma, Servicio, ServicioSlot } from '@/types';
 // Las tres acciones que cambian lo que ve el huesped mandan la sesion de
 // recepcion. Las lecturas y reservarServicio no: las usa la app del huesped,
 // que entra por codigo de confirmacion y no tiene cuenta.
@@ -56,10 +56,38 @@ interface OpcionRow {
   icono: string | null;
   habilitada: boolean;
   orden: number;
+  etiquetas?: unknown;
+  descripciones?: unknown;
+}
+
+/**
+ * Las columnas nuevas son `jsonb`: pueden traer un objeto, `{}`, o —si alguien
+ * escribe a mano— cualquier cosa. Y una fila guardada antes del 20 de
+ * noviembre de 2026 no las trae. Lo que no sea un objeto con textos se trata
+ * como «no hay nada escrito», que es lo que quiere decir.
+ */
+function porIdioma(valor: unknown): PorIdioma {
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return {};
+  const salida: PorIdioma = {};
+  for (const idioma of ['es', 'en'] as const) {
+    const texto = (valor as Record<string, unknown>)[idioma];
+    if (typeof texto === 'string' && texto.trim()) salida[idioma] = texto;
+  }
+  return salida;
 }
 
 function toOpcion(row: OpcionRow): AdminOpcion {
-  return row;
+  return {
+    id: row.id,
+    clave: row.clave,
+    etiqueta: row.etiqueta,
+    descripcion: row.descripcion,
+    icono: row.icono,
+    habilitada: row.habilitada,
+    orden: row.orden,
+    etiquetas: porIdioma(row.etiquetas),
+    descripciones: porIdioma(row.descripciones),
+  };
 }
 
 interface ServicioRow {
@@ -104,6 +132,56 @@ export async function toggleOpcion(id: string, habilitada: boolean): Promise<voi
     headers: await cabeceraDeRecepcion(),
     body: JSON.stringify({ hotel: codigoActual(), action: 'toggle_opcion', id, habilitada }),
   });
+}
+
+/**
+ * Cambiarle el nombre a una opcion del menu, en los idiomas que haga falta.
+ *
+ * ── POR QUE NO PASA POR LA FUNCION ──────────────────────────────────────
+ * Igual que editar un servicio: va directo a la tabla y quien decide si se
+ * puede es RLS. La politica `humaya_admin_opciones_admin` exige rol
+ * `administrador`. Hacerlo cumplir en la base es mas seguro que una
+ * comprobacion en el camino que se puede olvidar.
+ *
+ * ── POR QUE EL OBJETO VIAJA COMPLETO ────────────────────────────────────
+ * `etiquetas` es UNA columna jsonb. Mandar solo el espanol borraria el
+ * ingles. El formulario lo leyo entero al abrir y lo manda entero.
+ */
+export interface CambiosOpcion {
+  etiquetas?: PorIdioma;
+  descripciones?: PorIdioma;
+}
+
+/** Saca los idiomas en blanco: un `''` guardado es basura que queda. */
+function sinVacios(textos: PorIdioma): PorIdioma {
+  const limpio: PorIdioma = {};
+  for (const idioma of ['es', 'en'] as const) {
+    const texto = textos[idioma]?.trim();
+    if (texto) limpio[idioma] = texto;
+  }
+  return limpio;
+}
+
+export async function editarOpcion(id: string, cambios: CambiosOpcion): Promise<void> {
+  const { cliente } = await import('./sesion');
+  const db = await cliente();
+
+  const fila: Record<string, unknown> = { actualizado_en: new Date().toISOString() };
+  if (cambios.etiquetas !== undefined) fila.etiquetas = sinVacios(cambios.etiquetas);
+  if (cambios.descripciones !== undefined) fila.descripciones = sinVacios(cambios.descripciones);
+
+  // `select()` para contar lo que de verdad cambio: sin el, una fila que RLS
+  // no deja tocar devuelve exito con cero filas y la pantalla diria que
+  // guardo algo que no guardo.
+  const { data, error } = await db
+    .from('humaya_admin_opciones')
+    .update(fila)
+    .eq('id', id)
+    .eq('negocio_id', elNegocio())
+    .select('id');
+
+  if (error) throw new Error(`opcion_${error.code ?? 'error'}`);
+  if (!data || data.length === 0) throw new Error('opcion_sin_permiso');
 }
 
 export async function getServicios(onlyEnabled = false): Promise<Servicio[]> {

@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { HumayaLogo } from '@/components/HumayaLogo';
 import { Card } from '@/components/ui';
 import { useAdminOpciones, useGuestProfile, useInterviewProgress } from '@/hooks';
+import { descripcionDeOpcion, etiquetaDeOpcion } from '@/i18n/opciones';
+import { supportedGuestLanguage } from '@/i18n/localizedText';
 import { daysUntil } from '@/services/clock';
 import { firstName, villaName } from '../format';
 import { OPCION_ICONS } from '../icons';
@@ -18,7 +20,12 @@ import { LanguageSelector } from './LanguageSelector';
  */
 export function HomePage() {
   const { stayId } = useCurrentStay();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  // El idioma en el que lee ESTA persona: decide cuál de los textos del hotel
+  // se muestra.
+  const idioma = supportedGuestLanguage(
+    i18n.language as Parameters<typeof supportedGuestLanguage>[0],
+  );
   const profile = useGuestProfile(stayId);
   const progress = useInterviewProgress(stayId);
   const opciones = useAdminOpciones(true);
@@ -88,10 +95,12 @@ export function HomePage() {
                   <Icon size={26} strokeWidth={1.6} className="text-gold" aria-hidden="true" />
                 ) : null}
                 <span className="font-display text-xl leading-tight font-medium text-text">
-                  {t(`nav.${opcion.clave}`, opcion.etiqueta)}
+                  {etiquetaDeOpcion(opcion, idioma)}
                 </span>
-                {opcion.descripcion ? (
-                  <p className="m-0 text-[13px] leading-relaxed text-muted">{opcion.descripcion}</p>
+                {descripcionDeOpcion(opcion, idioma) ? (
+                  <p className="m-0 text-[13px] leading-relaxed text-muted">
+                    {descripcionDeOpcion(opcion, idioma)}
+                  </p>
                 ) : null}
                 {isInterview ? (
                   <span className="mt-auto text-xs font-medium text-gold">

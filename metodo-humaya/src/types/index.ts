@@ -1,4 +1,4 @@
-export type { AdminOpcion, Servicio, ServicioSlot } from './admin';
+export type { AdminOpcion, PorIdioma, Servicio, ServicioSlot } from './admin';
 export type { ReservaDeServicio, ServicioConReservas } from './agenda';
 export type { CambiosVillaTv, VillaTv } from './tv';
 export type { Locale, LocalizedText, Pillar } from './common';

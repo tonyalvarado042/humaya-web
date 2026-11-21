@@ -3,6 +3,8 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/components/ui/cn';
 import { useAdminOpciones } from '@/hooks';
+import { etiquetaDeOpcion } from '@/i18n/opciones';
+import { supportedGuestLanguage } from '@/i18n/localizedText';
 import { OPCION_ICONS } from '../icons';
 import { GuestLanguageProvider } from './GuestLanguageProvider';
 import { StayProvider } from './StayProvider';
@@ -19,7 +21,10 @@ export function GuestLayout() {
 }
 
 function GuestShell() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const idioma = supportedGuestLanguage(
+    i18n.language as Parameters<typeof supportedGuestLanguage>[0],
+  );
   // Inicio no se puede deshabilitar: las demás opciones salen de
   // humaya_admin_opciones, la misma fuente que leen las fichas del Home.
   const opciones = useAdminOpciones(true);
@@ -28,10 +33,11 @@ function GuestShell() {
     { to: '/app', label: t('nav.home'), Icon: House, end: true },
     ...(opciones.data ?? []).map((opcion) => ({
       to: `/app/${opcion.clave}`,
-      // Las 5 opciones sembradas tienen su llave en nav.*, traducida; una
-      // opción nueva que agregue el admin cae a su etiqueta tal cual (en
-      // español, hasta que haya una forma de cargarla en los dos idiomas).
-      label: t(`nav.${opcion.clave}`, opcion.etiqueta),
+      // Lo que el hotel escribió en el idioma de esta persona le gana a la
+      // traducción de la app; donde no escribió nada, sigue valiendo la
+      // traducción. Ver src/i18n/opciones.ts: hasta el 20 de noviembre de
+      // 2026 renombrar una opción en admin no cambiaba NADA acá.
+      label: etiquetaDeOpcion(opcion, idioma),
       Icon: (opcion.icono && OPCION_ICONS[opcion.icono]) || House,
       end: false,
     })),

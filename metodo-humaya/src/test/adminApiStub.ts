@@ -8,6 +8,12 @@ export interface StubOpcion {
   icono: string | null;
   habilitada: boolean;
   orden: number;
+  /**
+   * Opcionales a proposito: una fila guardada antes del 20 de noviembre de
+   * 2026 no las trae, y el servicio tiene que aguantarlo igual.
+   */
+  etiquetas?: Record<string, string>;
+  descripciones?: Record<string, string>;
 }
 
 export interface StubServicio {

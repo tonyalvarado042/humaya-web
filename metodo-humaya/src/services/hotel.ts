@@ -1,4 +1,5 @@
 import { SUPABASE_KEY, SUPABASE_URL } from './sesion';
+import { comoTema, type Tema } from './tema';
 
 /**
  * De qué hotel es esta pantalla.
@@ -31,6 +32,8 @@ export interface Hotel {
   marcaExperiencia: string;
   marcaHotel: string;
   correo: string;
+  /** Colores y tipografia propios, o null para la paleta de siempre. */
+  tema: Tema | null;
 }
 
 export type Lado = 'huesped' | 'personal' | 'ambos';
@@ -82,6 +85,7 @@ interface FilaDominio {
   marca_experiencia: string | null;
   marca_hotel: string | null;
   correo: string | null;
+  tema: unknown;
 }
 
 interface FilaCodigo {
@@ -90,6 +94,7 @@ interface FilaCodigo {
   marca_experiencia: string;
   marca_hotel: string;
   correo: string;
+  tema: unknown;
 }
 
 const aHotel = (f: FilaCodigo): Hotel => ({
@@ -98,6 +103,7 @@ const aHotel = (f: FilaCodigo): Hotel => ({
   marcaExperiencia: f.marca_experiencia,
   marcaHotel: f.marca_hotel,
   correo: f.correo,
+  tema: comoTema(f.tema),
 });
 
 /**
@@ -155,6 +161,7 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
         marca_experiencia: fila.marca_experiencia ?? '',
         marca_hotel: fila.marca_hotel ?? '',
         correo: fila.correo ?? '',
+        tema: fila.tema,
       }),
       base: '',
       compartido: false,
