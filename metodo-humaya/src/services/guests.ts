@@ -96,32 +96,34 @@ export function timelineFor(stayId: string): TimelineEvent[] {
   const followUp = new Date(`${day(stay.checkOut)}T00:00:00Z`);
   followUp.setUTCDate(followUp.getUTCDate() + 1);
 
+  // Sin una sola frase: los nombres de los hitos y el «dia 7 de 7» los pone
+  // la pantalla, que es la que sabe en que idioma esta. Ver Timeline.tsx.
   return [
     {
       id: 'interview',
-      label: progress.complete
-        ? 'Entrevista completa'
-        : `Entrevista ${progress.answered} de ${progress.total}`,
-      when: lastAnswer ? day(lastAnswer) : 'Sin empezar',
       done: progress.complete,
+      date: lastAnswer ? day(lastAnswer) : null,
+      interview: {
+        answered: progress.answered,
+        total: progress.total,
+        complete: progress.complete,
+      },
     },
     {
       id: 'prep',
-      label: 'Preparación pre-llegada',
-      when: stay.prepDay ? `día ${stay.prepDay} de 7` : '—',
       done: (stay.prepDay ?? 0) >= 7,
+      date: null,
+      prepDay: stay.prepDay ?? null,
     },
     {
       id: 'arrival',
-      label: 'Llegada',
-      when: day(stay.checkIn),
       done: day(stay.checkIn) <= getToday(),
+      date: day(stay.checkIn),
     },
     {
       id: 'follow-up',
-      label: 'Seguimiento',
-      when: followUp.toISOString().slice(0, 10),
       done: false,
+      date: followUp.toISOString().slice(0, 10),
     },
   ];
 }

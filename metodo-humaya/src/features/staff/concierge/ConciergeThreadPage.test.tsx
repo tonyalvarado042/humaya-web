@@ -43,7 +43,7 @@ describe('Conversación de un huésped', () => {
 
     expect(await screen.findByRole('heading', { name: 'Valeria' })).toBeInTheDocument();
     expect(screen.getByText(/tienen helicóptero/)).toBeInTheDocument();
-    expect(screen.getByText(/El bot no supo responder/)).toBeInTheDocument();
+    expect(screen.getByText(/The bot did not know how to answer/)).toBeInTheDocument();
   });
 
   it('marca la conversación como leída al abrirla', async () => {
@@ -77,9 +77,9 @@ describe('Conversación de un huésped', () => {
     stubConciergeApi();
     renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
 
-    const field = await screen.findByLabelText('Tu respuesta (español)');
+    const field = await screen.findByLabelText('Your reply (Spanish)');
     await userEvent.type(field, 'Ya te confirmamos el horario.');
-    await userEvent.click(screen.getByRole('button', { name: 'Enviar' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Send' }));
 
     expect(await screen.findAllByText('Ya te confirmamos el horario.')).not.toHaveLength(0);
     expect(field).toHaveValue('');
@@ -92,14 +92,14 @@ describe('Conversación de un huésped', () => {
     stubConciergeApi();
     renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
 
-    const es = await screen.findByLabelText('Tu respuesta (español)');
+    const es = await screen.findByLabelText('Your reply (Spanish)');
     await userEvent.type(es, 'Ya está reservado.');
 
-    expect(await screen.findByText(/va a recibir el texto en español/)).toBeInTheDocument();
+    expect(await screen.findByText(/will receive the Spanish text/)).toBeInTheDocument();
 
-    await userEvent.type(screen.getByLabelText('La misma, en inglés'), "It's booked.");
+    await userEvent.type(screen.getByLabelText('The same, in English'), "It's booked.");
 
-    expect(screen.queryByText(/va a recibir el texto en español/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/will receive the Spanish text/)).not.toBeInTheDocument();
   });
 
   it('manda los dos idiomas cuando se escriben los dos', async () => {
@@ -107,11 +107,11 @@ describe('Conversación de un huésped', () => {
     renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
 
     await userEvent.type(
-      await screen.findByLabelText('Tu respuesta (español)'),
+      await screen.findByLabelText('Your reply (Spanish)'),
       'Ya está reservado.',
     );
-    await userEvent.type(screen.getByLabelText('La misma, en inglés'), "It's booked.");
-    await userEvent.click(screen.getByRole('button', { name: 'Enviar' }));
+    await userEvent.type(screen.getByLabelText('The same, in English'), "It's booked.");
+    await userEvent.click(screen.getByRole('button', { name: 'Send' }));
 
     const envio = fetchMock.mock.calls
       .map(([, init]) => String((init as RequestInit | undefined)?.body ?? ''))
@@ -137,15 +137,15 @@ describe('Conversación de un huésped', () => {
     renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
 
     // Lo que puede terminar en una ambulancia.
-    expect(await screen.findByText('Nunca olvidar')).toBeInTheDocument();
-    expect(screen.getByText('Andrés: alergia a frutos secos')).toBeInTheDocument();
+    expect(await screen.findByText('Never forget')).toBeInTheDocument();
+    expect(screen.getByText('Andrés: nut allergy')).toBeInTheDocument();
 
     // Dónde va en su estadía: la misma pregunta se contesta distinto el
     // primer día que la última mañana.
-    expect(screen.getByText(/Llega hoy a las/)).toBeInTheDocument();
+    expect(screen.getByText(/Arrives today at/)).toBeInTheDocument();
 
     // La celebración que, si nadie menciona, se pierde.
-    expect(screen.getByText(/Aniversario · 5 años/)).toBeInTheDocument();
+    expect(screen.getByText(/Anniversary · 5 years/)).toBeInTheDocument();
 
     // Cómo pidió que lo atendamos, en sus palabras.
     expect(screen.getByText(/mensaje antes de que alguien pase por la villa/)).toBeInTheDocument();
@@ -155,7 +155,7 @@ describe('Conversación de un huésped', () => {
     stubConciergeApi();
     renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
 
-    const seccion = await screen.findByText(/Lo que ya nos dijo · 5/);
+    const seccion = await screen.findByText(/What they already told us · 5/);
     const plegable = seccion.closest('details');
 
     // Cerrada al entrar: el chat es lo que se viene a leer, no el expediente.
@@ -175,7 +175,7 @@ describe('Conversación de un huésped', () => {
     stubConciergeApi();
     renderRoutes(routes, { route: '/staff/concierge/s-mendez-rojas' });
 
-    const enlace = await screen.findByRole('link', { name: /Abrir la ficha completa/ });
+    const enlace = await screen.findByRole('link', { name: /Open the full profile/ });
     expect(enlace).toHaveAttribute('href', '/staff/guests/s-mendez-rojas');
   });
 
@@ -183,6 +183,6 @@ describe('Conversación de un huésped', () => {
     stubConciergeApi();
     renderRoutes(routes, { route: '/staff/concierge/no-existe' });
 
-    expect(await screen.findByText('No encontramos esa conversación')).toBeInTheDocument();
+    expect(await screen.findByText('We could not find that conversation')).toBeInTheDocument();
   });
 });

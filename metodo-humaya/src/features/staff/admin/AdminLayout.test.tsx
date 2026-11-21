@@ -6,7 +6,10 @@ import { routes } from '@/router';
 import { stubAdminApi } from '@/test/adminApiStub';
 import { renderRoutes } from '@/test/renderWithProviders';
 import { NEGOCIO_DE_PRUEBA, stubSesionAbierta, supabaseStub } from '@/test/supabaseStub';
-import { SECCIONES_ADMIN } from './secciones';
+import { seccionesAdmin } from './secciones';
+
+// Las pruebas corren en ingles, que es el idioma por omision de recepcion.
+const SECCIONES = seccionesAdmin('en');
 
 /**
  * Admin dejó de ser una pantalla y pasó a ser seis.
@@ -50,7 +53,7 @@ describe('la portada de Admin', () => {
     renderRoutes(routes, { route: '/staff/admin' });
 
     await screen.findByRole('heading', { name: 'Admin' });
-    for (const seccion of SECCIONES_ADMIN) {
+    for (const seccion of SECCIONES) {
       const ficha = screen.getByRole('heading', { name: seccion.titulo, level: 2 });
       expect(ficha).toBeInTheDocument();
       expect(screen.getByText(seccion.cuerpo)).toBeInTheDocument();
@@ -62,8 +65,8 @@ describe('la portada de Admin', () => {
 
     // Acotado a la lista de fichas: el mismo nombre está además en el menú de
     // secciones de arriba, y sin acotar la búsqueda encuentra los dos.
-    const fichas = within(await screen.findByRole('list', { name: 'Lo que se configura' }));
-    for (const seccion of SECCIONES_ADMIN) {
+    const fichas = within(await screen.findByRole('list', { name: 'What you configure' }));
+    for (const seccion of SECCIONES) {
       const enlace = fichas.getByRole('link', { name: new RegExp(seccion.titulo) });
       expect(enlace).toHaveAttribute('href', `/staff/admin/${seccion.ruta}`);
     }
@@ -74,22 +77,20 @@ describe('el menú de secciones', () => {
   it('lleva de una sección a otra sin pasar por la portada', async () => {
     renderRoutes(routes, { route: '/staff/admin/servicios' });
 
-    await screen.findByRole('heading', { name: 'Servicios de Reservas' });
+    await screen.findByRole('heading', { name: 'Bookable services' });
 
-    const menu = within(screen.getByRole('navigation', { name: 'Secciones de Admin' }));
-    await userEvent.click(menu.getByRole('link', { name: 'Menú del huésped' }));
+    const menu = within(screen.getByRole('navigation', { name: 'Admin sections' }));
+    await userEvent.click(menu.getByRole('link', { name: 'Guest menu' }));
 
     expect(
-      await screen.findByRole('heading', { name: 'Menú del huésped', level: 2 }),
+      await screen.findByRole('heading', { name: 'Guest menu', level: 2 }),
     ).toBeInTheDocument();
   });
 
   it('está en todas las secciones', async () => {
     renderRoutes(routes, { route: '/staff/admin/marca' });
 
-    expect(
-      await screen.findByRole('navigation', { name: 'Secciones de Admin' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('navigation', { name: 'Admin sections' })).toBeInTheDocument();
   });
 });
 
@@ -105,7 +106,7 @@ describe('quién ve qué', () => {
     renderRoutes(routes, { route: '/staff/admin' });
 
     await screen.findByRole('heading', { name: 'Admin' });
-    expect(screen.getByRole('status')).toHaveTextContent(/lo hace un administrador/i);
+    expect(screen.getByRole('status')).toHaveTextContent(/is done by an administrator/i);
   });
 
   it('a un administrador no le avisa nada', async () => {

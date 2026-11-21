@@ -14,7 +14,7 @@ import {
 import { useAjustes, useReservas } from '@/hooks';
 import { getToday } from '@/services/clock';
 import { resumirReservas, type FiltroReservas, type Reserva } from '@/services/reservas';
-import { longDate } from '../format';
+import { localeDe, longDate } from '../format';
 import { useIdiomaRecepcion } from '../puerta/contexto';
 import { Screen, ScreenError, ScreenHeading, ScreenLoading } from '../layout/ScreenState';
 import { arrivalsCopy, type ArrivalsTextos } from './copy';
@@ -65,7 +65,7 @@ type Vista = FiltroReservas | 'demo';
 export function ArrivalsPage() {
   const [idioma] = useIdiomaRecepcion();
   const copy = arrivalsCopy[idioma];
-  const locale = idioma === 'es' ? 'es-CR' : 'en-US';
+  const locale = localeDe(idioma);
   const hoy = getToday();
 
   const ajustes = useAjustes();

@@ -160,3 +160,33 @@ Son tres caminos y los tres son razonables:
 
 Hoy está en el peor de los tres: promete y no cumple. No lo elegí yo porque escribir 628 líneas de
 voz de marca en inglés no es una corrección, es una decisión de producto.
+
+---
+
+## «Aplica 1» — 21 de noviembre de 2026
+
+Tony eligió la primera de las tres salidas: **traducir recepción entera**, para que un
+recepcionista que no lee español pueda trabajar un turno completo. Hecho. Lo que cambió, más allá
+de escribir el texto:
+
+| Decisión | Por qué |
+| --- | --- |
+| La página lee el idioma **una vez** y se lo pasa a sus hijos | Era el patrón que ya usaban Llegadas y Huéspedes. Y los selectores de arriba eran constantes de módulo: leían el texto al importar el archivo y se quedaban en el idioma del primer render |
+| `longDate` y `timeLabel` **ya no tienen idioma por omisión** | El `locale = 'es-CR'` por omisión fue el fallo de Huéspedes. Una fecha en español nunca se ve «rota», se ve como una fecha; sin valor por omisión, al que se le olvide no le compila |
+| `localeDe(idioma)` en un solo lugar | El ternario `idioma === 'es' ? 'es-CR' : 'en-US'` estaba escrito a mano pantalla por pantalla |
+| La línea de tiempo del huésped: el servicio manda los **hechos**, la pantalla arma la frase | `timelineFor()` devolvía «Preparación pre-llegada» y «día 7 de 7» ya escritos. Un dato con idioma adentro no se puede traducir |
+| Las etiquetas de alerta siguen el idioma de recepción | `localizedText(a.label, 'es')` estaba clavado en tres lugares: la ficha mostraba «alergia a frutos secos» a alguien que lee en inglés, cuando el dato ya tenía su versión |
+| Lo que **no** se traduce: los pilares (Move, Nourish…), «HUMAYA Experience», y los nombres de idioma (Español, English) | Son nombre propio. Traducirlos en una pantalla le daría al equipo dos vocabularios para lo mismo |
+| Lo que **tampoco** se traduce: el contenido que escribió el hotel | Los temas del bot, las notas, los textos de la entrevista, los WOW. Eso es dato, no pantalla. Se ve en la ficha: el marco en inglés y lo que escribió el hotel en español |
+| `renderWithProviders` aprendió la opción `recepcion` | Para montar un componente de recepción suelto hace falta la puerta. Y de paso la prueba dice en qué idioma mira, en vez de depender del valor por omisión |
+
+### Dos cosas que la traducción destapó
+
+**El panel comparaba un dato contra un texto de la pantalla.** `preferredCare !== copy.sinEntrevista`:
+con la pantalla en inglés la comparación no calzaba nunca y la ficha mostraba «Cómo pidió que lo
+atendamos: Todavía no completaron la entrevista». Se compara contra el texto español a propósito,
+con el motivo escrito al lado. El dato sigue siendo una frase de pantalla, que es la trampa de
+fondo.
+
+**«key since settings».** Traduje `llaveDesde` como «since» cuando significa «de dónde sale la
+llave». Se vio abriendo la pantalla, no en una prueba.

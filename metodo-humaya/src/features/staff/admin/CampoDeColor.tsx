@@ -2,7 +2,8 @@ import { useId } from 'react';
 import { Button } from '@/components/ui';
 import { contraste, veredicto, type Veredicto } from '@/services/contraste';
 import { esColor } from '@/services/tema';
-import { marcaCopy as copy } from './copyMarca';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { marcaCopy, type MarcaTextos } from './copyMarca';
 
 /**
  * Un color de la marca: la muestra que se puede abrir, el hex escrito, y
@@ -30,18 +31,29 @@ interface CampoDeColorProps {
   extra?: React.ReactNode;
 }
 
-const TONOS: Record<Veredicto, { texto: string; clase: string }> = {
-  bien: { texto: copy.contrasteBien, clase: 'text-on-success' },
-  justo: { texto: copy.contrasteJusto, clase: 'text-on-warning' },
-  mal: { texto: copy.contrasteMal, clase: 'text-on-alert' },
-  desconocido: { texto: '', clase: '' },
-};
+/**
+ * El veredicto del contraste, con su color.
+ *
+ * Era una constante de modulo que leia `copy` al importar el archivo: con dos
+ * idiomas se quedaba en el del primer render y el boton de idioma no la
+ * cambiaba nunca.
+ */
+function tonos(copy: MarcaTextos): Record<Veredicto, { texto: string; clase: string }> {
+  return {
+    bien: { texto: copy.contrasteBien, clase: 'text-on-success' },
+    justo: { texto: copy.contrasteJusto, clase: 'text-on-warning' },
+    mal: { texto: copy.contrasteMal, clase: 'text-on-alert' },
+    desconocido: { texto: '', clase: '' },
+  };
+}
 
 export function CampoDeColor({ label, ayuda, valor, onChange, contra, extra }: CampoDeColorProps) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = marcaCopy[idioma];
   const id = useId();
   const puesto = esColor(valor);
   const razon = puesto && contra ? contraste(valor, contra) : null;
-  const tono = TONOS[veredicto(razon)];
+  const tono = tonos(copy)[veredicto(razon)];
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -84,7 +96,7 @@ export function CampoDeColor({ label, ayuda, valor, onChange, contra, extra }: C
       ) : null}
       {valor && !puesto ? (
         <p className="m-0 text-[13px] text-on-alert" role="alert">
-          Escribilo como #rrggbb. Así no se guarda.
+          {copy.noEsColor}
         </p>
       ) : null}
     </div>

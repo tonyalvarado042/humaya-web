@@ -5,7 +5,8 @@ import { localizedText } from '@/i18n/localizedText';
 import { useConciergeConversations, useGuestProfile, useSaveTeamNotes } from '@/hooks';
 import { initials, villaName } from '../format';
 import { Screen, ScreenLoading } from '../layout/ScreenState';
-import { profileCopy as copy } from './copy';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { profileCopy, type ProfileTextos } from './copy';
 import { Timeline } from './Timeline';
 import { WowPanel } from './WowPanel';
 
@@ -17,6 +18,8 @@ function nightsBetween(checkIn: string, checkOut: string): number {
 }
 
 export function GuestProfilePage() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = profileCopy[idioma];
   const { stayId } = useParams<{ stayId: string }>();
   const profile = useGuestProfile(stayId ?? '');
   const saveNotes = useSaveTeamNotes(stayId ?? '');
@@ -26,7 +29,7 @@ export function GuestProfilePage() {
   if (!stayId) {
     return (
       <Screen>
-        <NotFound />
+        <NotFound copy={copy} />
       </Screen>
     );
   }
@@ -40,7 +43,7 @@ export function GuestProfilePage() {
   if (profile.isError || !profile.data) {
     return (
       <Screen>
-        <NotFound />
+        <NotFound copy={copy} />
       </Screen>
     );
   }
@@ -88,7 +91,7 @@ export function GuestProfilePage() {
                       : 'info'
                 }
               >
-                {localizedText(alert.label, 'es')}
+                {localizedText(alert.label, idioma)}
               </Tag>
             </li>
           ))}
@@ -134,7 +137,7 @@ export function GuestProfilePage() {
             <p className="m-0 text-sm text-muted">{copy.noPillars}</p>
           )}
 
-          <Timeline events={timeline} />
+          <Timeline copy={copy} events={timeline} />
 
           <div className="flex flex-col gap-2">
             <Textarea
@@ -159,7 +162,7 @@ export function GuestProfilePage() {
   );
 }
 
-function NotFound() {
+function NotFound({ copy }: { copy: ProfileTextos }) {
   return (
     <EmptyState
       title={copy.notFoundTitle}

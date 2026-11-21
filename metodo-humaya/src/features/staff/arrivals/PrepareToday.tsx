@@ -1,10 +1,14 @@
 import { Skeleton } from '@/components/ui';
 import { useWowsDueBy } from '@/hooks';
-import { timeLabel, villaName } from '../format';
-import { demoCopy as copy } from './copyDemo';
+import { localeDe, timeLabel, villaName } from '../format';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { demoCopy } from './copyDemo';
 
 /** Las experiencias WOW con hora límite hoy, ordenadas por cuándo vencen. */
 export function PrepareToday() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = demoCopy[idioma];
+  const locale = localeDe(idioma);
   const wows = useWowsDueBy();
 
   return (
@@ -30,7 +34,7 @@ export function PrepareToday() {
           <li key={wow.id} className="flex flex-col gap-0.5 text-sm">
             <span className="font-medium">{wow.title}</span>
             <span className="text-muted">
-              {villaName(wow.villa)} · antes de las {timeLabel(wow.dueBy ?? '')}
+              {villaName(wow.villa)} · {copy.antesDeLas(timeLabel(wow.dueBy ?? '', locale))}
             </span>
           </li>
         ))}

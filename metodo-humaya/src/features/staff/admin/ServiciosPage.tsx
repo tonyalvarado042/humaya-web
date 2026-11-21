@@ -5,7 +5,8 @@ import type { CambiosServicio } from '@/services/admin';
 import type { Servicio } from '@/types';
 import { ScreenError, ScreenLoading } from '../layout/ScreenState';
 import { useEsAdministrador } from '../puerta/contexto';
-import { adminCopy as copy } from './copy';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { adminCopy } from './copy';
 
 /**
  * El catálogo de servicios reservables.
@@ -20,6 +21,8 @@ import { adminCopy as copy } from './copy';
  * (src/mocks/spa.ts); esto agrega servicios más allá de esos dos.
  */
 export function ServiciosPage() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = adminCopy[idioma];
   const servicios = useAdminServicios();
   const toggleServicio = useToggleServicio();
   const crearServicio = useCrearServicio();
@@ -224,6 +227,8 @@ function FilaServicio({
   onGuardar,
   onToggle,
 }: FilaServicioProps) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = adminCopy[idioma];
   if (editando) {
     return (
       <Card>
@@ -290,6 +295,8 @@ function FormularioServicio({
   onCancelar,
   onGuardar,
 }: FormularioServicioProps) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = adminCopy[idioma];
   // Postgres devuelve `time` como "08:00:00" y un <input type="time"> espera
   // "08:00": sin recortar, el campo aparece vacio y guardar borraria la hora.
   const hhmm = (valor: string) => valor.slice(0, 5);

@@ -50,27 +50,27 @@ afterEach(() => {
 
 function abrir() {
   renderRoutes(routes, { route: '/staff/admin/marca' });
-  return screen.findByRole('heading', { name: 'Marca', level: 2 });
+  return screen.findByRole('heading', { name: 'Brand', level: 2 });
 }
 
 describe('los nombres', () => {
   it('nace con lo que está guardado y no vacía', async () => {
     await abrir();
 
-    expect(screen.getByLabelText('Nombre de la experiencia')).toHaveValue('HUMAYA Experience');
-    expect(screen.getByLabelText('Nombre del hotel')).toHaveValue('HUMAYA');
-    expect(screen.getByLabelText('Correo de reservas')).toHaveValue('reservations@stayhumaya.com');
+    expect(screen.getByLabelText('Name of the experience')).toHaveValue('HUMAYA Experience');
+    expect(screen.getByLabelText('Name of the hotel')).toHaveValue('HUMAYA');
+    expect(screen.getByLabelText('Bookings email')).toHaveValue('reservations@stayhumaya.com');
   });
 
   it('guarda el nombre nuevo', async () => {
     await abrir();
 
-    const campo = screen.getByLabelText('Nombre del hotel');
+    const campo = screen.getByLabelText('Name of the hotel');
     await userEvent.clear(campo);
     await userEvent.type(campo, 'BIKE & BED');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar la marca' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save the brand' }));
 
-    await screen.findByText('Guardado. Ya lo está viendo el huésped.');
+    await screen.findByText('Saved. The guest is already seeing it.');
     expect(guardado().marca_hotel).toBe('BIKE & BED');
   });
 });
@@ -82,17 +82,17 @@ describe('los colores', () => {
     ];
     await abrir();
 
-    expect(screen.getByLabelText('Acento, sobre fondo oscuro')).toHaveValue('#4a9d7f');
-    expect(screen.getByLabelText('Acento, sobre fondo claro')).toHaveValue('#2f6b56');
+    expect(screen.getByLabelText('Accent, on a dark background')).toHaveValue('#4a9d7f');
+    expect(screen.getByLabelText('Accent, on a light background')).toHaveValue('#2f6b56');
   });
 
   it('guarda el acento', async () => {
     await abrir();
 
-    await userEvent.type(screen.getByLabelText('Acento, sobre fondo oscuro'), '#4a9d7f');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar la marca' }));
+    await userEvent.type(screen.getByLabelText('Accent, on a dark background'), '#4a9d7f');
+    await userEvent.click(screen.getByRole('button', { name: 'Save the brand' }));
 
-    await screen.findByText('Guardado. Ya lo está viendo el huésped.');
+    await screen.findByText('Saved. The guest is already seeing it.');
     expect(guardado().tema).toEqual({ acento: '#4a9d7f' });
   });
 
@@ -106,10 +106,10 @@ describe('los colores', () => {
     ];
     await abrir();
 
-    await userEvent.type(screen.getByLabelText('Acento, sobre fondo oscuro'), '#4a9d7f');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar la marca' }));
+    await userEvent.type(screen.getByLabelText('Accent, on a dark background'), '#4a9d7f');
+    await userEvent.click(screen.getByRole('button', { name: 'Save the brand' }));
 
-    await screen.findByText('Guardado. Ya lo está viendo el huésped.');
+    await screen.findByText('Saved. The guest is already seeing it.');
     expect(guardado().tema).toEqual({
       fuenteTitulos: 'Playfair Display',
       fuenteGoogle: true,
@@ -122,10 +122,10 @@ describe('los colores', () => {
     supabaseStub.tablas.humaya_hoteles = [hotel({ tema: { acento: '#4a9d7f' } })];
     await abrir();
 
-    await userEvent.click(screen.getAllByRole('button', { name: 'Quitar' })[0]);
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar la marca' }));
+    await userEvent.click(screen.getAllByRole('button', { name: 'Clear' })[0]);
+    await userEvent.click(screen.getByRole('button', { name: 'Save the brand' }));
 
-    await screen.findByText('Guardado. Ya lo está viendo el huésped.');
+    await screen.findByText('Saved. The guest is already seeing it.');
     expect(guardado().tema).toEqual({});
   });
 
@@ -137,19 +137,19 @@ describe('los colores', () => {
   it('avisa cuando lo escrito no es un color', async () => {
     await abrir();
 
-    await userEvent.type(screen.getByLabelText('Acento, sobre fondo oscuro'), 'verde');
+    await userEvent.type(screen.getByLabelText('Accent, on a dark background'), 'verde');
 
-    expect(await screen.findByText(/Escribilo como #rrggbb/)).toBeInTheDocument();
+    expect(await screen.findByText(/Write it as #rrggbb/)).toBeInTheDocument();
   });
 
   it('propone el texto que se lee encima del acento', async () => {
     await abrir();
 
     // Un verde oscuro: encima se lee blanco.
-    await userEvent.type(screen.getByLabelText('Acento, sobre fondo oscuro'), '#2f6b56');
-    await userEvent.click(screen.getByRole('button', { name: 'Usar el que se lee' }));
+    await userEvent.type(screen.getByLabelText('Accent, on a dark background'), '#2f6b56');
+    await userEvent.click(screen.getByRole('button', { name: 'Use the one that reads' }));
 
-    expect(screen.getByLabelText('Texto encima del acento')).toHaveValue('#ffffff');
+    expect(screen.getByLabelText('Text on top of the accent')).toHaveValue('#ffffff');
   });
 });
 
@@ -157,13 +157,13 @@ describe('las letras', () => {
   it('guarda la fuente y si hay que bajarla de Google', async () => {
     await abrir();
 
-    await userEvent.type(screen.getByLabelText('Títulos'), 'Playfair Display');
+    await userEvent.type(screen.getByLabelText('Headings'), 'Playfair Display');
     await userEvent.click(
-      screen.getByRole('checkbox', { name: /Bajar estas fuentes de Google Fonts/ }),
+      screen.getByRole('checkbox', { name: /Download these fonts from Google Fonts/ }),
     );
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar la marca' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save the brand' }));
 
-    await screen.findByText('Guardado. Ya lo está viendo el huésped.');
+    await screen.findByText('Saved. The guest is already seeing it.');
     expect(guardado().tema).toEqual({ fuenteTitulos: 'Playfair Display', fuenteGoogle: true });
   });
 });
@@ -174,7 +174,7 @@ describe('quién puede cambiar la marca', () => {
     stubSesionAbierta({ ...ADMINISTRADOR, rol: 'operaciones' });
     await abrir();
 
-    expect(screen.queryByRole('button', { name: 'Guardar la marca' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Save the brand' })).not.toBeInTheDocument();
   });
 
   /** Pero mirar cómo queda no toca la base: eso lo puede hacer cualquiera. */
@@ -182,6 +182,6 @@ describe('quién puede cambiar la marca', () => {
     stubSesionAbierta({ ...ADMINISTRADOR, rol: 'operaciones' });
     await abrir();
 
-    expect(screen.getByRole('button', { name: 'Ver cómo queda' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'See how it looks' })).toBeInTheDocument();
   });
 });

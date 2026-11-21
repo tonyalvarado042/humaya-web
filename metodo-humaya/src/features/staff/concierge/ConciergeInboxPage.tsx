@@ -2,11 +2,13 @@ import { MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge, Card, Tag } from '@/components/ui';
 import { useConciergeConversations } from '@/hooks';
+import { localeDe } from '../format';
 import { Screen, ScreenError, ScreenHeading, ScreenLoading } from '../layout/ScreenState';
-import { conciergeInboxCopy as copy } from './copy';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { conciergeInboxCopy } from './copy';
 
-function lastMessageAt(iso: string): string {
-  return new Intl.DateTimeFormat('es-CR', {
+function lastMessageAt(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: 'short',
     timeStyle: 'short',
     timeZone: 'America/Costa_Rica',
@@ -15,6 +17,8 @@ function lastMessageAt(iso: string): string {
 
 /** Bandeja del Concierge: una fila por huésped, con lo último que preguntó. */
 export function ConciergeInboxPage() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = conciergeInboxCopy[idioma];
   const conversations = useConciergeConversations();
 
   if (conversations.isPending) {
@@ -27,7 +31,7 @@ export function ConciergeInboxPage() {
 
   return (
     <Screen>
-      <ScreenHeading eyebrow="Recepción" title={copy.title} />
+      <ScreenHeading eyebrow={copy.area} title={copy.title} />
 
       <ul className="m-0 flex list-none flex-col gap-3 p-0">
         {conversations.data.map((conversation) => (
@@ -51,7 +55,7 @@ export function ConciergeInboxPage() {
                   <p className="m-0 truncate text-sm text-muted">
                     {conversation.lastGuestMessage.text}
                     <span className="ml-2 text-xs text-muted-soft">
-                      · {lastMessageAt(conversation.lastGuestMessage.at)}
+                      · {lastMessageAt(conversation.lastGuestMessage.at, localeDe(idioma))}
                     </span>
                   </p>
                 ) : (

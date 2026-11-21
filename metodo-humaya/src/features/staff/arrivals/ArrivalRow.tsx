@@ -4,10 +4,13 @@ import { Badge, Tag } from '@/components/ui';
 import { useConciergeConversations } from '@/hooks';
 import { localizedText } from '@/i18n/localizedText';
 import type { Arrival } from '@/types';
-import { demoCopy as copy } from './copyDemo';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { demoCopy } from './copyDemo';
 
 /** El Badge del estado de la entrevista, igual en la tabla y en las tarjetas. */
 export function InterviewBadge({ interview }: { interview: Arrival['interview'] }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = demoCopy[idioma];
   if (interview.complete) return <Badge tone="success">{copy.interviewComplete}</Badge>;
   if (interview.answered === 0) return <Badge tone="neutral">{copy.interviewPending}</Badge>;
   return (
@@ -17,6 +20,7 @@ export function InterviewBadge({ interview }: { interview: Arrival['interview'] 
 
 /** Las alertas del huésped. La de alergia ya lleva ícono además del color. */
 export function AlertTags({ alerts }: { alerts: Arrival['alerts'] }) {
+  const [idioma] = useIdiomaRecepcion();
   if (alerts.length === 0) return null;
 
   return (
@@ -32,7 +36,7 @@ export function AlertTags({ alerts }: { alerts: Arrival['alerts'] }) {
                   : 'info'
             }
           >
-            {localizedText(alert.label, 'es')}
+            {localizedText(alert.label, idioma)}
           </Tag>
         </li>
       ))}
@@ -42,6 +46,8 @@ export function AlertTags({ alerts }: { alerts: Arrival['alerts'] }) {
 
 /** Aviso de que ese huésped le escribió al Concierge y sigue sin leerse. */
 export function ConciergeIndicator({ stayId }: { stayId: string }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = demoCopy[idioma];
   const conversations = useConciergeConversations();
   const conversation = (conversations.data ?? []).find((item) => item.stayId === stayId);
 
@@ -62,6 +68,8 @@ export function ConciergeIndicator({ stayId }: { stayId: string }) {
 }
 
 export function ProfileLink({ stayId }: { stayId: string }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = demoCopy[idioma];
   return (
     <Link
       to={`/staff/guests/${stayId}`}

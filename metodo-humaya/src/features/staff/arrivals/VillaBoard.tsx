@@ -1,7 +1,8 @@
 import { cn } from '@/components/ui/cn';
 import type { VillaStatus } from '@/types';
 import { villaName } from '../format';
-import { demoCopy as copy } from './copyDemo';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { demoCopy } from './copyDemo';
 
 const stateClasses: Record<VillaStatus['state'], string> = {
   arriving: 'bg-gold-dim text-ink',
@@ -12,6 +13,8 @@ const stateClasses: Record<VillaStatus['state'], string> = {
 
 /** El tablero de las 10 villas. Al costado en escritorio, debajo en angosto. */
 export function VillaBoard({ villas }: { villas: VillaStatus[] }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = demoCopy[idioma];
   if (villas.length === 0) return null;
 
   return (

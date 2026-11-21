@@ -18,9 +18,10 @@ import { useAgendaPorServicio } from '@/hooks';
 import { ahoraEnCostaRica, diaSiguiente, diasDesde, hoyEnCostaRica } from '@/services/clock';
 import { enOrdenDeHora, laProxima } from '@/services/agenda';
 import type { ReservaDeServicio, ServicioConReservas } from '@/types';
-import { longDate } from '../format';
+import { localeDe, longDate } from '../format';
 import { Screen, ScreenError, ScreenHeading, ScreenLoading } from '../layout/ScreenState';
-import { spaCopy as copy } from './copy';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { spaCopy, type SpaTextos } from './copy';
 
 /**
  * La agenda de recepción: lo que los huéspedes tienen reservado, de verdad.
@@ -36,21 +37,31 @@ import { spaCopy as copy } from './copy';
  * Son dos preguntas distintas y se mezclaban mal en un solo control:
  * «qué días miro» y «cómo lo quiero ver». Por hora sirve para atender el día;
  * por servicio, para saber cómo viene la semana del entrenador.
+ *
+ * ── POR QUÉ LOS TEXTOS LLEGAN POR PROPIEDAD ─────────────────────────────
+ * Porque el idioma lo lee la pantalla, una sola vez, y lo reparte. Si cada
+ * componente de abajo llamara al hook, `PantallaTv` —que su prueba monta
+ * fuera de la puerta de recepción— reventaría, y los selectores de arriba,
+ * que son constantes de módulo, se quedarían en el idioma del primer render.
  */
 
 type Cuando = 'hoy' | 'manana' | 'semana';
 type Como = 'hora' | 'servicio';
 
-const CUANDO: SegmentedOption<Cuando>[] = [
-  { value: 'hoy', label: copy.hoy },
-  { value: 'manana', label: copy.manana },
-  { value: 'semana', label: copy.semana },
-];
+function diasAMirar(copy: SpaTextos): SegmentedOption<Cuando>[] {
+  return [
+    { value: 'hoy', label: copy.hoy },
+    { value: 'manana', label: copy.manana },
+    { value: 'semana', label: copy.semana },
+  ];
+}
 
-const COMO: SegmentedOption<Como>[] = [
-  { value: 'hora', label: copy.porHora },
-  { value: 'servicio', label: copy.porServicio },
-];
+function formasDeVerlo(copy: SpaTextos): SegmentedOption<Como>[] {
+  return [
+    { value: 'hora', label: copy.porHora },
+    { value: 'servicio', label: copy.porServicio },
+  ];
+}
 
 function rangoDe(cuando: Cuando, hoy: string): { desde: string; hasta: string } {
   if (cuando === 'manana') {
@@ -73,8 +84,8 @@ function horaLegible(hhmm: string): string {
 }
 
 /** El día en corto, para cuando el rango abarca varios. */
-function diaCorto(fecha: string): string {
-  return new Intl.DateTimeFormat('es-CR', {
+function diaCorto(fecha: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -82,7 +93,7 @@ function diaCorto(fecha: string): string {
   }).format(new Date(`${fecha}T12:00:00-06:00`));
 }
 
-function NombreDelServicio({ reserva }: { reserva: ReservaDeServicio }) {
+function NombreDelServicio({ reserva, copy }: { reserva: ReservaDeServicio; copy: SpaTextos }) {
   // Sin nombre significa que el servicio ya no está en el catálogo. Se dice,
   // porque la persona va a llegar igual y alguien tiene que atenderla.
   if (!reserva.servicioNombre) {
@@ -105,6 +116,9 @@ function NombreDelServicio({ reserva }: { reserva: ReservaDeServicio }) {
 }
 
 export function SpaPage() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = spaCopy[idioma];
+  const locale = localeDe(idioma);
   const hoy = hoyEnCostaRica();
   const [cuando, setCuando] = useState<Cuando>('hoy');
   const [como, setComo] = useState<Como>('hora');
@@ -129,18 +143,27 @@ export function SpaPage() {
   return (
     <Screen>
       <ScreenHeading
-        eyebrow={variosDias ? `${diaCorto(desde)} – ${diaCorto(hasta)}` : longDate(desde)}
+        eyebrow={
+          variosDias
+            ? `${diaCorto(desde, locale)} – ${diaCorto(hasta, locale)}`
+            : longDate(desde, locale)
+        }
         title={copy.title}
       />
 
       <div className="flex flex-wrap gap-3">
         <SegmentedControl
           label={copy.cuandoLabel}
-          options={CUANDO}
+          options={diasAMirar(copy)}
           value={cuando}
           onChange={setCuando}
         />
-        <SegmentedControl label={copy.comoLabel} options={COMO} value={como} onChange={setComo} />
+        <SegmentedControl
+          label={copy.comoLabel}
+          options={formasDeVerlo(copy)}
+          value={como}
+          onChange={setComo}
+        />
       </div>
 
       <section className="grid gap-4 sm:grid-cols-3">
@@ -151,7 +174,7 @@ export function SpaPage() {
           suffix={
             proxima
               ? variosDias
-                ? diaCorto(proxima.fecha)
+                ? diaCorto(proxima.fecha, locale)
                 : proxima.guestName
               : reservas.length > 0
                 ? copy.yaPasaron
@@ -166,9 +189,9 @@ export function SpaPage() {
       ) : reservas.length === 0 && como === 'hora' ? (
         <EmptyState title={copy.vacioTitulo} description={copy.vacioCuerpo} />
       ) : como === 'hora' ? (
-        <PorHora reservas={reservas} variosDias={variosDias} />
+        <PorHora reservas={reservas} variosDias={variosDias} copy={copy} locale={locale} />
       ) : (
-        <PorServicio grupos={grupos} variosDias={variosDias} />
+        <PorServicio grupos={grupos} variosDias={variosDias} copy={copy} locale={locale} />
       )}
 
       {/* Se dice antes de que alguien lo busque. Callarlo haría que recepción
@@ -192,9 +215,11 @@ export function SpaPage() {
 interface PorHoraProps {
   reservas: ReservaDeServicio[];
   variosDias: boolean;
+  copy: SpaTextos;
+  locale: string;
 }
 
-function PorHora({ reservas, variosDias }: PorHoraProps) {
+function PorHora({ reservas, variosDias, copy, locale }: PorHoraProps) {
   return (
     <>
       {/* Tabla completa desde 1024 px; abajo, tarjetas. */}
@@ -211,12 +236,12 @@ function PorHora({ reservas, variosDias }: PorHoraProps) {
             {reservas.map((reserva) => (
               <TableRow key={reserva.id}>
                 <TableCell className="text-[15px] font-medium">
-                  {variosDias ? `${diaCorto(reserva.fecha)} · ` : ''}
+                  {variosDias ? `${diaCorto(reserva.fecha, locale)} · ` : ''}
                   {horaLegible(reserva.horaInicio)}
                 </TableCell>
                 <TableCell className="text-[15px]">{reserva.guestName}</TableCell>
                 <TableCell>
-                  <NombreDelServicio reserva={reserva} />
+                  <NombreDelServicio reserva={reserva} copy={copy} />
                 </TableCell>
               </TableRow>
             ))}
@@ -228,11 +253,11 @@ function PorHora({ reservas, variosDias }: PorHoraProps) {
         {reservas.map((reserva) => (
           <Card key={reserva.id} className="flex flex-col gap-1.5">
             <span className="font-display text-xl">
-              {variosDias ? `${diaCorto(reserva.fecha)} · ` : ''}
+              {variosDias ? `${diaCorto(reserva.fecha, locale)} · ` : ''}
               {horaLegible(reserva.horaInicio)}
             </span>
             <span className="text-[15px] font-medium text-text">{reserva.guestName}</span>
-            <NombreDelServicio reserva={reserva} />
+            <NombreDelServicio reserva={reserva} copy={copy} />
           </Card>
         ))}
       </div>
@@ -243,9 +268,11 @@ function PorHora({ reservas, variosDias }: PorHoraProps) {
 interface PorServicioProps {
   grupos: ServicioConReservas[];
   variosDias: boolean;
+  copy: SpaTextos;
+  locale: string;
 }
 
-function PorServicio({ grupos, variosDias }: PorServicioProps) {
+function PorServicio({ grupos, variosDias, copy, locale }: PorServicioProps) {
   return (
     <div className="flex flex-col gap-3">
       {grupos.map((grupo) => (
@@ -267,7 +294,7 @@ function PorServicio({ grupos, variosDias }: PorServicioProps) {
               {grupo.reservas.map((reserva) => (
                 <li key={reserva.id} className="flex flex-wrap items-baseline gap-x-2.5">
                   <span className="text-[15px] font-medium text-text">
-                    {variosDias ? `${diaCorto(reserva.fecha)} · ` : ''}
+                    {variosDias ? `${diaCorto(reserva.fecha, locale)} · ` : ''}
                     {horaLegible(reserva.horaInicio)}
                   </span>
                   <span className="text-[15px] text-text">{reserva.guestName}</span>

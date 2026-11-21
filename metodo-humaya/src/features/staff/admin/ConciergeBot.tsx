@@ -12,7 +12,8 @@ import {
   useTemasBase,
 } from '@/hooks';
 import type { TemaBase } from '@/services/conciergeBase';
-import { botCopy as copy } from './copyBot';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { botCopy } from './copyBot';
 import { RespuestasGuardadas } from './RespuestasGuardadas';
 
 /**
@@ -29,6 +30,8 @@ import { RespuestasGuardadas } from './RespuestasGuardadas';
  * escribe, se lee, y recién ahí se enciende.
  */
 export function ConciergeBot() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = botCopy[idioma];
   const estado = useEstadoBot();
   const temas = useTemasBase();
   const probar = useProbarBot();
@@ -340,6 +343,8 @@ export function ConciergeBot() {
  * cancela de verdad.
  */
 function FilaTema({ tema }: { tema: TemaBase }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = botCopy[idioma];
   const editar = useEditarTema();
   const borrar = useBorrarTema();
   const [abierto, setAbierto] = useState(false);
@@ -410,6 +415,8 @@ interface FormularioTemaProps {
 }
 
 function FormularioTema({ tema, guardando, fallo, onCancelar, onGuardar }: FormularioTemaProps) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = botCopy[idioma];
   const [titulo, setTitulo] = useState(tema.tema);
   const [contenido, setContenido] = useState(tema.contenido);
   const [vacio, setVacio] = useState(false);

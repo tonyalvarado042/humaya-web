@@ -6,7 +6,8 @@ import type { CambiosOpcion } from '@/services/admin';
 import type { AdminOpcion, PorIdioma } from '@/types';
 import { ScreenError, ScreenLoading } from '../layout/ScreenState';
 import { useEsAdministrador } from '../puerta/contexto';
-import { menuCopy as copy } from './copyMenu';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { menuCopy } from './copyMenu';
 
 /**
  * El menú del huésped: qué opciones ve y cómo se llaman.
@@ -27,6 +28,8 @@ import { menuCopy as copy } from './copyMenu';
  * huésped y cambiarle el idioma.
  */
 export function MenuPage() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = menuCopy[idioma];
   const opciones = useAdminOpciones();
   const toggle = useToggleOpcion();
   const editar = useEditarOpcion();
@@ -127,6 +130,8 @@ interface FormularioProps {
  * tecleó y descartó — lo contrario de cancelar.
  */
 function FormularioNombres({ opcion, guardando, fallo, onCancelar, onGuardar }: FormularioProps) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = menuCopy[idioma];
   const [etiquetas, setEtiquetas] = useState<PorIdioma>(opcion.etiquetas ?? {});
   const [descripciones, setDescripciones] = useState<PorIdioma>(opcion.descripciones ?? {});
 

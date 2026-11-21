@@ -65,7 +65,7 @@ async function abrirElFormulario() {
 
   const titulo = await screen.findByRole('heading', { name: 'Reservas' });
   const ficha = titulo.closest('li') as HTMLElement;
-  await userEvent.click(within(ficha).getByRole('button', { name: 'Cambiar el nombre' }));
+  await userEvent.click(within(ficha).getByRole('button', { name: 'Change the name' }));
   return ficha;
 }
 
@@ -73,11 +73,11 @@ describe('renombrar una opción del menú', () => {
   it('guarda el nombre en los dos idiomas', async () => {
     await abrirElFormulario();
 
-    await userEvent.type(screen.getByLabelText('Nombre en español'), 'Rituales');
-    await userEvent.type(screen.getByLabelText('Nombre en inglés'), 'Rituals');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+    await userEvent.type(screen.getByLabelText('Spanish name'), 'Rituales');
+    await userEvent.type(screen.getByLabelText('English name'), 'Rituals');
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    await screen.findByRole('button', { name: 'Cambiar el nombre' });
+    await screen.findByRole('button', { name: 'Change the name' });
 
     const fila = supabaseStub.tablas.humaya_admin_opciones[0];
     expect(fila.etiquetas).toEqual({ es: 'Rituales', en: 'Rituals' });
@@ -91,10 +91,10 @@ describe('renombrar una opción del menú', () => {
   it('un idioma en blanco no se guarda como texto vacío', async () => {
     await abrirElFormulario();
 
-    await userEvent.type(screen.getByLabelText('Nombre en español'), 'Rituales');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+    await userEvent.type(screen.getByLabelText('Spanish name'), 'Rituales');
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    await screen.findByRole('button', { name: 'Cambiar el nombre' });
+    await screen.findByRole('button', { name: 'Change the name' });
 
     const fila = supabaseStub.tablas.humaya_admin_opciones[0];
     expect(fila.etiquetas).toEqual({ es: 'Rituales' });
@@ -105,23 +105,23 @@ describe('renombrar una opción del menú', () => {
   it('muestra lo que ve el huésped si no se escribe nada', async () => {
     await abrirElFormulario();
 
-    expect(screen.getByLabelText('Nombre en español')).toHaveAttribute(
+    expect(screen.getByLabelText('Spanish name')).toHaveAttribute(
       'placeholder',
-      'Ahora dice: Reservas',
+      'Right now it says: Reservas',
     );
-    expect(screen.getByLabelText('Nombre en inglés')).toHaveAttribute(
+    expect(screen.getByLabelText('English name')).toHaveAttribute(
       'placeholder',
-      'Ahora dice: Bookings',
+      'Right now it says: Bookings',
     );
   });
 
   it('cancelar no guarda nada', async () => {
     await abrirElFormulario();
 
-    await userEvent.type(screen.getByLabelText('Nombre en español'), 'Rituales');
-    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+    await userEvent.type(screen.getByLabelText('Spanish name'), 'Rituales');
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-    await screen.findByRole('button', { name: 'Cambiar el nombre' });
+    await screen.findByRole('button', { name: 'Change the name' });
     expect(supabaseStub.tablas.humaya_admin_opciones[0].etiquetas).toEqual({});
   });
 
@@ -131,7 +131,7 @@ describe('renombrar una opción del menú', () => {
     renderRoutes(routes, { route: '/staff/admin/menu' });
 
     expect(await screen.findByRole('heading', { name: 'Rituales' })).toBeInTheDocument();
-    expect(screen.getByText('Lo que ve en inglés: Bookings')).toBeInTheDocument();
+    expect(screen.getByText('What they see in English: Bookings')).toBeInTheDocument();
   });
 });
 
@@ -146,9 +146,9 @@ describe('quién puede cambiar el menú', () => {
     renderRoutes(routes, { route: '/staff/admin/menu' });
 
     await screen.findByRole('heading', { name: 'Reservas' });
-    expect(screen.queryByRole('button', { name: 'Cambiar el nombre' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Change the name' })).not.toBeInTheDocument();
     // Y lo explica, en vez de dejar un hueco sin motivo.
-    expect(screen.getByRole('status')).toHaveTextContent(/lo hace un administrador/i);
+    expect(screen.getByRole('status')).toHaveTextContent(/is done by an administrator/i);
   });
 
   /**
@@ -162,8 +162,8 @@ describe('quién puede cambiar el menú', () => {
 
     const titulo = await screen.findByRole('heading', { name: 'Reservas' });
     const ficha = titulo.closest('li') as HTMLElement;
-    await userEvent.click(within(ficha).getByRole('button', { name: 'Deshabilitar' }));
+    await userEvent.click(within(ficha).getByRole('button', { name: 'Disable' }));
 
-    expect(await within(ficha).findByText('Deshabilitada')).toBeInTheDocument();
+    expect(await within(ficha).findByText('Disabled')).toBeInTheDocument();
   });
 });

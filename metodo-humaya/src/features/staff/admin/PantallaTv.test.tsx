@@ -43,23 +43,23 @@ beforeEach(() => {
 
 describe('las pantallas del TV en Admin', () => {
   it('lista las villas y dice cuál está vacía', async () => {
-    renderWithProviders(<PantallaTv />);
+    renderWithProviders(<PantallaTv />, { recepcion: 'en' });
 
     expect(await screen.findByText('V1 · CAPI CAPI')).toBeInTheDocument();
     expect(screen.getByText('V4 · BRUMA')).toBeInTheDocument();
-    expect(screen.getByText('Con Sarah Lovestad')).toBeInTheDocument();
-    expect(screen.getByText('Vacía')).toBeInTheDocument();
+    expect(screen.getByText('With Sarah Lovestad')).toBeInTheDocument();
+    expect(screen.getByText('Empty')).toBeInTheDocument();
   });
 
   it('la dirección del televisor trae la clave, que es lo único que hay que escribir', async () => {
-    renderWithProviders(<PantallaTv />);
+    renderWithProviders(<PantallaTv />, { recepcion: 'en' });
     await screen.findByText('V4 · BRUMA');
 
     // El editor arranca cerrado: diez villas abiertas a la vez son ilegibles.
     expect(screen.queryByText(new RegExp(CLAVE))).not.toBeInTheDocument();
 
     const fila = screen.getByText('V4 · BRUMA').closest('div')?.parentElement as HTMLElement;
-    await userEvent.click(within(fila).getByRole('button', { name: 'Editar' }));
+    await userEvent.click(within(fila).getByRole('button', { name: 'Edit' }));
 
     expect(await screen.findByText(new RegExp(`k=${CLAVE}`))).toBeInTheDocument();
   });
@@ -72,18 +72,18 @@ describe('las pantallas del TV en Admin', () => {
     // pantalla contra el hotel demo el 21 de noviembre de 2026 —que tiene
     // dos villas— el aviso afirmaba diez. Un número inventado, sostenido por
     // una prueba en verde.
-    renderWithProviders(<PantallaTv />);
+    renderWithProviders(<PantallaTv />, { recepcion: 'en' });
 
     expect(
-      await screen.findByText(/Es la misma para todas las pantallas del hotel/),
+      await screen.findByText(/It is the same for every screen in the hotel/),
     ).toBeInTheDocument();
     expect(screen.queryByText(/diez pantallas/)).not.toBeInTheDocument();
   });
 
   it('cuando no hay ninguna villa, dice dónde se crean', async () => {
     supabaseStub.tablas.humaya_tv_villas = [];
-    renderWithProviders(<PantallaTv />);
+    renderWithProviders(<PantallaTv />, { recepcion: 'en' });
 
-    expect(await screen.findByText('Todavía no hay ninguna villa')).toBeInTheDocument();
+    expect(await screen.findByText('There are no villas yet')).toBeInTheDocument();
   });
 });

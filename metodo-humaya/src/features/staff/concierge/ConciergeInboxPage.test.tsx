@@ -48,8 +48,8 @@ describe('Bandeja del Concierge', () => {
     ]);
     renderRoutes(routes, { route: '/staff/concierge' });
 
-    expect(await screen.findByText('1 sin leer')).toBeInTheDocument();
-    expect(screen.getByText('Esperando al equipo')).toBeInTheDocument();
+    expect(await screen.findByText('1 unread')).toBeInTheDocument();
+    expect(screen.getByText('Waiting for the team')).toBeInTheDocument();
     expect(screen.getByText(/tienen helicóptero/)).toBeInTheDocument();
   });
 
@@ -57,7 +57,7 @@ describe('Bandeja del Concierge', () => {
     stubConciergeApi();
     renderRoutes(routes, { route: '/staff/concierge' });
 
-    expect(await screen.findAllByText('Todavía no escribió.')).toHaveLength(2);
+    expect(await screen.findAllByText('Has not written yet.')).toHaveLength(2);
   });
 
   it('cada fila enlaza a la conversación de ese huésped', async () => {

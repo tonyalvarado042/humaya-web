@@ -19,7 +19,7 @@ afterEach(() => {
 });
 
 function wowPanel() {
-  return screen.findByRole('region', { name: 'Experiencias WOW' });
+  return screen.findByRole('region', { name: 'WOW experiences' });
 }
 
 describe('cabecera del perfil', () => {
@@ -29,14 +29,14 @@ describe('cabecera del perfil', () => {
     expect(
       await screen.findByRole('heading', { name: 'Valeria Méndez y Andrés Rojas' }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Villa 04 · 3 noches · 2 personas · Español/)).toBeInTheDocument();
+    expect(screen.getByText(/Villa 04 · 3 nights · 2 guests · Español/)).toBeInTheDocument();
   });
 
   it('muestra las alertas, con la alergia como texto', async () => {
     renderRoutes(routes, { route: VALERIA });
 
-    expect(await screen.findByText('Andrés: alergia a frutos secos')).toBeInTheDocument();
-    expect(screen.getByText('Aniversario · 5 años')).toBeInTheDocument();
+    expect(await screen.findByText('Andrés: nut allergy')).toBeInTheDocument();
+    expect(screen.getByText('Anniversary · 5 years')).toBeInTheDocument();
   });
 
   it('muestra cómo quieren que los atendamos', async () => {
@@ -48,7 +48,7 @@ describe('cabecera del perfil', () => {
   it('vuelve a Llegadas', async () => {
     const { router } = renderRoutes(routes, { route: VALERIA });
 
-    await userEvent.click(await screen.findByRole('link', { name: '← Llegadas' }));
+    await userEvent.click(await screen.findByRole('link', { name: '← Arrivals' }));
 
     expect(router.state.location.pathname).toBe('/staff');
   });
@@ -68,15 +68,15 @@ describe('lo que dejó la entrevista', () => {
   it('muestra la línea de tiempo del Método Humaya', async () => {
     renderRoutes(routes, { route: VALERIA });
 
-    expect(await screen.findByText('Entrevista completa')).toBeInTheDocument();
-    expect(screen.getByText('Preparación pre-llegada')).toBeInTheDocument();
-    expect(screen.getByText('Seguimiento')).toBeInTheDocument();
+    expect(await screen.findByText('Interview complete')).toBeInTheDocument();
+    expect(screen.getByText('Pre-arrival prep')).toBeInTheDocument();
+    expect(screen.getByText('Follow-up')).toBeInTheDocument();
   });
 
   it('a quien no la completó le avisa, sin inventar pilares', async () => {
     renderRoutes(routes, { route: '/staff/guests/s-whitfield' });
 
-    expect(await screen.findByText(/cuando complete la entrevista/i)).toBeInTheDocument();
+    expect(await screen.findByText(/once they complete the interview/i)).toBeInTheDocument();
   });
 });
 
@@ -94,11 +94,11 @@ describe('experiencias WOW', () => {
 
     const panel = await wowPanel();
     const items = await within(panel).findAllByRole('listitem');
-    const suggested = items.find((item) => within(item).queryByText('Sugerida')) as HTMLElement;
+    const suggested = items.find((item) => within(item).queryByText('Suggested')) as HTMLElement;
 
-    await userEvent.click(within(suggested).getByRole('button', { name: 'Planificar' }));
+    await userEvent.click(within(suggested).getByRole('button', { name: 'Plan it' }));
 
-    expect(await within(suggested).findByText('Planificada')).toBeInTheDocument();
+    expect(await within(suggested).findByText('Planned')).toBeInTheDocument();
   });
 
   it('una experiencia hecha ya no se puede mover', async () => {
@@ -106,12 +106,12 @@ describe('experiencias WOW', () => {
 
     const panel = await wowPanel();
     const items = await within(panel).findAllByRole('listitem');
-    const planned = items.find((item) => within(item).queryByText('Planificada')) as HTMLElement;
+    const planned = items.find((item) => within(item).queryByText('Planned')) as HTMLElement;
 
-    await userEvent.click(within(planned).getByRole('button', { name: 'Marcar como hecha' }));
+    await userEvent.click(within(planned).getByRole('button', { name: 'Mark as done' }));
 
-    expect(await within(planned).findByText('Hecha')).toBeInTheDocument();
-    expect(within(planned).getByRole('button', { name: 'Lista' })).toBeDisabled();
+    expect(await within(planned).findByText('Done')).toBeInTheDocument();
+    expect(within(planned).getByRole('button', { name: 'Ready' })).toBeDisabled();
   });
 
   it('el cambio persiste al ir a Llegadas y volver', async () => {
@@ -119,12 +119,12 @@ describe('experiencias WOW', () => {
 
     const panel = await wowPanel();
     const suggested = (await within(panel).findAllByRole('listitem')).find((item) =>
-      within(item).queryByText('Sugerida'),
+      within(item).queryByText('Suggested'),
     ) as HTMLElement;
-    await userEvent.click(within(suggested).getByRole('button', { name: 'Planificar' }));
-    await within(suggested).findByText('Planificada');
+    await userEvent.click(within(suggested).getByRole('button', { name: 'Plan it' }));
+    await within(suggested).findByText('Planned');
 
-    await userEvent.click(screen.getByRole('link', { name: '← Llegadas' }));
+    await userEvent.click(screen.getByRole('link', { name: '← Arrivals' }));
     expect(router.state.location.pathname).toBe('/staff');
 
     // Llegadas ya no abre en los datos de ejemplo sino en las reservas de
@@ -134,15 +134,15 @@ describe('experiencias WOW', () => {
     await userEvent.click(await screen.findByRole('radio', { name: 'Demo' }));
 
     const rows = within(
-      await screen.findByRole('table', { name: 'Llegadas del período' }),
+      await screen.findByRole('table', { name: 'Arrivals in the period' }),
     ).getAllByRole('row');
     const valeria = rows.find((row) =>
       within(row).queryByText('Valeria Méndez y Andrés Rojas'),
     ) as HTMLElement;
-    await userEvent.click(within(valeria).getByRole('link', { name: 'Ver perfil' }));
+    await userEvent.click(within(valeria).getByRole('link', { name: 'View profile' }));
 
     const backPanel = await wowPanel();
-    expect(within(backPanel).queryByText('Sugerida')).not.toBeInTheDocument();
+    expect(within(backPanel).queryByText('Suggested')).not.toBeInTheDocument();
   });
 });
 
@@ -164,7 +164,7 @@ describe('aviso del Concierge', () => {
     renderRoutes(routes, { route: VALERIA });
 
     const link = await screen.findByRole('link', {
-      name: /Le escribió al Concierge y todavía no se leyó/,
+      name: /They wrote to the Concierge and it has not been read yet/,
     });
     expect(link).toHaveAttribute('href', '/staff/concierge/s-mendez-rojas');
   });
@@ -174,7 +174,7 @@ describe('aviso del Concierge', () => {
 
     await screen.findByRole('heading', { name: 'Valeria Méndez y Andrés Rojas' });
     expect(
-      screen.queryByText('Le escribió al Concierge y todavía no se leyó'),
+      screen.queryByText('They wrote to the Concierge and it has not been read yet'),
     ).not.toBeInTheDocument();
   });
 });
@@ -183,11 +183,11 @@ describe('notas del equipo', () => {
   it('se guardan al salir del campo', async () => {
     renderRoutes(routes, { route: VALERIA });
 
-    const notes = await screen.findByLabelText('Notas del equipo');
+    const notes = await screen.findByLabelText('Team notes');
     await userEvent.type(notes, 'Llegaron cansados del vuelo.');
     await userEvent.tab();
 
-    expect(await screen.findByText('Notas guardadas')).toBeInTheDocument();
+    expect(await screen.findByText('Notes saved')).toBeInTheDocument();
 
     const profile = await getGuestProfile('s-mendez-rojas');
     expect(profile.teamNotes).toBe('Llegaron cansados del vuelo.');
@@ -198,7 +198,7 @@ describe('estadía que no existe', () => {
   it('ofrece el camino de vuelta', async () => {
     renderRoutes(routes, { route: '/staff/guests/s-inventada' });
 
-    expect(await screen.findByText('No encontramos a ese huésped')).toBeInTheDocument();
+    expect(await screen.findByText('We could not find that guest')).toBeInTheDocument();
   });
 
   it('sin estadía en la URL ya NO cae acá: esa dirección es la lista', async () => {

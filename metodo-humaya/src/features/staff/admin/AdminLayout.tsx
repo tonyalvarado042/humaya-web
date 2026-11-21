@@ -1,8 +1,9 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { cn } from '@/components/ui/cn';
 import { Screen, ScreenHeading } from '../layout/ScreenState';
-import { useEsAdministrador } from '../puerta/contexto';
-import { SECCIONES_ADMIN } from './secciones';
+import { useEsAdministrador, useIdiomaRecepcion } from '../puerta/contexto';
+import { adminCopy } from './copy';
+import { seccionesAdmin } from './secciones';
 
 /**
  * El marco de Admin: el título, el menú de secciones, y abajo la sección.
@@ -22,19 +23,21 @@ import { SECCIONES_ADMIN } from './secciones';
  */
 export function AdminLayout() {
   const esAdmin = useEsAdministrador();
+  const [idioma] = useIdiomaRecepcion();
+  const copy = adminCopy[idioma];
 
   return (
     <Screen>
-      <ScreenHeading eyebrow="Recepción" title="Admin" />
+      <ScreenHeading eyebrow={copy.area} title={copy.title} />
 
-      <nav aria-label="Secciones de Admin" className="-mx-1 overflow-x-auto">
+      <nav aria-label={copy.navLabel} className="-mx-1 overflow-x-auto">
         <ul className="m-0 flex list-none items-center gap-1 p-1">
           <li>
             <Enlace to="/staff/admin" end>
-              Todo
+              {copy.todo}
             </Enlace>
           </li>
-          {SECCIONES_ADMIN.map((seccion) => (
+          {seccionesAdmin(idioma).map((seccion) => (
             <li key={seccion.ruta}>
               <Enlace to={`/staff/admin/${seccion.ruta}`}>{seccion.titulo}</Enlace>
             </li>
@@ -47,9 +50,7 @@ export function AdminLayout() {
           role="status"
           className="m-0 rounded-card border border-line bg-surface-sunken px-4 py-3 text-sm leading-relaxed text-muted"
         >
-          Podés ver todo y encender o apagar lo que ya existe. Cambiar los nombres, la marca, los
-          precios y los datos de ejemplo lo hace un administrador: esos botones no aparecen por eso,
-          no porque falte algo.
+          {copy.avisoSinPermiso}
         </p>
       )}
 

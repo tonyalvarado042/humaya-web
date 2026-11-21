@@ -3,7 +3,8 @@ import { Badge, Button, Card, Input, Textarea } from '@/components/ui';
 import { useGuardarVillaTv, useSubirFotoTv, useVillasTv } from '@/hooks';
 import { direccionDelTv, urlDeFoto } from '@/services/tv';
 import type { CambiosVillaTv, VillaTv } from '@/types';
-import { tvCopy as copy } from './copyTv';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { tvCopy } from './copyTv';
 
 /**
  * Las pantallas de los televisores, administradas desde recepción.
@@ -19,6 +20,8 @@ import { tvCopy as copy } from './copyTv';
  * de la villa adentro. Sin verla, no hay forma de colgar un televisor nuevo.
  */
 export function PantallaTv() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = tvCopy[idioma];
   const villas = useVillasTv();
   const [abierta, setAbierta] = useState<string | null>(null);
 
@@ -57,6 +60,8 @@ export function PantallaTv() {
 }
 
 function Cargando() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = tvCopy[idioma];
   return (
     <section className="flex flex-col gap-2">
       <h2 className="m-0 font-display text-2xl font-medium">{copy.titulo}</h2>
@@ -68,6 +73,8 @@ function Cargando() {
 }
 
 function NoCargo({ onRetry }: { onRetry: () => void }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = tvCopy[idioma];
   return (
     <section className="flex flex-col items-start gap-2" role="alert">
       <h2 className="m-0 font-display text-2xl font-medium">{copy.titulo}</h2>
@@ -86,6 +93,8 @@ interface FilaProps {
 }
 
 function FilaVilla({ villa, abierta, onAbrir }: FilaProps) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = tvCopy[idioma];
   return (
     <Card className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
@@ -111,6 +120,8 @@ function useCampo(inicial: string | null) {
 }
 
 function Editor({ villa }: { villa: VillaTv }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = tvCopy[idioma];
   const guardar = useGuardarVillaTv();
   const subir = useSubirFotoTv();
   const archivo = useRef<HTMLInputElement>(null);

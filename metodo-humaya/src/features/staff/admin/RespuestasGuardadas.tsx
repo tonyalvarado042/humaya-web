@@ -7,7 +7,8 @@ import {
   useRespuestasGuardadas,
 } from '@/hooks';
 import type { RespuestaGuardada } from '@/services/conciergeBase';
-import { respuestasCopy as copy } from './copyRespuestas';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { respuestasCopy } from './copyRespuestas';
 
 /**
  * Los textos que recepción manda una y otra vez.
@@ -24,6 +25,8 @@ import { respuestasCopy as copy } from './copyRespuestas';
  * que la está leyendo en ese momento.
  */
 export function RespuestasGuardadas() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = respuestasCopy[idioma];
   const respuestas = useRespuestasGuardadas();
   const crear = useCrearRespuesta();
 
@@ -101,6 +104,8 @@ export function RespuestasGuardadas() {
 }
 
 function Fila({ respuesta }: { respuesta: RespuestaGuardada }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = respuestasCopy[idioma];
   const editar = useEditarRespuesta();
   const borrar = useBorrarRespuesta();
   const [abierto, setAbierto] = useState(false);
@@ -174,6 +179,8 @@ interface FormularioProps {
 
 /** Existe solo mientras se edita, para que cancelar cancele de verdad. */
 function Formulario({ respuesta, guardando, fallo, onCancelar, onGuardar }: FormularioProps) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = respuestasCopy[idioma];
   const [titulo, setTitulo] = useState(respuesta.titulo);
   const [texto, setTexto] = useState(respuesta.texto);
   const [textoEn, setTextoEn] = useState(respuesta.textoEn ?? '');

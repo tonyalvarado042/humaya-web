@@ -9,13 +9,15 @@ import {
   useSendStaffReply,
 } from '@/hooks';
 import { DEMO_STAYS } from '@/mocks';
+import { localeDe } from '../format';
 import { Screen, ScreenError, ScreenLoading } from '../layout/ScreenState';
-import { conciergeThreadCopy as copy } from './copy';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { conciergeThreadCopy, type ThreadTextos } from './copy';
 import { PanelHuesped } from './PanelHuesped';
 
-function messageAt(iso: string): string {
+function messageAt(iso: string, locale: string): string {
   if (!iso) return '';
-  return new Intl.DateTimeFormat('es-CR', {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: 'short',
     timeStyle: 'short',
     timeZone: 'America/Costa_Rica',
@@ -24,6 +26,8 @@ function messageAt(iso: string): string {
 
 /** Hilo completo de un huésped, con respuesta del staff. */
 export function ConciergeThreadPage() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = conciergeThreadCopy[idioma];
   const { stayId } = useParams<{ stayId: string }>();
   const [draft, setDraft] = useState('');
   const [draftEn, setDraftEn] = useState('');
@@ -43,7 +47,7 @@ export function ConciergeThreadPage() {
   if (!stayId || !demoStay) {
     return (
       <Screen>
-        <NotFound />
+        <NotFound copy={copy} />
       </Screen>
     );
   }
@@ -121,7 +125,7 @@ export function ConciergeThreadPage() {
                         : 'self-start text-xs text-muted-soft'
                     }
                   >
-                    {messageAt(message.at)}
+                    {messageAt(message.at, localeDe(idioma))}
                   </span>
                 </div>
               ))
@@ -220,7 +224,7 @@ export function ConciergeThreadPage() {
   );
 }
 
-function NotFound() {
+function NotFound({ copy }: { copy: ThreadTextos }) {
   return (
     <EmptyState
       title={copy.notFoundTitle}

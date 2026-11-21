@@ -7,7 +7,8 @@ import { type Tema } from '@/services/tema';
 import { ScreenError, ScreenLoading } from '../layout/ScreenState';
 import { useEsAdministrador } from '../puerta/contexto';
 import { CampoDeColor } from './CampoDeColor';
-import { marcaCopy as copy } from './copyMarca';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { marcaCopy } from './copyMarca';
 
 /**
  * La marca de este hotel: nombres, colores y letras.
@@ -29,6 +30,8 @@ import { marcaCopy as copy } from './copyMarca';
  * Este formulario lo leyó entero al abrir y lo manda entero.
  */
 export function MarcaPage() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = marcaCopy[idioma];
   const marca = useMarcaDelHotel();
   const guardar = useGuardarMarca();
   const esAdmin = useEsAdministrador();
@@ -116,6 +119,8 @@ function Formulario({
   onGuardar,
   onProbar,
 }: FormularioProps) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = marcaCopy[idioma];
   const [experiencia, setExperiencia] = useState(inicial.marcaExperiencia);
   const [hotel, setHotel] = useState(inicial.marcaHotel);
   const [correo, setCorreo] = useState(inicial.correo);

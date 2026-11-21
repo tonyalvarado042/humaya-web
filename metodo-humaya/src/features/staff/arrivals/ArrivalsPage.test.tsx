@@ -195,7 +195,9 @@ describe('el demo, mientras Admin lo deje encendido', () => {
     await userEvent.click(screen.getByRole('radio', { name: 'Demo' }));
 
     // La pantalla vieja entera, con su aviso de que son datos inventados.
-    expect(await screen.findByRole('table', { name: 'Llegadas del período' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('table', { name: 'Arrivals in the period' }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Sample data/)).toBeInTheDocument();
   });
 

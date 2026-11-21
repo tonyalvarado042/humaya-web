@@ -23,7 +23,7 @@ describe('el menú del huésped', () => {
     for (const label of ['Entrevista', 'Concierge', 'Mi villa', 'Reservas', 'Move']) {
       expect(screen.getByRole('heading', { name: label })).toBeInTheDocument();
     }
-    expect(screen.getAllByText('Habilitada')).toHaveLength(6);
+    expect(screen.getAllByText('Enabled')).toHaveLength(6);
   });
 
   it('deshabilitar una opción la saca de la lista del Home del huésped', async () => {
@@ -32,9 +32,9 @@ describe('el menú del huésped', () => {
 
     const moveHeading = await screen.findByRole('heading', { name: 'Move' });
     const moveCard = moveHeading.closest('li') as HTMLElement;
-    await userEvent.click(within(moveCard).getByRole('button', { name: 'Deshabilitar' }));
+    await userEvent.click(within(moveCard).getByRole('button', { name: 'Disable' }));
 
-    expect(await within(moveCard).findByText('Deshabilitada')).toBeInTheDocument();
-    expect(within(moveCard).getByRole('button', { name: 'Habilitar' })).toBeInTheDocument();
+    expect(await within(moveCard).findByText('Disabled')).toBeInTheDocument();
+    expect(within(moveCard).getByRole('button', { name: 'Enable' })).toBeInTheDocument();
   });
 });

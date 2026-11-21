@@ -1,13 +1,23 @@
 import { Badge, Button, Card, EmptyState, Skeleton } from '@/components/ui';
 import { useUpdateWowStatus, useWowSuggestions } from '@/hooks';
 import type { WowStatus } from '@/types';
-import { profileCopy as copy } from './copy';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { profileCopy, type ProfileTextos } from './copy';
 
-const statusLabel: Record<WowStatus, string> = {
-  suggested: copy.statusSuggested,
-  planned: copy.statusPlanned,
-  done: copy.statusDone,
-};
+/**
+ * Los estados y los botones, en el idioma de la pantalla.
+ *
+ * Eran tres constantes de módulo que leían `copy` al importar el archivo.
+ * Con el texto en un solo idioma eso daba igual; con dos, se quedaban en el
+ * del primer render y el botón de idioma no las cambiaba nunca.
+ */
+function etiquetaDelEstado(copy: ProfileTextos): Record<WowStatus, string> {
+  return {
+    suggested: copy.statusSuggested,
+    planned: copy.statusPlanned,
+    done: copy.statusDone,
+  };
+}
 
 const statusTone: Record<WowStatus, 'neutral' | 'warning' | 'success'> = {
   suggested: 'neutral',
@@ -16,14 +26,22 @@ const statusTone: Record<WowStatus, 'neutral' | 'warning' | 'success'> = {
 };
 
 /** El siguiente estado, y cómo se llama el botón que lleva hasta ahí. */
-const nextStep: Record<WowStatus, { next: WowStatus | null; action: string }> = {
-  suggested: { next: 'planned', action: copy.actionPlan },
-  planned: { next: 'done', action: copy.actionDone },
-  done: { next: null, action: copy.actionFinished },
-};
+function siguientePaso(
+  copy: ProfileTextos,
+): Record<WowStatus, { next: WowStatus | null; action: string }> {
+  return {
+    suggested: { next: 'planned', action: copy.actionPlan },
+    planned: { next: 'done', action: copy.actionDone },
+    done: { next: null, action: copy.actionFinished },
+  };
+}
 
 /** Las experiencias WOW de una estadía, con su avance de estado. */
 export function WowPanel({ stayId }: { stayId: string }) {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = profileCopy[idioma];
+  const statusLabel = etiquetaDelEstado(copy);
+  const nextStep = siguientePaso(copy);
   const wows = useWowSuggestions(stayId);
   const updateStatus = useUpdateWowStatus(stayId);
 
@@ -42,7 +60,7 @@ export function WowPanel({ stayId }: { stayId: string }) {
       {wows.isPending ? (
         <>
           <span aria-live="polite" className="sr-only">
-            Cargando las experiencias sugeridas…
+            {copy.wowCargando}
           </span>
           <Skeleton variant="block" className="h-32" />
           <Skeleton variant="block" className="h-32" />

@@ -34,11 +34,23 @@ export interface PillarSummary {
 }
 
 /** Un hito del HUMAYA Experience en la línea de tiempo del perfil. */
+/**
+ * Un hito de la linea de tiempo del HUMAYA Experience.
+ *
+ * Trae los HECHOS, no la frase: el texto lo arma la pantalla en su idioma.
+ * Tenia `label` y `when` ya escritos —«Preparacion pre-llegada», «dia 7 de
+ * 7»—, siempre en espanol, y con recepcion en ingles la linea de tiempo
+ * quedaba en espanol en medio de una pantalla traducida.
+ */
 export interface TimelineEvent {
   id: string;
-  label: string;
-  when: string;
   done: boolean;
+  /** La fecha ISO del hito, o null cuando todavia no hay. */
+  date: string | null;
+  /** Solo la entrevista: cuantas respondio de cuantas. */
+  interview?: { answered: number; total: number; complete: boolean };
+  /** Solo la preparacion: en que dia de los siete va. */
+  prepDay?: number | null;
 }
 
 /** Todo lo que la pantalla Perfil del huésped necesita, en una sola llamada. */

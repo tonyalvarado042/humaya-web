@@ -33,7 +33,7 @@ describe('servicios de Reservas', () => {
     stubAdminApi();
     renderRoutes(routes, { route: '/staff/admin/servicios' });
 
-    expect(await screen.findByText('Todavía no agregaste ningún servicio.')).toBeInTheDocument();
+    expect(await screen.findByText('You have not added any service yet.')).toBeInTheDocument();
   });
 
   it('lista los que ya existen, con precio y proveedor', async () => {
@@ -51,26 +51,26 @@ describe('servicios de Reservas', () => {
     stubAdminApi();
     renderRoutes(routes, { route: '/staff/admin/servicios' });
 
-    await screen.findByText('Todavía no agregaste ningún servicio.');
+    await screen.findByText('You have not added any service yet.');
 
-    await userEvent.type(screen.getByLabelText('Nombre'), 'Masaje relajante');
-    await userEvent.type(screen.getByLabelText('Con quién'), 'Studio Humaya');
-    await userEvent.type(screen.getByLabelText('Precio (USD)'), '80');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar servicio' }));
+    await userEvent.type(screen.getByLabelText('Name'), 'Masaje relajante');
+    await userEvent.type(screen.getByLabelText('With whom'), 'Studio Humaya');
+    await userEvent.type(screen.getByLabelText('Price (USD)'), '80');
+    await userEvent.click(screen.getByRole('button', { name: 'Save service' }));
 
     expect(await screen.findByRole('heading', { name: 'Masaje relajante' })).toBeInTheDocument();
     expect(screen.getByText(/Studio Humaya/)).toBeInTheDocument();
-    expect(screen.queryByText('Todavía no agregaste ningún servicio.')).not.toBeInTheDocument();
+    expect(screen.queryByText('You have not added any service yet.')).not.toBeInTheDocument();
   });
 
   it('no deja guardar sin nombre', async () => {
     stubAdminApi();
     renderRoutes(routes, { route: '/staff/admin/servicios' });
 
-    await screen.findByText('Todavía no agregaste ningún servicio.');
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar servicio' }));
+    await screen.findByText('You have not added any service yet.');
+    await userEvent.click(screen.getByRole('button', { name: 'Save service' }));
 
-    expect(await screen.findByText('Escribí un nombre.')).toBeInTheDocument();
+    expect(await screen.findByText('Write a name.')).toBeInTheDocument();
   });
 
   it('deshabilitar un servicio lo saca de las opciones de Reservas', async () => {
@@ -79,8 +79,8 @@ describe('servicios de Reservas', () => {
 
     const heading = await screen.findByRole('heading', { name: 'Entrenamiento personal' });
     const card = heading.closest('li') as HTMLElement;
-    await userEvent.click(within(card).getByRole('button', { name: 'Deshabilitar' }));
+    await userEvent.click(within(card).getByRole('button', { name: 'Disable' }));
 
-    expect(await within(card).findByText('Deshabilitada')).toBeInTheDocument();
+    expect(await within(card).findByText('Disabled')).toBeInTheDocument();
   });
 });

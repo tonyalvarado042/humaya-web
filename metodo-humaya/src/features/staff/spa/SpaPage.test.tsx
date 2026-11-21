@@ -93,14 +93,14 @@ describe('la agenda de servicios', () => {
 
     await screen.findAllByText('Hannah Weber');
     expect(screen.getAllByText('4:00 p.m.').length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Con Personal trainer · 60 min/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/With Personal trainer · 60 min/).length).toBeGreaterThan(0);
   });
 
   it('cambiar a mañana trae lo de mañana y saca lo de hoy', async () => {
     renderRoutes(routes, { route: '/staff/spa' });
     await screen.findAllByText('Hannah Weber');
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Mañana' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Tomorrow' }));
 
     expect(await screen.findAllByText('Valeria Méndez')).not.toHaveLength(0);
     expect(screen.queryAllByText('Hannah Weber')).toHaveLength(0);
@@ -111,17 +111,19 @@ describe('la agenda de servicios', () => {
     renderRoutes(routes, { route: '/staff/spa' });
     await screen.findAllByText('Hannah Weber');
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Por servicio' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'By service' }));
 
     expect(await screen.findByText('Masaje')).toBeInTheDocument();
-    expect(screen.getByText('Nadie anotado en estos días.')).toBeInTheDocument();
+    expect(screen.getByText('Nobody booked on these days.')).toBeInTheDocument();
   });
 
   it('explica que el sauna y el cold plunge no llegan acá', async () => {
     // Callarlo haría que recepción concluya que nadie los usa.
     renderRoutes(routes, { route: '/staff/spa' });
 
-    expect(await screen.findByText(/Sauna y cold plunge no salen acá/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Sauna and cold plunge do not show up here/),
+    ).toBeInTheDocument();
   });
 });
 
@@ -130,7 +132,7 @@ describe('cuando no hay nada reservado', () => {
     supabaseStub.tablas.humaya_servicio_reservas = [];
     renderRoutes(routes, { route: '/staff/spa' });
 
-    expect(await screen.findByText('No hay nada reservado en estos días')).toBeInTheDocument();
+    expect(await screen.findByText('Nothing booked for these days')).toBeInTheDocument();
   });
 
   it('y si tampoco hay catálogo, dice dónde se agregan', async () => {
@@ -138,6 +140,6 @@ describe('cuando no hay nada reservado', () => {
     supabaseStub.tablas.humaya_servicio_reservas = [];
     renderRoutes(routes, { route: '/staff/spa' });
 
-    expect(await screen.findByText('No hay servicios en el catálogo')).toBeInTheDocument();
+    expect(await screen.findByText('There are no services in the catalog')).toBeInTheDocument();
   });
 });

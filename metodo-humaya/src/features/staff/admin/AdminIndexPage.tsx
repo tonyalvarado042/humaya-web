@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui';
 import { MARCA } from '@/marca';
-import { SECCIONES_ADMIN } from './secciones';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { adminCopy } from './copy';
+import { seccionesAdmin } from './secciones';
 
 /**
  * La portada de Admin: qué se configura y dónde.
@@ -12,18 +14,21 @@ import { SECCIONES_ADMIN } from './secciones';
  * falta la frase.
  */
 export function AdminIndexPage() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = adminCopy[idioma];
   return (
     <div className="flex flex-col gap-4">
       <p className="m-0 max-w-prose text-sm leading-relaxed text-muted">
-        Todo lo que se configura de <strong className="font-medium text-text">{MARCA.hotel}</strong>{' '}
-        vive acá. Cada sección cambia lo que el huésped ve en el momento en que se guarda.
+        {copy.portadaAntes}
+        <strong className="font-medium text-text">{MARCA.hotel}</strong>
+        {copy.portadaDespues}
       </p>
 
       <ul
-        aria-label="Lo que se configura"
+        aria-label={copy.portadaLista}
         className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2 xl:grid-cols-3"
       >
-        {SECCIONES_ADMIN.map(({ ruta, titulo, cuerpo, Icon }) => (
+        {seccionesAdmin(idioma).map(({ ruta, titulo, cuerpo, Icon }) => (
           <li key={ruta}>
             <Link to={ruta} className="block h-full no-underline">
               <Card className="flex h-full flex-col gap-2">

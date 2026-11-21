@@ -17,7 +17,7 @@ import {
 import { useReservas } from '@/hooks';
 import { hoyEnCostaRica } from '@/services/clock';
 import type { Reserva } from '@/services/reservas';
-import { longDate } from '../format';
+import { localeDe, longDate } from '../format';
 import { momentoDeLaEstadia, type Momento } from '../estadia';
 import { Screen, ScreenError, ScreenHeading, ScreenLoading } from '../layout/ScreenState';
 import { useIdiomaRecepcion } from '../puerta/contexto';
@@ -118,10 +118,7 @@ export function GuestsListPage() {
 
   return (
     <Screen>
-      <ScreenHeading
-        eyebrow={longDate(hoy, idioma === 'es' ? 'es-CR' : 'en-US')}
-        title={copy.title}
-      />
+      <ScreenHeading eyebrow={longDate(hoy, localeDe(idioma))} title={copy.title} />
       <p className="m-0 text-sm text-muted">{copy.subtitulo}</p>
 
       <SegmentedControl

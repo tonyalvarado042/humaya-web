@@ -1,7 +1,8 @@
 import { Badge, Button, Card } from '@/components/ui';
 import { useAjustes, useCambiarDemo } from '@/hooks';
 import { useEsAdministrador } from '../puerta/contexto';
-import { adminCopy as copy } from './copy';
+import { useIdiomaRecepcion } from '../puerta/contexto';
+import { adminCopy } from './copy';
 
 /**
  * Lo que no es de ninguna de las otras secciones. Hoy: los datos de ejemplo.
@@ -11,6 +12,8 @@ import { adminCopy as copy } from './copy';
  * settings.
  */
 export function AjustesPage() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = adminCopy[idioma];
   const ajustes = useAjustes();
   const cambiarDemo = useCambiarDemo();
   const esAdmin = useEsAdministrador();

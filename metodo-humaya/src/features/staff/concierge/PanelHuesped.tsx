@@ -15,12 +15,13 @@ import { localizedText } from '@/i18n/localizedText';
 import { getToday } from '@/services/clock';
 import { ahora } from '@/services/reloj';
 import type { ChatMessage, Stay } from '@/types';
-import { useQuienEntro } from '../puerta/contexto';
-import { panelCopy as copy } from './copyPanel';
+import { localeDe } from '../format';
+import { useIdiomaRecepcion, useQuienEntro } from '../puerta/contexto';
+import { panelCopy, type PanelTextos } from './copyPanel';
 import { esperaDesde } from './espera';
 import { momentoDeLaEstadia, type Momento } from '../estadia';
 
-function haceCuanto(iso: string): string {
+function haceCuanto(iso: string, copy: PanelTextos): string {
   // `ahora()` y no `Date.now()`: el reloj de la máquina puede ir corrido —
   // el 16 de noviembre de 2026 el de Tony iba 4 minutos adelantado, y una
   // nota recién escrita aparecía como «hace 4 minutos». Un número que dice
@@ -33,16 +34,16 @@ function haceCuanto(iso: string): string {
   return copy.dias(Math.floor(horas / 24));
 }
 
-function fechaCorta(iso: string): string {
-  return new Intl.DateTimeFormat('es-CR', {
+function fechaCorta(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
     day: 'numeric',
     month: 'short',
     timeZone: 'UTC',
   }).format(new Date(`${iso.slice(0, 10)}T12:00:00Z`));
 }
 
-function hora(iso: string): string {
-  return new Intl.DateTimeFormat('es-CR', {
+function hora(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
     hour: 'numeric',
     minute: '2-digit',
     timeZone: 'America/Costa_Rica',
@@ -50,20 +51,25 @@ function hora(iso: string): string {
 }
 
 /** La línea del reloj de la estadía, y si hay que mirarla dos veces. */
-function lineaDelMomento(momento: Momento, stay: Stay): { texto: string; urgente: boolean } {
+function lineaDelMomento(
+  momento: Momento,
+  stay: Stay,
+  copy: PanelTextos,
+  locale: string,
+): { texto: string; urgente: boolean } {
   switch (momento.clase) {
     case 'por-llegar':
       return { texto: copy.llegaEnDias(momento.dias), urgente: momento.dias <= 1 };
     case 'llega-hoy':
-      return { texto: copy.llegaHoy(hora(stay.checkIn)), urgente: true };
+      return { texto: copy.llegaHoy(hora(stay.checkIn, locale)), urgente: true };
     case 'se-va-hoy':
-      return { texto: copy.seVaHoy(hora(stay.checkOut)), urgente: true };
+      return { texto: copy.seVaHoy(hora(stay.checkOut, locale)), urgente: true };
     case 'se-fue':
       return { texto: copy.seFue(momento.dias), urgente: false };
     default:
       return {
         texto: momento.seVaManana
-          ? `${copy.diaDe(momento.dia, momento.noches)} · ${copy.seVaManana(hora(stay.checkOut))}`
+          ? `${copy.diaDe(momento.dia, momento.noches)} · ${copy.seVaManana(hora(stay.checkOut, locale))}`
           : copy.diaDe(momento.dia, momento.noches),
         urgente: momento.seVaManana,
       };
@@ -129,6 +135,11 @@ interface PanelProps {
  * de memoria. Por eso la ficha viene a la conversación, y no al revés.
  */
 export function PanelHuesped({ stayId, messages }: PanelProps) {
+  // `idiomaRecepcion` y no `idioma`: mas abajo `idioma` ya es el del
+  // HUESPED, que es otra cosa y se muestra como insignia.
+  const [idiomaRecepcion] = useIdiomaRecepcion();
+  const copy = panelCopy[idiomaRecepcion];
+  const locale = localeDe(idiomaRecepcion);
   const perfil = useGuestProfile(stayId);
   const asignacion = useAsignacion(stayId);
   const asignar = useAsignar(stayId);
@@ -150,7 +161,7 @@ export function PanelHuesped({ stayId, messages }: PanelProps) {
   const presente = alertas.filter((a) => a.kind === 'info');
   const pilares = (perfil.data?.pillars ?? []).filter((p) => p.text.trim());
   const momento = stay ? momentoDeLaEstadia(stay, getToday()) : null;
-  const linea = momento && stay ? lineaDelMomento(momento, stay) : null;
+  const linea = momento && stay ? lineaDelMomento(momento, stay, copy, locale) : null;
   const mia = asignacion.data?.asignadoId === yo.id;
 
   return (
@@ -159,7 +170,7 @@ export function PanelHuesped({ stayId, messages }: PanelProps) {
         {idioma ? (
           <Badge tone="neutral">{idioma === 'en' ? copy.escribeIngles : copy.escribeEspanol}</Badge>
         ) : null}
-        {espera ? <Badge tone="warning">{copy.esperando(haceCuanto(espera))}</Badge> : null}
+        {espera ? <Badge tone="warning">{copy.esperando(haceCuanto(espera, copy))}</Badge> : null}
       </div>
 
       {/* Lo que puede terminar en una ambulancia va primero y va en rojo.
@@ -172,7 +183,7 @@ export function PanelHuesped({ stayId, messages }: PanelProps) {
           </span>
           {alergias.map((a) => (
             <p key={a.label.es} className="m-0 text-sm font-medium text-on-alert">
-              {localizedText(a.label, 'es')}
+              {localizedText(a.label, idiomaRecepcion)}
             </p>
           ))}
         </div>
@@ -194,8 +205,8 @@ export function PanelHuesped({ stayId, messages }: PanelProps) {
 
       {stay ? (
         <p className="m-0 text-sm text-muted">
-          {copy.villa} {stay.villa} · {fechaCorta(stay.checkIn)}–{fechaCorta(stay.checkOut)} ·{' '}
-          {copy.personas(stay.partySize)}
+          {copy.villa} {stay.villa} · {fechaCorta(stay.checkIn, locale)}–
+          {fechaCorta(stay.checkOut, locale)} · {copy.personas(stay.partySize)}
         </p>
       ) : null}
 
@@ -209,14 +220,22 @@ export function PanelHuesped({ stayId, messages }: PanelProps) {
       {celebra.length > 0 ? (
         <p className="m-0 flex items-center gap-1.5 text-sm text-gold">
           <PartyPopper size={15} strokeWidth={1.7} aria-hidden="true" className="shrink-0" />
-          {copy.celebra}: {celebra.map((a) => localizedText(a.label, 'es')).join(' · ')}
+          {copy.celebra}: {celebra.map((a) => localizedText(a.label, idiomaRecepcion)).join(' · ')}
         </p>
       ) : null}
 
       {/* En sus palabras, no en las nuestras: si alguien pidió que le avisen
           antes de tocarle la puerta, eso cambia la respuesta que se escribe
           abajo, y por eso se lee antes de escribirla. */}
-      {perfil.data?.preferredCare && perfil.data.preferredCare !== copy.sinEntrevista ? (
+      {/* Se compara contra el texto ESPAÑOL a propósito, no contra `copy`.
+          `preferredCare` es un dato y viene siempre en español; cuando no hay
+          entrevista trae literalmente esa frase. Comparándolo contra `copy`
+          —como estaba—, con recepción en inglés la comparación no calzaba
+          nunca y la pantalla mostraba «Cómo pidió que lo atendamos: Todavía
+          no completaron la entrevista». Un dato que es una frase de pantalla
+          es una trampa; mientras siga siéndolo, la comparación tiene que
+          saberlo. */}
+      {perfil.data?.preferredCare && perfil.data.preferredCare !== panelCopy.es.sinEntrevista ? (
         <div className="flex flex-col gap-1 border-t border-line-soft pt-3">
           <span className="text-eyebrow text-muted-soft">{copy.comoAtenderlo}</span>
           <p className="m-0 font-display text-[15px] leading-snug text-text italic">
@@ -231,7 +250,7 @@ export function PanelHuesped({ stayId, messages }: PanelProps) {
           <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
             {presente.map((a) => (
               <li key={a.label.es} className="text-[13px] text-muted">
-                {localizedText(a.label, 'es')}
+                {localizedText(a.label, idiomaRecepcion)}
               </li>
             ))}
           </ul>
@@ -257,8 +276,8 @@ export function PanelHuesped({ stayId, messages }: PanelProps) {
           <ul className="m-0 flex list-none flex-col gap-1 p-0">
             {reservas.data.map((r) => (
               <li key={`${r.facility}-${r.start}`} className="text-[13px] text-muted">
-                {copy.instalaciones[r.facility] ?? r.facility} · {fechaCorta(r.start)}{' '}
-                {hora(r.start)}
+                {copy.instalaciones[r.facility] ?? r.facility} · {fechaCorta(r.start, locale)}{' '}
+                {hora(r.start, locale)}
               </li>
             ))}
           </ul>
@@ -327,6 +346,8 @@ export function PanelHuesped({ stayId, messages }: PanelProps) {
  * merece ocupar media pantalla de teléfono.
  */
 function NotasInternas({ stayId }: { stayId: string }) {
+  const [idiomaRecepcion] = useIdiomaRecepcion();
+  const copy = panelCopy[idiomaRecepcion];
   const notas = useNotasInternas(stayId);
   const crear = useCrearNota(stayId);
   const borrar = useBorrarNota(stayId);
@@ -356,7 +377,7 @@ function NotasInternas({ stayId }: { stayId: string }) {
               <div className="flex flex-col gap-0.5">
                 <p className="m-0 whitespace-pre-wrap text-sm text-text">{nota.texto}</p>
                 <span className="text-xs text-muted-soft">
-                  {nota.autor ?? copy.alguien} · {haceCuanto(nota.creadoEn)}
+                  {nota.autor ?? copy.alguien} · {haceCuanto(nota.creadoEn, copy)}
                 </span>
               </div>
               <Button
