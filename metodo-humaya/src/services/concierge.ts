@@ -4,6 +4,7 @@ import type { ChatMessage, ConciergeConversation, LocalizedText } from '@/types'
 // CRM. El hilo del huesped no: entra por codigo de confirmacion, no tiene
 // cuenta, y su propio hilo es suyo.
 import { codigoActual } from '@/marca';
+import { actualizarLaApp, esPantallaVieja } from './actualizar';
 import { cabeceraDeRecepcion } from './sesion';
 
 /**
@@ -45,6 +46,12 @@ async function call<T>(input: string, init?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...init?.headers },
   });
   if (!response.ok) {
+    // Lo mismo que en `admin.ts`: un `falta_hotel` quiere decir que esta
+    // pantalla es mas vieja que el servidor. Ver `actualizar.ts`.
+    const cuerpo = await response.text().catch(() => '');
+    if (esPantallaVieja(response.status, cuerpo) && actualizarLaApp()) {
+      throw new Error('concierge_desactualizado');
+    }
     throw new Error(`concierge_http_${response.status}`);
   }
   return response.json() as Promise<T>;

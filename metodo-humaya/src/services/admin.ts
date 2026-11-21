@@ -3,6 +3,7 @@ import type { AdminOpcion, PorIdioma, Servicio, ServicioSlot } from '@/types';
 // recepcion. Las lecturas y reservarServicio no: las usa la app del huesped,
 // que entra por codigo de confirmacion y no tiene cuenta.
 import { codigoActual } from '@/marca';
+import { actualizarLaApp, esPantallaVieja } from './actualizar';
 import { elNegocio } from './negocio';
 import { cabeceraDeRecepcion } from './sesion';
 
@@ -43,6 +44,12 @@ async function call<T>(input: string, init?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...init?.headers },
   });
   if (!response.ok) {
+    // `falta_hotel` solo puede venir de un bundle viejo: el de hoy siempre
+    // manda el hotel. Ver `actualizar.ts`.
+    const cuerpo = await response.text().catch(() => '');
+    if (esPantallaVieja(response.status, cuerpo) && actualizarLaApp()) {
+      throw new Error('admin_desactualizado');
+    }
     throw new Error(`admin_http_${response.status}`);
   }
   return response.json() as Promise<T>;

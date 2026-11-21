@@ -93,6 +93,37 @@ export function createRoutes({
           ],
         };
 
+  /**
+   * Y al revés: la app del huésped no se sirve desde el dominio de recepción.
+   *
+   * Faltaba esta mitad. El 21 de noviembre de 2026 Tony abrió
+   * `staff.stayhumaya.com/app` y le salió «No pudimos cargar esta pantalla».
+   * La dirección existía —el mismo Worker sirve los dos dominios— y montaba
+   * la app del huésped, con su selector de estadías de la demo, en la casa de
+   * recepción. Ahora sale para el dominio del huésped, igual que `/staff`
+   * sale para el del personal.
+   */
+  const app: RouteObject =
+    lado === 'personal' && MARCA.dominiosSeparados
+      ? {
+          path: '/app/*',
+          element: <Mudanza base={MARCA.dominioHuesped} aviso="Taking you to the guest app…" />,
+        }
+      : {
+          path: '/app',
+          element: <GuestLayout />,
+          children: [
+            { index: true, element: <HomePage /> },
+            { path: 'resumen', element: <MyDataPage /> },
+            { path: 'interview', element: <InterviewPage /> },
+            { path: 'concierge', element: <ConciergePage /> },
+            { path: 'villa', element: <VillaPage /> },
+            { path: 'bookings', element: <BookingsPage /> },
+            { path: 'move', element: <MovePage /> },
+            { path: 'move/:sessionId', element: <SessionPlayerPage /> },
+          ],
+        };
+
   return [
     {
       path: '/',
@@ -104,20 +135,7 @@ export function createRoutes({
       path: '/entrada',
       element: <EntradaPage />,
     },
-    {
-      path: '/app',
-      element: <GuestLayout />,
-      children: [
-        { index: true, element: <HomePage /> },
-        { path: 'resumen', element: <MyDataPage /> },
-        { path: 'interview', element: <InterviewPage /> },
-        { path: 'concierge', element: <ConciergePage /> },
-        { path: 'villa', element: <VillaPage /> },
-        { path: 'bookings', element: <BookingsPage /> },
-        { path: 'move', element: <MovePage /> },
-        { path: 'move/:sessionId', element: <SessionPlayerPage /> },
-      ],
-    },
+    app,
     staff,
     ...(includeDevUi
       ? [
