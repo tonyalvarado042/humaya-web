@@ -102,7 +102,9 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     noSoyYo: 'Not you? Look up another booking',
     conLlaveBuscando: 'Opening your stay…',
     llaveVencida: 'That link is no longer open. Look up your stay here.',
-    queEsTitulo: 'HUMAYA Experience',
+    get queEsTitulo() {
+      return MARCA.experiencia;
+    },
     queEsCuerpo:
       'Your stay, on the television in your villa and here on your phone. It is not here to replace anyone: it is here so that when we talk, we already know what you need.',
     queEsPersona: 'Whatever you ask, a person answers.',
@@ -146,7 +148,9 @@ export const entradaCopy: Record<Idioma, EntradaTextos> = {
     noSoyYo: '¿No sos vos? Buscar otra reserva',
     conLlaveBuscando: 'Abriendo tu estadía…',
     llaveVencida: 'Ese enlace ya no está abierto. Buscá tu estadía acá.',
-    queEsTitulo: 'HUMAYA Experience',
+    get queEsTitulo() {
+      return MARCA.experiencia;
+    },
     queEsCuerpo:
       'Tu estadía, en el televisor de tu villa y acá en tu teléfono. No está para reemplazar a nadie: está para que, cuando hablemos, ya sepamos qué necesitás.',
     queEsPersona: 'Lo que pidas, lo contesta una persona.',

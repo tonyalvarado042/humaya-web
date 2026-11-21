@@ -25,12 +25,16 @@ export function guidePage(S, llave) {
   const local = (S.local || []).map((c) => `<h3>${esc(c.category)}</h3>` + (c.items || []).map((i) =>
     `<div class="place"><div><b>${esc(i.name)}</b><p>${esc(i.note)}</p></div><span>${esc(i.distance || "")}</span></div>`).join("")).join("");
   const steps = (S.checkout && S.checkout.steps || []).map((x) => `<li>${esc(x)}</li>`).join("");
-  // La puerta de la app. El dominio viene de la base porque este Worker
-  // sirve los televisores de todos los hoteles; antes estaba escrito el de
-  // HUMAYA y el segundo hotel habria mandado a sus huespedes al primero.
-  const casa = S.dominio_huesped || "experience.stayhumaya.com";
-  const puerta = `https://${casa}/entrada` +
-    (llave ? `?s=${encodeURIComponent(llave)}` : "");
+  // La puerta de la app. Viene entera de la base —con el codigo del hotel
+  // adentro cuando toca— porque este Worker sirve los televisores de todos
+  // los hoteles: antes estaba escrito el dominio de HUMAYA y el segundo
+  // hotel habria mandado a sus huespedes al primero.
+  // El nombre de la experiencia es del HOTEL, no de HUMAYA: estaba escrito
+  // aca y el telefono del huesped del hotel demo leia «HUMAYA Experience»
+  // abajo y «Demo Experience» arriba, en la misma pantalla.
+  const experiencia = S.marca && S.marca.experiencia || "HUMAYA Experience";
+  const casa = S.puerta_huesped || "https://experience.stayhumaya.com";
+  const puerta = `${casa}/entrada` + (llave ? `?s=${encodeURIComponent(llave)}` : "");
   const sos = (S.emergency || []).map((e) => `<a class="sos" href="tel:${esc(e.phone)}">${esc(e.name)} <b>${esc(e.phone)}</b></a>`).join("");
   const notes = items(S.notes);
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -59,7 +63,7 @@ footer{text-align:center;color:#a99a8c;font-size:12px;margin-top:30px;letter-spa
 <header><div><small>${esc(S.name)}</small><h1>${st.active && st.guest ? "Welcome, " + esc(st.guest) : "Welcome to " + esc(S.name)}</h1></div></header>
 <main>
 <div class="card exp">
-  <div class="k">HUMAYA Experience</div>
+  <div class="k">${esc(experiencia)}</div>
   <p class="lead">Your stay, on the television and here on your phone.</p>
   <p>It is not here to replace anyone. It is here so that when we talk, we already
      know what you need: the Wi-Fi, your villa, what is worth doing nearby and how
@@ -78,6 +82,6 @@ ${section("House rules", items(S.rules))}
 ${section("Around here", local)}
 ${section("Check-out by " + t12(S.checkout_time), steps ? `<ol>${steps}</ol>` : "")}
 ${section("Emergency", sos)}
-<footer>HUMAYA EXPERIENCE · ${esc(S.name)} · COSTA RICA</footer>
+<footer>${esc(experiencia.toUpperCase())} · ${esc(S.name)} · COSTA RICA</footer>
 </main></body></html>`;
 }

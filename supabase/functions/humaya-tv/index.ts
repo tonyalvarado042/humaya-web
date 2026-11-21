@@ -277,11 +277,17 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
     )
     : null;
 
-  // ── A que dominio manda el QR ───────────────────────────────────
+  // ── A donde manda el QR ─────────────────────────────────────────
   // Sale de la base y no de una constante: este Worker sirve los televisores
   // de TODOS los hoteles, y el boton del QR llevaba escrito el de HUMAYA.
   // `localhost` y `127.0.0.1` estan en la tabla para el desarrollo local y
   // dentro de un QR no llevan a ninguna parte.
+  //
+  // ⚠️ En el dominio COMPARTIDO del producto hay que mandar el codigo del
+  // hotel en la ruta (`/demo/entrada`). Sin el, la app no sabe de que hotel
+  // es la pantalla y contesta «falta el hotel en la direccion» antes de
+  // pintar nada: el boton quedaba muerto para cualquier hotel sin dominio
+  // propio. Comprobado en vivo el 21 de noviembre de 2026.
   const { data: puertas } = await db
     .from("humaya_dominios")
     .select("dominio,negocio_id,lado")
@@ -289,13 +295,31 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
   const candidatas = (puertas ?? []).filter((d: { dominio: string }) =>
     d.dominio !== "localhost" && d.dominio !== "127.0.0.1"
   ) as { dominio: string; negocio_id: string | null; lado: string }[];
-  const dominioHuesped =
+  const suya =
     // el suyo, y si tiene varios el que es solo de huespedes
-    candidatas.find((d) => d.negocio_id === villa.negocio_id && d.lado === "huesped")?.dominio ??
-      candidatas.find((d) => d.negocio_id === villa.negocio_id)?.dominio ??
-      // el del producto, que sirve a cualquier hotel: la llave dice cual es
-      candidatas.find((d) => !d.negocio_id && d.lado === "huesped")?.dominio ??
-      "experience.stayhumaya.com";
+    candidatas.find((d) => d.negocio_id === villa.negocio_id && d.lado === "huesped") ??
+      candidatas.find((d) => d.negocio_id === villa.negocio_id) ??
+      // el del producto, que sirve a cualquier hotel
+      candidatas.find((d) => !d.negocio_id && d.lado === "huesped");
+
+  const { data: neg } = await db
+    .from("cta_negocios")
+    .select("codigo")
+    .eq("id", villa.negocio_id)
+    .maybeSingle();
+  const codigoHotel = (neg as { codigo?: string } | null)?.codigo ?? "";
+
+  // Como se llama la experiencia EN ESTE HOTEL. Estaba escrito a mano en la
+  // pagina del QR, asi que el huesped del hotel demo leia «Demo Experience»
+  // arriba y «HUMAYA Experience» abajo, en la misma pantalla del telefono.
+  const { data: marcaFila } = await db
+    .from("humaya_hoteles")
+    .select("marca_experiencia,marca_hotel")
+    .eq("negocio_id", villa.negocio_id)
+    .maybeSingle();
+  const marca = marcaFila as { marca_experiencia: string | null; marca_hotel: string | null } | null;
+  const prefijo = suya && !suya.negocio_id && codigoHotel ? `/${codigoHotel}` : "";
+  const puertaHuesped = `https://${suya?.dominio ?? "experience.stayhumaya.com"}${prefijo}`;
 
   const notas = villa.nota_titulo || villa.nota_texto
     ? [{ title: villa.nota_titulo ?? "", body: villa.nota_texto ?? "" }]
@@ -320,7 +344,11 @@ async function estado(db: SupabaseClient, villa: Villa, faseForzada: string | nu
     ocupacion: reserva?.huesped ? "reserva" : villa.huesped ? "a_mano" : "vacia",
     // Lo que el Worker mete dentro del QR, y a donde apunta el boton.
     llave_estadia: llaveEstadia,
-    dominio_huesped: dominioHuesped,
+    puerta_huesped: puertaHuesped,
+    marca: {
+      experiencia: marca?.marca_experiencia || "HUMAYA Experience",
+      hotel: marca?.marca_hotel || "HUMAYA",
+    },
     wifi: mostrar && ssid ? { ssid, password: claveWifi ?? "" } : null,
     access: [],
     welcome: villa.bienvenida || (g.welcome ?? ""),

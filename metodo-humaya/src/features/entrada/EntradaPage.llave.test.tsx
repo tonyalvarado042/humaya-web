@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { aplicarHotel } from '@/marca';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { EntradaPage } from './EntradaPage';
 
@@ -42,6 +43,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   window.history.replaceState({}, '', '/entrada');
+  aplicarHotel(null);
 });
 
 describe('cuando el QR trae la llave de la estadía', () => {
@@ -129,5 +131,30 @@ describe('cuando la llave ya no abre', () => {
     // Y no dice «no encontramos tu reserva», que sería echarle la culpa a un
     // código que el huésped nunca escribió.
     expect(screen.queryByText(/We couldn/)).not.toBeInTheDocument();
+  });
+});
+
+describe('en otro hotel', () => {
+  it('la experiencia se llama como la llama ESE hotel, arriba y abajo', async () => {
+    // El fallo que esto agarra: el bloque de abajo tenía escrito «HUMAYA
+    // Experience». Visto en vivo el 21 de noviembre de 2026 en el hotel
+    // demo: arriba decía «DEMO EXPERIENCE» y abajo «HUMAYA EXPERIENCE», en
+    // la misma pantalla del teléfono. Decirle a un huésped el nombre de otra
+    // empresa no es un detalle: es decirle que está en otro hotel.
+    aplicarHotel({
+      negocioId: 'n-demo',
+      codigo: 'demo',
+      marcaExperiencia: 'Demo Experience',
+      marcaHotel: 'HOTEL DEMO',
+      correo: 'demo@liderax10.com',
+      tema: null,
+    });
+    conLaLlave({ found: true, guestName: 'Ana', reserva: 'R1' });
+
+    renderWithProviders(<EntradaPage />);
+    await screen.findByText(/Found you, Ana/);
+
+    expect(screen.getAllByText('Demo Experience').length).toBeGreaterThan(1);
+    expect(screen.queryByText('HUMAYA Experience')).not.toBeInTheDocument();
   });
 });
