@@ -42,11 +42,36 @@
 // —que es justo lo que va a hacer un huésped desde un correo o un QR— daría
 // 404. Con ella, cualquier ruta desconocida sirve index.html y el router
 // resuelve del lado del navegador.
+//
+// ── POR QUE LOS CUATRO DOMINIOS ESTAN LISTADOS ──────────────────────────
+// 20 de noviembre de 2026. Los dos de stayhumaya.com estaban puestos a mano
+// en el panel y este archivo no los mencionaba. Al agregar los dos del
+// producto hacia falta decidir: la documentacion de Cloudflare advierte que
+// una ruta puede DESAPARECER cuando se despliega con wrangler, asi que
+// listar solo los nuevos arriesgaba dejar a HUMAYA sin dominio.
+//
+// Estan los cuatro. De paso, el repositorio pasa a ser la fuente de verdad
+// de donde vive esta app, en vez de un panel que hay que ir a mirar.
+//
+// ── UN SOLO WORKER PARA VARIOS HOTELES ──────────────────────────────────
+// hotelexp.liderax10.com (recepcion) y guestexp.liderax10.com (huesped) son
+// los dominios del producto, y sirven a TODOS los hoteles. Que hotel es cada
+// pantalla no lo decide la infraestructura: lo resuelve
+// src/services/hotel.ts contra humaya_dominios. Agregar un hotel es una
+// fila, no un despliegue.
+//
+// Un hotel con dominio propio —como HUMAYA— se agrega aca y en esa tabla.
 {
   "name": "humaya-experience",
   "compatibility_date": "2026-11-01",
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
-  }
+  },
+  "routes": [
+    { "pattern": "experience.stayhumaya.com", "custom_domain": true },
+    { "pattern": "staff.stayhumaya.com", "custom_domain": true },
+    { "pattern": "guestexp.liderax10.com", "custom_domain": true },
+    { "pattern": "hotelexp.liderax10.com", "custom_domain": true }
+  ]
 }

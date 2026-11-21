@@ -3,8 +3,9 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { crearRouter } from '@/router';
+import { FaltaElHotel } from '@/components/FaltaElHotel';
 import { aplicarHotel } from '@/marca';
-import { resolverHotel } from '@/services/hotel';
+import { codigoDeLaRuta, resolverHotel } from '@/services/hotel';
 import '@/i18n';
 import '@/styles/tokens.css';
 
@@ -41,9 +42,24 @@ async function arrancar() {
   const donde = await resolverHotel(window.location.hostname, window.location.pathname);
   aplicarHotel(donde.hotel);
 
+  const raiz = createRoot(rootElement!);
+
+  // En el dominio compartido del huesped, sin hotel en la direccion no hay
+  // nada que pintar: mostrar el Home de OTRO hotel seria ensenarle a alguien
+  // la marca y los datos de un tercero. Y dejarlo en blanco es un callejon
+  // sin salida, que no tira error pero deja a la persona parada.
+  if (donde.compartido && donde.lado === 'huesped' && !donde.hotel) {
+    raiz.render(
+      <StrictMode>
+        <FaltaElHotel codigo={codigoDeLaRuta(window.location.pathname)} />
+      </StrictMode>,
+    );
+    return;
+  }
+
   const router = crearRouter({ lado: donde.lado, base: donde.base });
 
-  createRoot(rootElement!).render(
+  raiz.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
