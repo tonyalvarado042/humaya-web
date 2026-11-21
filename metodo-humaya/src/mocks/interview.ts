@@ -1,4 +1,5 @@
 import type { InterviewAnswer, InterviewDepth, InterviewQuestion } from '@/types';
+import { momentoDemo } from './today';
 
 /**
  * Preguntas de la entrevista.
@@ -345,42 +346,42 @@ const answer = (questionId: string, value: string, answeredAt: string): Intervie
  */
 export const SEED_ANSWERS: Record<string, InterviewAnswer[]> = {
   's-mendez-rojas': [
-    answer('q-light-connect', 'pareja', '2026-11-09T14:14:00-06:00'),
-    answer('q-light-nourish', 'frutos-secos', '2026-11-09T14:15:00-06:00'),
-    answer('q-light-move', 'moderado', '2026-11-09T14:16:00-06:00'),
-    answer('q-light-believe', 'aniversario', '2026-11-09T14:17:00-06:00'),
-    answer('q-light-create', 'calma', '2026-11-09T14:18:00-06:00'),
+    answer('q-light-connect', 'pareja', momentoDemo(-5, '14:14')),
+    answer('q-light-nourish', 'frutos-secos', momentoDemo(-5, '14:15')),
+    answer('q-light-move', 'moderado', momentoDemo(-5, '14:16')),
+    answer('q-light-believe', 'aniversario', momentoDemo(-5, '14:17')),
+    answer('q-light-create', 'calma', momentoDemo(-5, '14:18')),
   ],
   's-keller': [
-    answer('q-light-connect', 'familia', '2026-11-02T09:41:00-06:00'),
-    answer('q-light-nourish', 'lacteos', '2026-11-02T09:42:00-06:00'),
-    answer('q-light-move', 'intenso', '2026-11-02T09:43:00-06:00'),
-    answer('q-light-believe', 'nada', '2026-11-02T09:44:00-06:00'),
-    answer('q-light-create', 'cercanos', '2026-11-02T09:45:00-06:00'),
+    answer('q-light-connect', 'familia', momentoDemo(-12, '09:41')),
+    answer('q-light-nourish', 'lacteos', momentoDemo(-12, '09:42')),
+    answer('q-light-move', 'intenso', momentoDemo(-12, '09:43')),
+    answer('q-light-believe', 'nada', momentoDemo(-12, '09:44')),
+    answer('q-light-create', 'cercanos', momentoDemo(-12, '09:45')),
   ],
   's-durand': [
-    answer('q-light-connect', 'solo', '2026-11-11T18:06:00-06:00'),
-    answer('q-light-nourish', 'otra', '2026-11-11T18:07:00-06:00'),
-    answer('q-light-move', 'suave', '2026-11-11T18:08:00-06:00'),
+    answer('q-light-connect', 'solo', momentoDemo(-3, '18:06')),
+    answer('q-light-nourish', 'otra', momentoDemo(-3, '18:07')),
+    answer('q-light-move', 'suave', momentoDemo(-3, '18:08')),
   ],
   's-arias': [
-    answer('q-light-connect', 'amigos', '2026-10-28T11:21:00-06:00'),
-    answer('q-light-nourish', 'ninguna', '2026-10-28T11:22:00-06:00'),
-    answer('q-light-move', 'moderado', '2026-10-28T11:23:00-06:00'),
-    answer('q-light-believe', 'cumpleanos', '2026-10-28T11:24:00-06:00'),
-    answer('q-light-create', 'cercanos', '2026-10-28T11:25:00-06:00'),
+    answer('q-light-connect', 'amigos', momentoDemo(-17, '11:21')),
+    answer('q-light-nourish', 'ninguna', momentoDemo(-17, '11:22')),
+    answer('q-light-move', 'moderado', momentoDemo(-17, '11:23')),
+    answer('q-light-believe', 'cumpleanos', momentoDemo(-17, '11:24')),
+    answer('q-light-create', 'cercanos', momentoDemo(-17, '11:25')),
   ],
   's-bianchi': [
-    answer('q-light-connect', 'solo', '2026-11-01T16:01:00-06:00'),
-    answer('q-light-nourish', 'ninguna', '2026-11-01T16:02:00-06:00'),
-    answer('q-light-move', 'intenso', '2026-11-01T16:03:00-06:00'),
-    answer('q-light-believe', 'nada', '2026-11-01T16:04:00-06:00'),
-    answer('q-light-create', 'necesario', '2026-11-01T16:05:00-06:00'),
+    answer('q-light-connect', 'solo', momentoDemo(-13, '16:01')),
+    answer('q-light-nourish', 'ninguna', momentoDemo(-13, '16:02')),
+    answer('q-light-move', 'intenso', momentoDemo(-13, '16:03')),
+    answer('q-light-believe', 'nada', momentoDemo(-13, '16:04')),
+    answer('q-light-create', 'necesario', momentoDemo(-13, '16:05')),
   ],
   // Hannah se frenó justo en la pregunta de alergias: por eso todavía no
   // aceptó la política de privacidad.
   's-weber': [
-    answer('q-light-connect', 'solo', '2026-11-12T08:31:00-06:00'),
-    answer('q-light-move', 'suave', '2026-11-12T08:32:00-06:00'),
+    answer('q-light-connect', 'solo', momentoDemo(-2, '08:31')),
+    answer('q-light-move', 'suave', momentoDemo(-2, '08:32')),
   ],
 };

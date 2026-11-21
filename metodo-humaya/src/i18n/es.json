@@ -129,7 +129,7 @@
     "dayLabel": "Día",
     "slotsLabel": "Horarios de {{facility}}",
     "suggestionLead": "Sugerencia para ustedes:",
-    "suggestionBody": "sauna al atardecer el domingo y cold plunge temprano el lunes, antes de la caminata.",
+    "suggestionBody": "sauna al atardecer y, al día siguiente, cold plunge temprano antes de la caminata.",
     "pickSlot": "Elegí un horario",
     "confirm": "Reservar {{facility}} · {{time}}",
     "confirmedLabel": "Reservado",

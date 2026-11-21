@@ -1,4 +1,5 @@
 import type { WowExperience } from '@/types';
+import { momentoDemo } from './today';
 
 /**
  * Experiencias WOW sugeridas a partir de la entrevista. El "por qué" repite el
@@ -15,7 +16,7 @@ export const SEED_WOWS: WowExperience[] = [
     title: 'Flores de la zona y una nota escrita a mano por su aniversario',
     reason: 'Celebran 5 años juntos y lo mencionaron en la entrevista.',
     status: 'planned',
-    dueBy: '2026-11-14T15:00:00-06:00',
+    dueBy: momentoDemo(0, '15:00'),
   },
   {
     id: 'w-mendez-nourish',
@@ -40,7 +41,7 @@ export const SEED_WOWS: WowExperience[] = [
     title: 'Kit de exploración para los niños',
     reason: 'Vienen con Mia y Finn, de 9 y 6 años, y quieren moverse al aire libre.',
     status: 'planned',
-    dueBy: '2026-11-14T16:30:00-06:00',
+    dueBy: momentoDemo(0, '16:30'),
   },
   {
     id: 'w-durand-create',
@@ -49,7 +50,7 @@ export const SEED_WOWS: WowExperience[] = [
     title: 'Escritorio listo y café de filtro de la zona',
     reason: 'Viene a trabajar y pidió un espacio tranquilo con buena luz.',
     status: 'planned',
-    dueBy: '2026-11-14T17:00:00-06:00',
+    dueBy: momentoDemo(0, '17:00'),
   },
   {
     id: 'w-arias-believe',

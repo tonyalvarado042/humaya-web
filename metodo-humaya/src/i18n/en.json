@@ -129,7 +129,7 @@
     "dayLabel": "Day",
     "slotsLabel": "{{facility}} times",
     "suggestionLead": "Our suggestion:",
-    "suggestionBody": "sauna at sunset on Sunday and an early cold plunge on Monday, before your hike.",
+    "suggestionBody": "sauna at sunset and, the next morning, an early cold plunge before your hike.",
     "pickSlot": "Choose a time",
     "confirm": "Book {{facility}} · {{time}}",
     "confirmedLabel": "Booked",

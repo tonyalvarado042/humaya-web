@@ -1,9 +1,10 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resetMockState } from '@/mocks';
+import { daysFromToday, resetMockState } from '@/mocks';
 import { getDaySchedule } from '@/services/spa';
 import { stubAdminApi, type StubServicio } from '@/test/adminApiStub';
+import { dayParts } from '../format';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { BookingsPage } from './BookingsPage';
 
@@ -53,13 +54,16 @@ describe('elegir instalación y día', () => {
     stubAdminApi();
     renderWithProviders(<BookingsPage />, { stayId: VALERIA });
 
-    const days = await screen.findAllByRole('radio', { name: /nov/ });
-    expect(days.map((day) => day.textContent)).toEqual([
-      'Sáb14 nov',
-      'Dom15 nov',
-      'Lun16 nov',
-      'Mar17 nov',
-    ]);
+    // Los cuatro días de Valeria: hoy y los tres siguientes. Las etiquetas se
+    // arman con el mismo formateador que usa la pantalla en vez de escribirlas
+    // a mano: con fechas fijas, esta prueba envejecía junto con la demo.
+    const esperados = [0, 1, 2, 3].map((dia) => {
+      const partes = dayParts(daysFromToday(dia));
+      return `${partes.weekday}${partes.day}`;
+    });
+
+    const days = await screen.findAllByRole('radio', { name: /\d/ });
+    expect(days.map((day) => day.textContent)).toEqual(esperados);
   });
 });
 
@@ -98,7 +102,7 @@ describe('confirmar una reserva', () => {
 
     expect(await screen.findByText('Reservado')).toBeInTheDocument();
 
-    const schedule = await getDaySchedule('2026-11-14');
+    const schedule = await getDaySchedule(daysFromToday(0));
     const row = schedule.rows.find((item) => item.time === '16:00');
 
     expect(row?.sauna).toEqual({

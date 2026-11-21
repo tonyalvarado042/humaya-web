@@ -1,4 +1,5 @@
 import type { Guest } from '@/types';
+import { momentoDemo } from './today';
 
 /**
  * Personas inventadas, como pide CLAUDE.md. Las nueve primeras son las del
@@ -12,7 +13,7 @@ export const GUESTS: Guest[] = [
     companions: [{ name: 'Andrés Rojas', relation: 'pareja' }],
     locale: 'es',
     source: 'waitlist',
-    consent: { privacyAcceptedAt: '2026-11-09T14:12:00-06:00', whatsappOptIn: true },
+    consent: { privacyAcceptedAt: momentoDemo(-5, '14:12'), whatsappOptIn: true },
   },
   {
     id: 'g-keller',
@@ -24,7 +25,7 @@ export const GUESTS: Guest[] = [
     ],
     locale: 'de',
     source: 'direct',
-    consent: { privacyAcceptedAt: '2026-11-02T09:40:00-06:00', whatsappOptIn: false },
+    consent: { privacyAcceptedAt: momentoDemo(-12, '09:40'), whatsappOptIn: false },
   },
   {
     id: 'g-durand',
@@ -32,7 +33,7 @@ export const GUESTS: Guest[] = [
     companions: [],
     locale: 'fr',
     source: 'ota',
-    consent: { privacyAcceptedAt: '2026-11-11T18:05:00-06:00', whatsappOptIn: true },
+    consent: { privacyAcceptedAt: momentoDemo(-3, '18:05'), whatsappOptIn: true },
   },
   {
     id: 'g-whitfield',
@@ -48,7 +49,7 @@ export const GUESTS: Guest[] = [
     companions: [{ name: 'Marcela Arias', relation: 'hermana' }],
     locale: 'es',
     source: 'waitlist',
-    consent: { privacyAcceptedAt: '2026-10-28T11:20:00-06:00', whatsappOptIn: true },
+    consent: { privacyAcceptedAt: momentoDemo(-17, '11:20'), whatsappOptIn: true },
   },
   {
     id: 'g-bianchi',
@@ -56,7 +57,7 @@ export const GUESTS: Guest[] = [
     companions: [],
     locale: 'en',
     source: 'direct',
-    consent: { privacyAcceptedAt: '2026-11-01T16:00:00-06:00', whatsappOptIn: true },
+    consent: { privacyAcceptedAt: momentoDemo(-13, '16:00'), whatsappOptIn: true },
   },
   {
     id: 'g-morales',
@@ -93,7 +94,7 @@ export const GUESTS: Guest[] = [
     companions: [{ name: 'Lucía Beltrán', relation: 'pareja' }],
     locale: 'es',
     source: 'direct',
-    consent: { privacyAcceptedAt: '2026-11-05T10:00:00-06:00', whatsappOptIn: false },
+    consent: { privacyAcceptedAt: momentoDemo(-9, '10:00'), whatsappOptIn: false },
   },
   {
     id: 'g-zamora',
@@ -101,7 +102,7 @@ export const GUESTS: Guest[] = [
     companions: [{ name: 'Inés Zamora', relation: 'madre' }],
     locale: 'es',
     source: 'waitlist',
-    consent: { privacyAcceptedAt: '2026-11-04T19:15:00-06:00', whatsappOptIn: true },
+    consent: { privacyAcceptedAt: momentoDemo(-10, '19:15'), whatsappOptIn: true },
   },
   {
     id: 'g-farah',
@@ -117,7 +118,7 @@ export const GUESTS: Guest[] = [
     companions: [],
     locale: 'en',
     source: 'direct',
-    consent: { privacyAcceptedAt: '2026-11-07T12:45:00-06:00', whatsappOptIn: true },
+    consent: { privacyAcceptedAt: momentoDemo(-7, '12:45'), whatsappOptIn: true },
   },
   {
     id: 'g-lindqvist',

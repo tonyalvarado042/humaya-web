@@ -1,8 +1,9 @@
 import { screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { resetMockState } from '@/mocks';
+import { momentoDemo, resetMockState } from '@/mocks';
 import { saveAnswer } from '@/services/interview';
 import { renderWithProviders } from '@/test/renderWithProviders';
+import { shortDate } from '../format';
 import { MyDataPage } from './MyDataPage';
 
 const VALERIA = 's-mendez-rojas';
@@ -16,8 +17,14 @@ describe('resumen de la estadía', () => {
   it('muestra las fechas y la cantidad de personas', async () => {
     renderWithProviders(<MyDataPage />, { stayId: VALERIA });
 
-    expect(await screen.findByText('Sáb 14 nov')).toBeInTheDocument();
-    expect(screen.getByText('Mar 17 nov')).toBeInTheDocument();
+    // Valeria llega hoy y se va dentro de tres días, siempre: las fechas de
+    // la demo se mueven con el calendario. Se arman con el mismo formateador
+    // que usa la pantalla.
+    // Con el instante completo, no con la fecha pelada: `new Date('2026-11-20')`
+    // es medianoche UTC, que en Costa Rica todavía es el día anterior, y la
+    // prueba buscaría un día antes del que pinta la pantalla.
+    expect(await screen.findByText(shortDate(momentoDemo(0, '15:00')))).toBeInTheDocument();
+    expect(screen.getByText(shortDate(momentoDemo(3, '11:00')))).toBeInTheDocument();
     expect(screen.getByText('2 personas')).toBeInTheDocument();
   });
 
@@ -50,7 +57,7 @@ describe('avance de la entrevista', () => {
     await saveAnswer(HANNAH, {
       questionId: 'q-light-believe',
       value: 'aniversario',
-      answeredAt: '2026-11-14T10:00:00-06:00',
+      answeredAt: momentoDemo(0, '10:00'),
     });
 
     renderWithProviders(<MyDataPage />, { stayId: HANNAH });

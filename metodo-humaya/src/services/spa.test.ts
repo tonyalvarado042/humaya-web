@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { resetMockState } from '@/mocks';
+import { daysFromToday, resetMockState } from '@/mocks';
 import { bookSlot, cancelSlot, getDaySchedule, getSlots, getStayBookings } from './spa';
 
-const DAY = '2026-11-15';
+/** La agenda sembrada del prototipo cae MAÑANA. Antes era el 15 de
+ *  noviembre de 2026 a secas, y envejecía con la demo. */
+const DAY = daysFromToday(1);
 
 beforeEach(() => {
   resetMockState();
