@@ -202,7 +202,7 @@ describe('el demo, mientras Admin lo deje encendido', () => {
   it('apagado en Admin, la opción desaparece', async () => {
     // Así queda la base cuando Tony apaga el interruptor antes de publicar.
     supabaseStub.tablas.humaya_ajustes = [
-      { negocio_id: 'n-1', clave: 'demo_visible', valor: false },
+      { negocio_id: NEGOCIO_DE_PRUEBA, clave: 'demo_visible', valor: false },
     ];
     renderRoutes(routes, { route: '/staff' });
     await tabla();
@@ -210,5 +210,22 @@ describe('el demo, mientras Admin lo deje encendido', () => {
     expect(screen.queryByRole('radio', { name: 'Demo' })).not.toBeInTheDocument();
     // Y las reservas de verdad siguen ahí.
     expect(screen.getByRole('radio', { name: 'Upcoming' })).toBeInTheDocument();
+  });
+
+  /**
+   * El ajuste de OTRO hotel no manda acá.
+   *
+   * Hasta el 21 de noviembre de 2026 sí mandaba: `getAjustes` leía la tabla
+   * entera sin filtrar y `setDemoVisible` ESCRIBÍA en todos los hoteles que
+   * tuvieran una propiedad. Apagar el demo en uno se lo apagaba a los otros.
+   */
+  it('apagarlo en otro hotel no lo apaga acá', async () => {
+    supabaseStub.tablas.humaya_ajustes = [
+      { negocio_id: 'otro-hotel', clave: 'demo_visible', valor: false },
+    ];
+    renderRoutes(routes, { route: '/staff' });
+    await tabla();
+
+    expect(screen.getByRole('radio', { name: 'Demo' })).toBeInTheDocument();
   });
 });

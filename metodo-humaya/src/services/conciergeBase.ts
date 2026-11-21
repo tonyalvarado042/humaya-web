@@ -170,26 +170,26 @@ export interface AjustesBot {
 export async function guardarAjustesBot(ajustes: AjustesBot): Promise<void> {
   const db = await cliente();
 
-  const { data: propiedades } = await db.from('humaya_propiedades').select('negocio_id');
-  const negocios = [
-    ...new Set(((propiedades ?? []) as { negocio_id: string }[]).map((p) => p.negocio_id)),
-  ];
-  if (negocios.length === 0) throw new Error('bot_sin_hotel');
-
   const claves: Record<string, unknown> = {};
   if (ajustes.encendido !== undefined) claves.bot_encendido = ajustes.encendido;
   if (ajustes.modelo !== undefined) claves.bot_modelo = ajustes.modelo;
   if (ajustes.precioEntrada !== undefined) claves.bot_precio_entrada = ajustes.precioEntrada;
   if (ajustes.precioSalida !== undefined) claves.bot_precio_salida = ajustes.precioSalida;
 
-  const filas = negocios.flatMap((negocioId) =>
-    Object.entries(claves).map(([clave, valor]) => ({
-      negocio_id: negocioId,
-      clave,
-      valor,
-      actualizado_en: new Date().toISOString(),
-    })),
-  );
+  // UN hotel: el de esta pantalla.
+  //
+  // Antes esto leía TODAS las propiedades y escribía el ajuste en TODOS los
+  // hoteles. Comprobado en vivo el 21 de noviembre de 2026: estando en la
+  // pantalla del hotel demo, apretar «Encender el bot» le escribió el ajuste
+  // a HUMAYA y dejó el del demo como estaba. Desde la pantalla de un hotel
+  // se le podía encender y apagar el Concierge a otro.
+  const negocio = elNegocio();
+  const filas = Object.entries(claves).map(([clave, valor]) => ({
+    negocio_id: negocio,
+    clave,
+    valor,
+    actualizado_en: new Date().toISOString(),
+  }));
 
   const { data, error } = await db
     .from('humaya_ajustes')

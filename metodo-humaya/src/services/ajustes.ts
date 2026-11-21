@@ -1,3 +1,4 @@
+import { elNegocio } from './negocio';
 import { cliente } from './sesion';
 
 /**
@@ -12,10 +13,18 @@ import { cliente } from './sesion';
  * entre las reservas de verdad y las estadías de la demo; apagado, la demo
  * desaparece de la pantalla sin tocar una línea ni desplegar nada.
  *
- * ── UN SOLO HOTEL, POR AHORA ────────────────────────────────────────────
- * Hoy `humaya_propiedades` tiene una sola propiedad, así que se lee el ajuste
- * sin preguntar de cuál hotel. Cuando entre Bike & Bed habrá que elegir, y
- * este es el archivo que cambia.
+ * ── EL DÍA QUE HUBO DOS HOTELES ─────────────────────────────────────────
+ * Acá decía: «hoy `humaya_propiedades` tiene una sola propiedad, así que se
+ * lee el ajuste sin preguntar de cuál hotel. Cuando entre Bike & Bed habrá
+ * que elegir, y este es el archivo que cambia.»
+ *
+ * Ese día llegó, y el aviso se quedó corto: no era solo que se LEÍA sin
+ * elegir. `setDemoVisible` leía TODAS las propiedades y escribía el ajuste
+ * en TODOS los hoteles. Comprobado en vivo el 21 de noviembre de 2026 con el
+ * gemelo de esto, el interruptor del bot: estando en la pantalla del hotel
+ * demo, el clic le cambió el ajuste a HUMAYA.
+ *
+ * Ahora se lee y se escribe UN hotel: el de esta pantalla.
  */
 
 export interface Ajustes {
@@ -33,7 +42,7 @@ interface FilaAjuste {
 
 export async function getAjustes(): Promise<Ajustes> {
   const db = await cliente();
-  const { data, error } = await db.from('humaya_ajustes').select('*');
+  const { data, error } = await db.from('humaya_ajustes').select('*').eq('negocio_id', elNegocio());
 
   // Un fallo acá no debe tumbar recepción: se sigue con lo de siempre y la
   // pantalla funciona. Lo que no puede pasar es quedarse en blanco por un
@@ -52,20 +61,16 @@ export async function getAjustes(): Promise<Ajustes> {
 export async function setDemoVisible(visible: boolean): Promise<void> {
   const db = await cliente();
 
-  const { data: propiedades } = await db.from('humaya_propiedades').select('negocio_id');
-  const negocios = ((propiedades ?? []) as { negocio_id: string | null }[])
-    .map((fila) => fila.negocio_id)
-    .filter((id): id is string => !!id);
-
-  if (negocios.length === 0) throw new Error('ajustes_sin_hotel');
-
+  // UN hotel: el de esta pantalla. Antes se escribía en todos los que
+  // tuvieran una propiedad, así que apagar el demo desde un hotel se lo
+  // apagaba a los demás.
   const { error } = await db.from('humaya_ajustes').upsert(
-    negocios.map((negocioId) => ({
-      negocio_id: negocioId,
+    {
+      negocio_id: elNegocio(),
       clave: 'demo_visible',
       valor: visible,
       actualizado_en: new Date().toISOString(),
-    })),
+    },
     { onConflict: 'negocio_id,clave' },
   );
 
