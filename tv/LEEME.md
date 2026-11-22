@@ -71,3 +71,62 @@ recepción.
 
 Desde la pantalla se abren Netflix, YouTube y las demás apps. No hace falta
 ninguna computadora en el hotel.
+
+## Los aires y la casa inteligente: qué falta de verdad
+
+> **21 de noviembre de 2026.** Tony: *«si aires wifi sí habrán pero aún no tengo
+> instalado eso»*. Esto queda escrito ahora porque hoy `/api/aircon` y
+> `/api/hub` contestan «no hay nada» y **no dicen en ninguna parte qué habría
+> que poner ahí**. Cuando lleguen los aires, nadie debería tener que leer 800
+> líneas de `tv.js` para averiguarlo.
+
+**La pantalla ya está entera.** Todo el lado del televisor vino de guest-tv y
+nunca se quitó: la tarjeta *Climate*, el panel de zonas con su dial, las
+flechas que suben y bajan la temperatura, OK que prende y apaga cada zona, el
+refresco cada 20 segundos y el texto para cuando el aire no contesta. Lo único
+que falta son estas dos rutas de `src/index.js`, que hoy son una línea cada una.
+
+### `/api/aircon`
+
+`GET` devuelve el estado; `POST` recibe un cambio. Lo que la pantalla lee:
+
+```
+{ connected, power: "on"|"off", mode: "cool"|"heat"|"fan", can_mode,
+  simulated?, preview?,
+  zones: [ { id, label, on, temp, setpoint, can_set } ] }
+```
+
+`POST {zone, on}` o `POST {zone, setpoint}` → `{ok: true}`, o
+`{ok: false, error: "…"}` y la pantalla muestra ese texto. El `setpoint` va
+entre 16 y 30, y cinco pulsaciones seguidas se juntan en un solo envío.
+
+Dos banderas que guest-tv ya trae y sirven justo para esta etapa:
+`simulated` avisa en pantalla que no se mueve nada real, y `preview` que el
+cambio se ve pero todavía no se manda. **Con `zones: []` la tarjeta de clima
+muestra el tiempo de afuera**, que es lo que se ve hoy.
+
+### `/api/hub` (piscina, parlantes, luces)
+
+```
+{ rooms: [ { id, label, lights: { on } } ],
+  pool: { label, temp, setpoint, heater, can_heat } | null,
+  speakers: [ { id, label, playing, volume } ] }
+```
+
+`POST {heater}`, `POST {speaker, action, volume}`, `POST {lights, on}`.
+
+### La restricción que decide si esto es fácil o difícil
+
+**Este Worker corre en el borde de Cloudflare, no en la villa**, y no tiene
+ninguna ruta a la red local de la casa. Que los aires sean «de WiFi» no basta:
+lo que importa es por dónde se les habla.
+
+- Si la marca tiene **API en la nube** (token, HTTPS, documentada), el Worker la
+  llama igual que llama al clima y **no hace falta nada dentro de la villa**.
+  Es una tarde de trabajo.
+- Si el aire **solo habla en su red local**, hace falta algo adentro de la
+  villa que salga hacia afuera —un túnel, un mini servidor— y eso ya es
+  hardware, mantenimiento y una pieza más que se puede caer.
+
+Al comprar, esa es la pregunta que vale: *¿tiene API en la nube?* No «¿es
+inteligente?».
