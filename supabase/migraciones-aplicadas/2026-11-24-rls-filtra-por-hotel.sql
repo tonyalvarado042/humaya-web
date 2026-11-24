@@ -1,6 +1,32 @@
 -- ========================================================================
 --  EL PISO DEL MULTI-HOTEL: que la BASE no deje ver el hotel ajeno
---  Escrito el 24 de noviembre de 2026. NO APLICADO: espera el OK de Tony.
+--  Escrito y APLICADO el 24 de noviembre de 2026, con el OK de Tony.
+--
+--  -- COMO SE APLICO, QUE NO FUE PEGANDO ESTE ARCHIVO ---------------------
+--  Los 26 ALTER de abajo son el estado FINAL, y sirven para leer qué quedó.
+--  Mandarlos en una sola peticion murio dos veces por tamaño, asi que se
+--  aplico un bucle que los genera desde `pg_policies`: lee la condicion
+--  actual de cada politica y le suma ` and public.humaya_puedo_ver(...)`.
+--  Mas seguro que esto, no menos: no puede saltarse una politica ni
+--  cambiarle la lista de roles por un error de transcripcion. El bucle
+--  aborta si no cambia exactamente 26.
+--
+--  -- VERIFICADO, NO SUPUESTO ---------------------------------------------
+--  Antes:  lm@puromtb.com, sin NINGUN hotel asignado -> 67 reservas, 3 hoteles.
+--          Un usuario inexistente -> 0. (O sea: la medicion distingue.)
+--  Despues:
+--    * lm@puromtb.com                    -> 0 reservas, 0 hoteles, 0 todo.
+--    * aalvarado@gmail.com (plataforma)  -> 67 reservas, 3 hoteles, 12 villas.
+--    * cuenta de prueba en Bike & Bed    -> 0 reservas, 1 hotel (el suyo).
+--      la MISMA cuenta, agregada a HUMAYA -> 67 reservas, 2 hoteles.
+--      (asi se prueba que el 0 era una negacion y no una consulta rota)
+--    * escribir en su hotel  -> 204, 1 fila cambiada (y revertida).
+--    * insertar en el hotel ajeno -> 42501 "new row violates row-level
+--      security policy".
+--  Y recepcion abierta de verdad con esa cuenta: entra, lista el menu del
+--  hotel (6 opciones) y sus 2 televisores. Cuenta borrada al terminar.
+--
+--  Eran 26 politicas, no 25 como decia el LEEME.
 -- ========================================================================
 --
 -- -- EL AGUJERO, MEDIDO --------------------------------------------------

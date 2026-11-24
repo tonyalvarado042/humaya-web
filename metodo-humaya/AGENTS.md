@@ -35,13 +35,40 @@ npm install
 npm run dev         # http://localhost:5173
 ```
 
+### Dos direcciones locales, y no son lo mismo
+
+| Dirección | Qué hotel abre | Para qué |
+|---|---|---|
+| `http://localhost:5173` | **HOTEL DEMO**, lado «ambos» | recepción (`/staff`) y la demo |
+| `http://127.0.0.1:5173` | **dominio compartido del huésped**, como `guestexp` | abrir un hotel **de verdad**: `/bikeandbed/app`, `/demo/app` |
+
+Lo decide `humaya_dominios`, no el código. El segundo es la única forma de
+probar en local lo que ve el huésped de un hotel real: en `localhost` el
+dominio es el propio de la demo, así que el prefijo de la ruta no se mira.
+
+⚠️ **El puerto 5173 no es decorativo, y la dirección tampoco.** Las Edge
+Functions traen una lista blanca de CORS con dos únicos orígenes locales
+escritos a mano: `http://localhost:5173` y `http://127.0.0.1:5173`. Cualquier
+otro —el 5174 que Vite elegía solo cuando el 5173 estaba ocupado, o un
+`algo.localhost`— **abre la app igual** y el navegador tira cada respuesta de
+Supabase: la pantalla dice *«No pudimos cargar esta pantalla… puede ser un
+problema de conexión»*, que suena a caída ajena y no lo es.
+
+Por eso `vite.config.ts` lleva `strictPort` (se niega a arrancar en otro
+puerto, y lo dice) y `host: '127.0.0.1'` (si no, Vite se ata solo a `::1` y
+`127.0.0.1` no contesta). Comprobado el 24 de noviembre de 2026 ocupando el
+5173 a propósito: *«Port 5173 is already in use»*, salida 1.
+
+Y por lo mismo, `npm run preview` (puerto 4173) **no llega a las funciones**:
+sirve para mirar el build, no para probar nada que consulte Supabase.
+
 Antes de dar cualquier tarea por terminada, los cuatro tienen que pasar:
 
 ```bash
 npx prettier --write "src/**/*.{ts,tsx,css}"   # correr ANTES de lint: si no, lint falla por formato
 npm run lint
 npm run typecheck
-npm run test        # 188 tests
+npm run test        # 540 pruebas en 71 archivos (24/11/2026)
 npm run build
 ```
 
