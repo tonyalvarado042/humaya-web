@@ -3,6 +3,7 @@ import { Card } from '@/components/ui';
 import { MARCA } from '@/marca';
 import { useIdiomaRecepcion } from '../puerta/contexto';
 import { adminCopy } from './copy';
+import { useSoyPlataforma } from '@/hooks/useSoyPlataforma';
 import { seccionesAdmin } from './secciones';
 
 /**
@@ -15,6 +16,7 @@ import { seccionesAdmin } from './secciones';
  */
 export function AdminIndexPage() {
   const [idioma] = useIdiomaRecepcion();
+  const esPlataforma = useSoyPlataforma();
   const copy = adminCopy[idioma];
   return (
     <div className="flex flex-col gap-4">
@@ -28,7 +30,7 @@ export function AdminIndexPage() {
         aria-label={copy.portadaLista}
         className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2 xl:grid-cols-3"
       >
-        {seccionesAdmin(idioma).map(({ ruta, titulo, cuerpo, Icon }) => (
+        {seccionesAdmin(idioma, esPlataforma).map(({ ruta, titulo, cuerpo, Icon }) => (
           <li key={ruta}>
             <Link to={ruta} className="block h-full no-underline">
               <Card className="flex h-full flex-col gap-2">

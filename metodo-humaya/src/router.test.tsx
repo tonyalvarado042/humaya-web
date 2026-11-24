@@ -64,6 +64,8 @@ describe('rutas base', () => {
         marcaHotel: 'ARENAL',
         correo: 'hola@arenal.com',
         esDemo: false,
+        portadaTitulo: null,
+        portadaBajada: null,
         tema: null,
       });
 
@@ -72,6 +74,52 @@ describe('rutas base', () => {
       expect(screen.queryByText(/Demo con datos ficticios/)).not.toBeInTheDocument();
       expect(screen.queryByText(/Demo de/)).not.toBeInTheDocument();
       expect(screen.getByText('Arenal Experience')).toBeVisible();
+    });
+
+    it('el hotel pone su propio titular, no el de HUMAYA', async () => {
+      // Tony, 24 de noviembre de 2026: «todos textos de home etc deben ser
+      // configurables, veo que dice Become More Human pero el hotel dueño
+      // puede poner ahí otra cosa». Esa frase es de HUMAYA.
+      const { aplicarHotel } = await import('@/marca');
+      aplicarHotel({
+        negocioId: 'n-3',
+        codigo: 'arenal',
+        marcaExperiencia: 'Arenal Experience',
+        marcaHotel: 'ARENAL',
+        correo: 'hola@arenal.com',
+        esDemo: false,
+        portadaTitulo: 'Donde el volcán te despierta',
+        portadaBajada: 'Tu estadía, en la palma de la mano.',
+        tema: null,
+      });
+
+      renderAt('/');
+
+      expect(
+        screen.getByRole('heading', { name: 'Donde el volcán te despierta' }),
+      ).toBeInTheDocument();
+      expect(screen.getByText('Tu estadía, en la palma de la mano.')).toBeInTheDocument();
+      // EL PUNTO: la frase de HUMAYA no aparece en el hotel de otro.
+      expect(screen.queryByText('Become More Human')).not.toBeInTheDocument();
+    });
+
+    it('sin nada escrito, se usa la de siempre', async () => {
+      const { aplicarHotel } = await import('@/marca');
+      aplicarHotel({
+        negocioId: 'n-4',
+        codigo: 'otro',
+        marcaExperiencia: 'Otro Experience',
+        marcaHotel: 'OTRO',
+        correo: 'hola@otro.com',
+        esDemo: false,
+        portadaTitulo: null,
+        portadaBajada: null,
+        tema: null,
+      });
+
+      renderAt('/');
+
+      expect(screen.getByRole('heading', { name: 'Become More Human' })).toBeInTheDocument();
     });
 
     it('en la demo sí lo avisa, y no repite el nombre', async () => {
@@ -83,6 +131,8 @@ describe('rutas base', () => {
         marcaHotel: 'HOTEL DEMO',
         correo: 'demo@liderax10.com',
         esDemo: true,
+        portadaTitulo: null,
+        portadaBajada: null,
         tema: null,
       });
 

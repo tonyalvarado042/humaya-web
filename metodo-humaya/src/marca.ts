@@ -59,6 +59,7 @@ let resueltos: { huesped: string | null; personal: string | null } = {
 let negocio: string | null = null;
 let codigo: string | null = null;
 let esDemo = false;
+let portada: { titulo: string | null; bajada: string | null } = { titulo: null, bajada: null };
 let tema: Tema | null = null;
 
 /**
@@ -96,6 +97,7 @@ export function aplicarHotel(hotel: Hotel | null): void {
     negocio = null;
     codigo = null;
     esDemo = false;
+    portada = { titulo: null, bajada: null };
     tema = null;
     aplicarTema(null);
     void avisarALosTextos(PORDEFECTO.experiencia);
@@ -110,6 +112,7 @@ export function aplicarHotel(hotel: Hotel | null): void {
   negocio = hotel.negocioId;
   codigo = hotel.codigo;
   esDemo = hotel.esDemo;
+  portada = { titulo: hotel.portadaTitulo, bajada: hotel.portadaBajada };
   tema = hotel.tema;
   // Los colores se ponen acá, en el mismo momento que el nombre, y por la
   // misma razón: esto corre antes de pintar. Ponerlos después haría que el
@@ -144,6 +147,11 @@ async function avisarALosTextos(experiencia: string): Promise<void> {
  */
 export function negocioActual(): string | null {
   return negocio;
+}
+
+/** El titular de la portada que eligio este hotel, o null. */
+export function portadaDelHotel(): { titulo: string | null; bajada: string | null } {
+  return portada;
 }
 
 export function esHotelDeDemostracion(): boolean {

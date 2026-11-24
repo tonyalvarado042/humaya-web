@@ -1,4 +1,19 @@
-import { MARCA, esHotelDeDemostracion } from '@/marca';
+import { MARCA, esHotelDeDemostracion, portadaDelHotel } from '@/marca';
+
+/**
+ * Lo que dice la portada cuando el hotel no escribió lo suyo.
+ *
+ * «Become More Human» es la frase de HUMAYA. Tony, 24 de noviembre de 2026:
+ * «todos textos de home etc deben ser configurables, veo que dice Become
+ * More Human pero el hotel dueño puede poner ahí otra cosa». Para un hotel
+ * que compre la app esa frase es la de otro, y es la primera que lee su
+ * huésped — así que ahora es un respaldo, no el texto.
+ */
+const PORDEFECTO = {
+  titulo: 'Become More Human',
+  bajada:
+    'Una experiencia conectada para acompañar al huésped y darle a recepción el contexto que necesita.',
+};
 
 /**
  * La portada del dominio compartido.
@@ -24,9 +39,12 @@ export const demoHomeCopy = {
   get eyebrow() {
     return esHotelDeDemostracion() ? `Demo de ${MARCA.experiencia}` : MARCA.experiencia;
   },
-  title: 'Become More Human',
-  description:
-    'Una experiencia conectada para acompañar al huésped y darle a recepción el contexto que necesita.',
+  get title() {
+    return portadaDelHotel().titulo || PORDEFECTO.titulo;
+  },
+  get description() {
+    return portadaDelHotel().bajada || PORDEFECTO.bajada;
+  },
   guestCta: 'App del huésped',
   staffCta: 'Recepción',
   /** Solo en la demo: en un hotel de verdad los datos son de verdad. */

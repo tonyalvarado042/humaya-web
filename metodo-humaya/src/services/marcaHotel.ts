@@ -23,6 +23,8 @@ export interface MarcaDelHotel {
   marcaExperiencia: string;
   marcaHotel: string;
   correo: string;
+  portadaTitulo: string;
+  portadaBajada: string;
   tema: Tema | null;
 }
 
@@ -30,6 +32,8 @@ interface FilaHotel {
   marca_experiencia: string | null;
   marca_hotel: string | null;
   correo: string | null;
+  portada_titulo: string | null;
+  portada_bajada: string | null;
   tema: unknown;
 }
 
@@ -39,7 +43,7 @@ export async function getMarcaDelHotel(): Promise<MarcaDelHotel> {
 
   const { data, error } = await db
     .from('humaya_hoteles')
-    .select('marca_experiencia,marca_hotel,correo,tema')
+    .select('marca_experiencia,marca_hotel,correo,tema,portada_titulo,portada_bajada')
     .eq('negocio_id', elNegocio())
     .maybeSingle<FilaHotel>();
 
@@ -52,6 +56,8 @@ export async function getMarcaDelHotel(): Promise<MarcaDelHotel> {
     marcaExperiencia: data.marca_experiencia ?? '',
     marcaHotel: data.marca_hotel ?? '',
     correo: data.correo ?? '',
+    portadaTitulo: data.portada_titulo ?? '',
+    portadaBajada: data.portada_bajada ?? '',
     tema: comoTema(data.tema),
   };
 }
@@ -61,6 +67,8 @@ export interface CambiosDeMarca {
   marcaExperiencia?: string;
   marcaHotel?: string;
   correo?: string;
+  portadaTitulo?: string;
+  portadaBajada?: string;
   tema?: Tema | null;
 }
 
@@ -96,6 +104,12 @@ export async function guardarMarcaDelHotel(cambios: CambiosDeMarca): Promise<voi
   if (cambios.marcaExperiencia !== undefined) fila.marca_experiencia = cambios.marcaExperiencia;
   if (cambios.marcaHotel !== undefined) fila.marca_hotel = cambios.marcaHotel;
   if (cambios.correo !== undefined) fila.correo = cambios.correo;
+  // En blanco se guarda null, no cadena vacia: null es «usa el de siempre»,
+  // y '' seria un titulo vacio de verdad.
+  if (cambios.portadaTitulo !== undefined)
+    fila.portada_titulo = cambios.portadaTitulo.trim() || null;
+  if (cambios.portadaBajada !== undefined)
+    fila.portada_bajada = cambios.portadaBajada.trim() || null;
   // `{}` y no null: la columna es `not null default '{}'`, y además `{}`
   // significa exactamente «este hotel usa la paleta de siempre».
   if (cambios.tema !== undefined) fila.tema = temaLimpio(cambios.tema) ?? {};

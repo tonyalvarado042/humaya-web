@@ -33,6 +33,8 @@ const HUMAYA = {
   marcaHotel: 'HUMAYA',
   correo: 'hola@stayhumaya.com',
   esDemo: false,
+  portadaTitulo: null,
+  portadaBajada: null,
   tema: null,
 };
 const DEMO = {
@@ -42,6 +44,8 @@ const DEMO = {
   marcaHotel: 'HOTEL DEMO',
   correo: 'demo@liderax10.com',
   esDemo: true,
+  portadaTitulo: null,
+  portadaBajada: null,
   tema: null,
 };
 

@@ -40,6 +40,16 @@ export interface Hotel {
    * mentira, y ademas el huesped la lee.
    */
   esDemo: boolean;
+  /**
+   * El titular de la portada y su bajada, o null para los de siempre.
+   *
+   * Tony, 24 de noviembre de 2026: «todos textos de home etc deben ser
+   * configurables, veo que dice Become More Human pero el hotel dueno puede
+   * poner ahi otra cosa». Esa frase es de HUMAYA; para un hotel que compre
+   * la app es la frase de otro, y es la primera que ve su huesped.
+   */
+  portadaTitulo: string | null;
+  portadaBajada: string | null;
 }
 
 export type Lado = 'huesped' | 'personal' | 'ambos';
@@ -101,6 +111,8 @@ interface FilaDominio {
   correo: string | null;
   tema: unknown;
   es_demo: boolean | null;
+  portada_titulo: string | null;
+  portada_bajada: string | null;
   dominio_huesped: string | null;
   dominio_personal: string | null;
 }
@@ -116,6 +128,8 @@ interface FilaCodigo {
   correo: string;
   tema: unknown;
   es_demo?: boolean;
+  portada_titulo?: string | null;
+  portada_bajada?: string | null;
 }
 
 const aHotel = (f: FilaCodigo): Hotel => ({
@@ -126,6 +140,8 @@ const aHotel = (f: FilaCodigo): Hotel => ({
   correo: f.correo,
   tema: comoTema(f.tema),
   esDemo: f.es_demo ?? false,
+  portadaTitulo: f.portada_titulo || null,
+  portadaBajada: f.portada_bajada || null,
 });
 
 /**
@@ -185,6 +201,8 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
         correo: fila.correo ?? '',
         tema: fila.tema,
         es_demo: fila.es_demo ?? false,
+        portada_titulo: fila.portada_titulo,
+        portada_bajada: fila.portada_bajada,
       }),
       base: '',
       compartido: false,

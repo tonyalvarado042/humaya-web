@@ -3,6 +3,7 @@ import { cn } from '@/components/ui/cn';
 import { Screen, ScreenHeading } from '../layout/ScreenState';
 import { useEsAdministrador, useIdiomaRecepcion } from '../puerta/contexto';
 import { adminCopy } from './copy';
+import { useSoyPlataforma } from '@/hooks/useSoyPlataforma';
 import { seccionesAdmin } from './secciones';
 
 /**
@@ -24,6 +25,7 @@ import { seccionesAdmin } from './secciones';
 export function AdminLayout() {
   const esAdmin = useEsAdministrador();
   const [idioma] = useIdiomaRecepcion();
+  const esPlataforma = useSoyPlataforma();
   const copy = adminCopy[idioma];
 
   return (
@@ -37,7 +39,7 @@ export function AdminLayout() {
               {copy.todo}
             </Enlace>
           </li>
-          {seccionesAdmin(idioma).map((seccion) => (
+          {seccionesAdmin(idioma, esPlataforma).map((seccion) => (
             <li key={seccion.ruta}>
               <Enlace to={`/staff/admin/${seccion.ruta}`}>{seccion.titulo}</Enlace>
             </li>

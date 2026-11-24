@@ -42,6 +42,8 @@ interface FilaHotel {
   correo: string | null;
   tema: unknown;
   es_demo: boolean | null;
+  portada_titulo: string | null;
+  portada_bajada: string | null;
 }
 
 /** Dónde se recuerda el hotel elegido, para no preguntarlo en cada visita. */
@@ -59,6 +61,8 @@ export async function misHoteles(): Promise<Hotel[]> {
     correo: f.correo ?? '',
     tema: comoTema(f.tema),
     esDemo: f.es_demo ?? false,
+    portadaTitulo: f.portada_titulo || null,
+    portadaBajada: f.portada_bajada || null,
   }));
 }
 

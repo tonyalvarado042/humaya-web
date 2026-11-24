@@ -1,4 +1,12 @@
-import { Image, LayoutGrid, MonitorPlay, Settings2, Sparkles, SprayCan } from 'lucide-react';
+import {
+  Building2,
+  Image,
+  LayoutGrid,
+  MonitorPlay,
+  Settings2,
+  Sparkles,
+  SprayCan,
+} from 'lucide-react';
 import type { Idioma } from '@/hooks/useIdiomaElegido';
 
 /**
@@ -37,9 +45,16 @@ export interface SeccionAdmin {
   Icon: typeof LayoutGrid;
 }
 
-export function seccionesAdmin(idioma: Idioma): SeccionAdmin[] {
+/**
+ * Las secciones de Admin.
+ *
+ * `conHoteles` agrega «Hotels», que solo ve una cuenta de plataforma: el
+ * resto no puede crear hoteles y ofrecerle el enlace seria mandarlo a una
+ * pantalla que la base le va a negar.
+ */
+export function seccionesAdmin(idioma: Idioma, conHoteles = false): SeccionAdmin[] {
   if (idioma === 'en') {
-    return [
+    const base: SeccionAdmin[] = [
       {
         ruta: 'marca',
         titulo: 'Brand',
@@ -79,9 +94,21 @@ export function seccionesAdmin(idioma: Idioma): SeccionAdmin[] {
         Icon: Settings2,
       },
     ];
+    return conHoteles
+      ? [
+          ...base,
+          {
+            ruta: 'hoteles',
+            titulo: 'Hotels',
+            cuerpo:
+              'Create a hotel, say where its bookings come from, and who works in it. Platform accounts only.',
+            Icon: Building2,
+          },
+        ]
+      : base;
   }
 
-  return [
+  const base: SeccionAdmin[] = [
     {
       ruta: 'marca',
       titulo: 'Marca',
@@ -121,4 +148,16 @@ export function seccionesAdmin(idioma: Idioma): SeccionAdmin[] {
       Icon: Settings2,
     },
   ];
+  return conHoteles
+    ? [
+        ...base,
+        {
+          ruta: 'hoteles',
+          titulo: 'Hoteles',
+          cuerpo:
+            'Crear un hotel, decir de dónde entran sus reservas y quién trabaja en él. Solo cuentas de plataforma.',
+          Icon: Building2,
+        },
+      ]
+    : base;
 }

@@ -12,6 +12,8 @@ const HUMAYA = {
   marca_hotel: 'HUMAYA',
   correo: 'reservations@stayhumaya.com',
   esDemo: false,
+  portadaTitulo: null,
+  portadaBajada: null,
 };
 
 const COMPARTIDO_HUESPED = {
@@ -24,6 +26,8 @@ const COMPARTIDO_HUESPED = {
   marca_hotel: null,
   correo: null,
   esDemo: false,
+  portadaTitulo: null,
+  portadaBajada: null,
 };
 
 /** Contesta a las dos funciones de la base según el cuerpo del pedido. */
@@ -108,6 +112,8 @@ describe('el dominio compartido del producto', () => {
           marca_hotel: 'Bike & Bed',
           correo: 'hola@bikeandbed.test',
           esDemo: false,
+          portadaTitulo: null,
+          portadaBajada: null,
         },
       ],
     );
@@ -151,6 +157,8 @@ describe('los textos siguen al hotel', () => {
       marcaHotel: 'HOTEL DEMO',
       correo: 'demo@liderax10.com',
       esDemo: false,
+      portadaTitulo: null,
+      portadaBajada: null,
       tema: null,
     });
     expect(entradaCopy.es.eyebrow).toBe('Demo Experience');
@@ -163,6 +171,8 @@ describe('los textos siguen al hotel', () => {
       marcaHotel: 'HUMAYA',
       correo: 'reservations@stayhumaya.com',
       esDemo: false,
+      portadaTitulo: null,
+      portadaBajada: null,
       tema: null,
     });
     expect(entradaCopy.es.eyebrow).toBe('HUMAYA Experience');
@@ -182,6 +192,8 @@ describe('los textos siguen al hotel', () => {
       marcaHotel: 'HOTEL DEMO',
       correo: 'demo@liderax10.com',
       esDemo: false,
+      portadaTitulo: null,
+      portadaBajada: null,
       tema: { acento: '#4a9d7f' },
     });
     expect(document.getElementById('humaya-tema')?.textContent).toContain('#4a9d7f');
@@ -193,6 +205,8 @@ describe('los textos siguen al hotel', () => {
       marcaHotel: 'HUMAYA',
       correo: 'reservations@stayhumaya.com',
       esDemo: false,
+      portadaTitulo: null,
+      portadaBajada: null,
       tema: null,
     });
     // Sin tema propio no queda nada puesto: vale la paleta de `tokens.css`.

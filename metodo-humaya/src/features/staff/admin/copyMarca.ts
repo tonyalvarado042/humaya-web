@@ -6,6 +6,13 @@ export interface MarcaTextos {
   cuerpo: string;
 
   nombresTitulo: string;
+  /** La portada del huesped: su titular y su bajada, por hotel. */
+  portadaTitulo: string;
+  portadaCuerpo: string;
+  portadaTituloLabel: string;
+  portadaTituloAyuda: string;
+  portadaBajadaLabel: string;
+  portadaBajadaAyuda: string;
   nombresCuerpo: string;
   marcaExperienciaLabel: string;
   marcaExperienciaAyuda: string;
@@ -64,6 +71,13 @@ export const marcaCopy: Record<Idioma, MarcaTextos> = {
       'Cómo se llama este hotel y con qué se ve. Lo que se guarda acá cambia la app del huésped y recepción en el momento, sin volver a publicar nada.',
 
     nombresTitulo: 'Los nombres',
+    portadaTitulo: 'La portada del huésped',
+    portadaCuerpo:
+      'Lo primero que lee quien abre la dirección del hotel. En blanco se usan las frases de siempre.',
+    portadaTituloLabel: 'Titular',
+    portadaTituloAyuda: 'La frase grande. En blanco: «Become More Human».',
+    portadaBajadaLabel: 'Bajada',
+    portadaBajadaAyuda: 'La línea que va debajo, explicando qué es esto.',
     nombresCuerpo:
       'El nombre de la experiencia es nombre propio y no se traduce: va igual en español y en inglés.',
     marcaExperienciaLabel: 'Nombre de la experiencia',
@@ -125,6 +139,13 @@ export const marcaCopy: Record<Idioma, MarcaTextos> = {
       'What this hotel is called and what it looks like. What you save here changes the guest app and the front desk right away, without publishing anything again.',
 
     nombresTitulo: 'The names',
+    portadaTitulo: "The guest's front page",
+    portadaCuerpo:
+      'The first thing anyone reads at the hotel’s address. Left blank, the usual lines are used.',
+    portadaTituloLabel: 'Headline',
+    portadaTituloAyuda: 'The big line. Blank means “Become More Human”.',
+    portadaBajadaLabel: 'Subhead',
+    portadaBajadaAyuda: 'The line underneath, saying what this is.',
     nombresCuerpo:
       'The name of the experience is a proper name and is not translated: it goes the same in Spanish and in English.',
     marcaExperienciaLabel: 'Name of the experience',

@@ -17,6 +17,7 @@ import { VillaPage } from '@/features/guest-app/villa/VillaPage';
 import { AdminIndexPage } from '@/features/staff/admin/AdminIndexPage';
 import { AdminLayout } from '@/features/staff/admin/AdminLayout';
 import { AjustesPage } from '@/features/staff/admin/AjustesPage';
+import { HotelesPage } from '@/features/staff/admin/HotelesPage';
 import { BotPage } from '@/features/staff/admin/BotPage';
 import { MarcaPage } from '@/features/staff/admin/MarcaPage';
 import { MenuPage } from '@/features/staff/admin/MenuPage';
@@ -101,6 +102,10 @@ export function createRoutes({
                 { path: 'concierge', element: <BotPage /> },
                 { path: 'tv', element: <TvPage /> },
                 { path: 'ajustes', element: <AjustesPage /> },
+                // Crear hoteles. Solo la ve el super admin, y la base lo
+                // exige: cada funcion pregunta si quien llama es de
+                // plataforma antes de hacer nada.
+                { path: 'hoteles', element: <HotelesPage /> },
               ],
             },
           ],

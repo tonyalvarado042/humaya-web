@@ -62,6 +62,8 @@ interface Inicial {
   marcaExperiencia: string;
   marcaHotel: string;
   correo: string;
+  portadaTitulo: string;
+  portadaBajada: string;
   tema: Tema | null;
 }
 
@@ -124,6 +126,8 @@ function Formulario({
   const [experiencia, setExperiencia] = useState(inicial.marcaExperiencia);
   const [hotel, setHotel] = useState(inicial.marcaHotel);
   const [correo, setCorreo] = useState(inicial.correo);
+  const [portadaTitulo, setPortadaTitulo] = useState(inicial.portadaTitulo);
+  const [portadaBajada, setPortadaBajada] = useState(inicial.portadaBajada);
   const [tema, setTema] = useState<Tema>(inicial.tema ?? {});
 
   const campo = (clave: keyof Tema) => (typeof tema[clave] === 'string' ? tema[clave] : '') ?? '';
@@ -153,6 +157,8 @@ function Formulario({
       marcaExperiencia: experiencia.trim(),
       marcaHotel: hotel.trim(),
       correo: correo.trim(),
+      portadaTitulo,
+      portadaBajada,
       tema,
     });
   }
@@ -189,6 +195,33 @@ function Formulario({
             type="email"
             value={correo}
             onChange={(event) => setCorreo(event.target.value)}
+          />
+        </div>
+      </Card>
+
+      {/* Tony, 24 de noviembre de 2026: «todos textos de home etc deben ser
+          configurables, veo que dice Become More Human pero el hotel dueno
+          puede poner ahi otra cosa». */}
+      <Card>
+        <div className="flex flex-col gap-3">
+          <div>
+            <h3 className="m-0 font-display text-lg font-medium">{copy.portadaTitulo}</h3>
+            <p className="m-0 max-w-prose text-[13px] leading-relaxed text-muted">
+              {copy.portadaCuerpo}
+            </p>
+          </div>
+          <Input
+            label={copy.portadaTituloLabel}
+            hint={copy.portadaTituloAyuda}
+            value={portadaTitulo}
+            placeholder="Become More Human"
+            onChange={(event) => setPortadaTitulo(event.target.value)}
+          />
+          <Input
+            label={copy.portadaBajadaLabel}
+            hint={copy.portadaBajadaAyuda}
+            value={portadaBajada}
+            onChange={(event) => setPortadaBajada(event.target.value)}
           />
         </div>
       </Card>
