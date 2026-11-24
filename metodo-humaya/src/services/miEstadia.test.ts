@@ -76,3 +76,68 @@ describe('cuando lo guardado no sirve', () => {
     expect(miEstadia('2026-12-18')).toBeNull();
   });
 });
+
+/**
+ * ── EL FALLO QUE ESTO AGARRA ───────────────────────────────────────────
+ * `localStorage` es del DOMINIO, y todos los hoteles comparten
+ * `guestexp.liderax10.com`. Con una llave sola, la estadía que un teléfono
+ * buscó en un hotel aparecía saludada en el otro.
+ *
+ * Comprobado en vivo el 24 de noviembre de 2026: reserva de prueba buscada
+ * en el hotel demo, y `/bikeandbed/entrada` en el mismo teléfono decía
+ * «Welcome back, Prueba Borrar».
+ */
+describe('la estadía recordada es de UN hotel', () => {
+  const ESTADIA = {
+    reserva: 'R-1',
+    guestName: 'Valeria Méndez',
+    checkin: '2026-11-26',
+    checkout: '2026-11-29',
+  };
+
+  async function enElHotel(codigo: string) {
+    const { aplicarHotel } = await import('@/marca');
+    aplicarHotel({
+      negocioId: `n-${codigo}`,
+      codigo,
+      marcaExperiencia: codigo,
+      marcaHotel: codigo,
+      correo: `hola@${codigo}.com`,
+      esDemo: false,
+      portadaTitulo: null,
+      portadaBajada: null,
+      tema: null,
+    });
+  }
+
+  it('no se le aparece al hotel de al lado', async () => {
+    await enElHotel('demo');
+    recordarEstadia(ESTADIA);
+    expect(miEstadia('2026-11-27')?.guestName).toBe('Valeria Méndez');
+
+    await enElHotel('bikeandbed');
+
+    // EL PUNTO: Bike & Bed nunca tuvo a esta persona.
+    expect(miEstadia('2026-11-27')).toBeNull();
+  });
+
+  it('cada hotel se acuerda de la suya', async () => {
+    await enElHotel('demo');
+    recordarEstadia(ESTADIA);
+    await enElHotel('bikeandbed');
+    recordarEstadia({ ...ESTADIA, reserva: 'R-2', guestName: 'Otro Huésped' });
+
+    await enElHotel('demo');
+    expect(miEstadia('2026-11-27')?.reserva).toBe('R-1');
+    await enElHotel('bikeandbed');
+    expect(miEstadia('2026-11-27')?.reserva).toBe('R-2');
+  });
+
+  it('la llave vieja sin hotel se borra en cuanto se la ve', async () => {
+    localStorage.setItem('humaya.mi-estadia', JSON.stringify(ESTADIA));
+    await enElHotel('bikeandbed');
+
+    expect(miEstadia('2026-11-27')).toBeNull();
+    expect(localStorage.getItem('humaya.mi-estadia')).toBeNull();
+  });
+});

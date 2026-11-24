@@ -107,8 +107,14 @@ describe('cuando el QR trae la llave de la estadía', () => {
     renderWithProviders(<EntradaPage />);
     await screen.findByText(/Found you/);
 
+    // La llave lleva el código del hotel desde el 24 de noviembre de 2026:
+    // `localStorage` es del dominio y todos los hoteles comparten
+    // guestexp.liderax10.com, así que una llave sola mostraba al huésped de
+    // un hotel en la pantalla del otro. Ver miEstadia.test.ts.
     await waitFor(() =>
-      expect(JSON.parse(localStorage.getItem('humaya.mi-estadia')!).reserva).toBe('6892JEMFAN'),
+      expect(JSON.parse(localStorage.getItem('humaya.mi-estadia.humaya')!).reserva).toBe(
+        '6892JEMFAN',
+      ),
     );
   });
 });

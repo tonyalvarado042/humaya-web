@@ -25,9 +25,42 @@
  * ── POR QUÉ CADUCA ──────────────────────────────────────────────────────
  * Porque una reserva vieja no es la estadía de nadie. Dos días después de la
  * salida se olvida sola: si el huésped vuelve, vuelve con otra reserva.
+ *
+ * ── POR QUÉ LA LLAVE LLEVA EL HOTEL ─────────────────────────────────────
+ * Porque todos los hoteles comparten el dominio `guestexp.liderax10.com`, y
+ * `localStorage` es del DOMINIO, no de la ruta. Con una sola llave, lo que
+ * un teléfono buscó en un hotel salía saludado en el otro.
+ *
+ * Comprobado en vivo el 24 de noviembre de 2026: se buscó una reserva de
+ * prueba en el hotel demo y, al abrir `/bikeandbed/entrada` en el mismo
+ * teléfono, Bike & Bed decía **«Welcome back, Prueba Borrar»** — el nombre
+ * de un huésped de otro hotel, en la pantalla de un hotel que nunca lo tuvo.
+ *
+ * No lo arregla RLS: esto pasa entero dentro del navegador.
  */
 
-const LLAVE = 'humaya.mi-estadia';
+import { codigoActual } from '@/marca';
+
+const RAIZ = 'humaya.mi-estadia';
+
+/** La llave de ESTE hotel. Sin hotel resuelto no se recuerda nada. */
+function llaveDelHotel(): string | null {
+  const codigo = codigoActual();
+  return codigo ? `${RAIZ}.${codigo}` : null;
+}
+
+/**
+ * La llave vieja, sin hotel, que servía a todos a la vez. Se borra apenas se
+ * la ve: mientras exista, sigue siendo el nombre de alguien a la vista de
+ * cualquier otro hotel del mismo dominio.
+ */
+function borrarLaVieja(): void {
+  try {
+    localStorage.removeItem(RAIZ);
+  } catch {
+    // Sin almacenamiento no hay nada vieja que borrar.
+  }
+}
 const DIAS_DESPUES = 2;
 
 export interface MiEstadia {
@@ -47,6 +80,10 @@ function vigente(estadia: MiEstadia, hoy: string): boolean {
 
 /** La estadía guardada, si hay una y todavía tiene sentido. */
 export function miEstadia(hoy: string = new Date().toISOString().slice(0, 10)): MiEstadia | null {
+  borrarLaVieja();
+  const LLAVE = llaveDelHotel();
+  if (!LLAVE) return null;
+
   let crudo: string | null;
   try {
     crudo = localStorage.getItem(LLAVE);
@@ -79,6 +116,8 @@ export function miEstadia(hoy: string = new Date().toISOString().slice(0, 10)): 
 }
 
 export function recordarEstadia(estadia: MiEstadia): void {
+  const LLAVE = llaveDelHotel();
+  if (!LLAVE) return;
   try {
     localStorage.setItem(LLAVE, JSON.stringify(estadia));
   } catch {
@@ -87,6 +126,9 @@ export function recordarEstadia(estadia: MiEstadia): void {
 }
 
 export function olvidarEstadia(): void {
+  borrarLaVieja();
+  const LLAVE = llaveDelHotel();
+  if (!LLAVE) return;
   try {
     localStorage.removeItem(LLAVE);
   } catch {
