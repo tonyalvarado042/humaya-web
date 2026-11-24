@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom';
 import { ladoDe, MARCA, type Lado } from '@/marca';
-import { Mudanza } from '@/components/Mudanza';
+import { Mudanza, MudanzaAlHuesped } from '@/components/Mudanza';
 import { Placeholder } from '@/components/Placeholder';
 import { DemoHomePage } from '@/features/demo-home/DemoHomePage';
 import { PuertaDelHuesped } from '@/features/guest-app/PuertaDelHuesped';
@@ -45,6 +45,14 @@ interface CreateRoutesOptions {
    * hotel lo dice la cuenta, y `/demo/staff` ahí no existe.
    */
   base?: string;
+  /**
+   * ¿El dominio desde el que se sale lo comparten varios hoteles?
+   *
+   * Decide si la mudanza a la app del huésped le pone el código del hotel
+   * a la ruta. En `hotelexp.liderax10.com` sí; en el dominio propio de un
+   * hotel, no.
+   */
+  compartido?: boolean;
 }
 
 /** Construye las rutas y permite verificar por separado el árbol de producción. */
@@ -52,6 +60,7 @@ export function createRoutes({
   includeDevUi = import.meta.env.DEV,
   lado = ladoDe(window.location.hostname),
   base = '',
+  compartido = false,
 }: CreateRoutesOptions = {}): RouteObject[] {
   /**
    * Recepción no se sirve desde el dominio del huésped. Hasta hoy sí:
@@ -132,7 +141,7 @@ export function createRoutes({
     lado === 'personal' && MARCA.dominiosSeparados
       ? {
           path: '/app/*',
-          element: <Mudanza base={MARCA.dominioHuesped} aviso="Taking you to the guest app…" />,
+          element: <MudanzaAlHuesped compartido={compartido} />,
         }
       : {
           path: '/app',

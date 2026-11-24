@@ -65,7 +65,11 @@ async function arrancar() {
     return;
   }
 
-  const router = crearRouter({ lado: donde.lado, base: donde.base });
+  const router = crearRouter({
+    lado: donde.lado,
+    base: donde.base,
+    compartido: donde.compartido,
+  });
 
   raiz.render(
     <StrictMode>

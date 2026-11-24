@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { codigoActual, MARCA } from '@/marca';
 
 /**
  * Manda al visitante al dominio que le corresponde, conservando la ruta.
@@ -18,6 +19,15 @@ import { useEffect } from 'react';
  * las dos cosas a la vez. Comprobado en vivo el 24 de noviembre de 2026 —
  * «Esta dirección no existe».
  *
+ * ── Y POR QUÉ, AL REVÉS, HAY QUE PONERLO ───────────────────────────────
+ * Por lo mismo, en espejo. Del lado del personal el hotel no va en la ruta,
+ * así que al mandar a alguien a la app del huésped **hay que agregárselo**.
+ *
+ * Sin esto, «Abrir la app del huésped» del menú de recepción caía en
+ * `guestexp.liderax10.com/app` —sin hotel— y el huésped de nadie veía
+ * «Falta el hotel en la dirección». Comprobado en vivo el 24 de noviembre
+ * de 2026, en el teléfono, con la recepción de Bike & Bed.
+ *
  * Usa `replace` y no `assign` para no dejar el dominio equivocado en el
  * historial: el botón de atrás volvería a rebotar.
  */
@@ -25,11 +35,14 @@ export function Mudanza({
   base,
   aviso,
   quitar = '',
+  agregar = '',
 }: {
   base: string;
   aviso: string;
   /** El prefijo del hotel (`/demo`), que no viaja al otro lado. */
   quitar?: string;
+  /** El prefijo del hotel que hay que PONER del otro lado (`/demo`). */
+  agregar?: string;
 }) {
   useEffect(() => {
     const { pathname, search, hash } = window.location;
@@ -37,8 +50,8 @@ export function Mudanza({
       quitar && (pathname === quitar || pathname.startsWith(`${quitar}/`))
         ? pathname.slice(quitar.length) || '/'
         : pathname;
-    window.location.replace(`${base}${limpio}${search}${hash}`);
-  }, [base, quitar]);
+    window.location.replace(`${base}${agregar}${limpio}${search}${hash}`);
+  }, [base, quitar, agregar]);
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
@@ -46,5 +59,28 @@ export function Mudanza({
         {aviso}
       </p>
     </div>
+  );
+}
+
+/**
+ * La mudanza de recepción a la app del huésped.
+ *
+ * Existe como componente aparte porque el prefijo **no se sabe cuando se
+ * arma el router**: del lado del personal el hotel lo dice la cuenta, y la
+ * cuenta se resuelve después de entrar. Acá se lee en el momento de pintar,
+ * que ya es después.
+ *
+ * `compartido` es del dominio desde el que se sale. En el dominio propio de
+ * un hotel —`staff.stayhumaya.com`— la app del huésped tampoco lleva
+ * prefijo, así que no se le pone ninguno.
+ */
+export function MudanzaAlHuesped({ compartido = false }: { compartido?: boolean }) {
+  const codigo = codigoActual();
+  return (
+    <Mudanza
+      base={MARCA.dominioHuesped}
+      agregar={compartido && codigo ? `/${codigo}` : ''}
+      aviso="Taking you to the guest app…"
+    />
   );
 }
