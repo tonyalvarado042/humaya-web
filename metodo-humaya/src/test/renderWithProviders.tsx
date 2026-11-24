@@ -68,7 +68,12 @@ export function renderWithProviders(
             <GuestLanguageProvider>
               {recepcion ? (
                 <PuertaContexto.Provider
-                  value={{ persona: QUIEN_ENTRO, idioma: recepcion, cambiarIdioma: () => {} }}
+                  value={{
+                    persona: QUIEN_ENTRO,
+                    idioma: recepcion,
+                    cambiarIdioma: () => {},
+                    cambiarHotel: null,
+                  }}
                 >
                   {children}
                 </PuertaContexto.Provider>

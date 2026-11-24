@@ -51,9 +51,43 @@ const PORDEFECTO = {
 };
 
 let actual = { ...PORDEFECTO };
+/** Los dominios que dio la base, o null mientras no haya contestado. */
+let resueltos: { huesped: string | null; personal: string | null } = {
+  huesped: null,
+  personal: null,
+};
 let negocio: string | null = null;
 let codigo: string | null = null;
+let esDemo = false;
 let tema: Tema | null = null;
+
+/**
+ * Los dos dominios de este juego, tal como los dio la base.
+ *
+ * ── POR QUÉ NO BASTA EL RESPALDO DEL ENTORNO ────────────────────────────
+ * Porque el respaldo es el de HUMAYA. Mientras estos dominios salieron solo
+ * del entorno, el botón «Recepción» de guestexp.liderax10.com/demo mandaba a
+ * staff.stayhumaya.com — el dominio de otro hotel. Comprobado en vivo el 24
+ * de noviembre de 2026: terminaba en «Esta dirección no existe».
+ *
+ * `aplicarHotel()` pisaba el nombre y el correo, pero no los dominios:
+ * router.tsx ya lo tenía escrito como advertencia.
+ *
+ * ── POR QUÉ VIVEN APARTE DE `actual` ───────────────────────────────────
+ * Porque `aplicarHotel()` reconstruye `actual` entero desde PORDEFECTO, y
+ * volvería a dejar los de HUMAYA. Los dominios son del juego de direcciones,
+ * no del hotel: en el dominio compartido los comparten todos, y se resuelven
+ * una vez al arrancar, antes de saber siquiera qué hotel es.
+ */
+export function aplicarDominios(dominios: {
+  huesped: string | null;
+  personal: string | null;
+}): void {
+  resueltos = {
+    huesped: dominios.huesped ? `https://${dominios.huesped}` : null,
+    personal: dominios.personal ? `https://${dominios.personal}` : null,
+  };
+}
 
 /** Deja puesto el hotel resuelto. Lo llama `main.tsx` antes de pintar. */
 export function aplicarHotel(hotel: Hotel | null): void {
@@ -61,6 +95,7 @@ export function aplicarHotel(hotel: Hotel | null): void {
     actual = { ...PORDEFECTO };
     negocio = null;
     codigo = null;
+    esDemo = false;
     tema = null;
     aplicarTema(null);
     void avisarALosTextos(PORDEFECTO.experiencia);
@@ -74,6 +109,7 @@ export function aplicarHotel(hotel: Hotel | null): void {
   };
   negocio = hotel.negocioId;
   codigo = hotel.codigo;
+  esDemo = hotel.esDemo;
   tema = hotel.tema;
   // Los colores se ponen acá, en el mismo momento que el nombre, y por la
   // misma razón: esto corre antes de pintar. Ponerlos después haría que el
@@ -108,6 +144,10 @@ async function avisarALosTextos(experiencia: string): Promise<void> {
  */
 export function negocioActual(): string | null {
   return negocio;
+}
+
+export function esHotelDeDemostracion(): boolean {
+  return esDemo;
 }
 
 export function codigoActual(): string | null {
@@ -156,10 +196,10 @@ export const MARCA = {
    * dominio del huésped sale para el del personal, y al revés.
    */
   get dominioHuesped() {
-    return actual.dominioHuesped;
+    return resueltos.huesped ?? actual.dominioHuesped;
   },
   get dominioPersonal() {
-    return actual.dominioPersonal;
+    return resueltos.personal ?? actual.dominioPersonal;
   },
   /**
    * ¿Se manda a cada quien a su dominio?

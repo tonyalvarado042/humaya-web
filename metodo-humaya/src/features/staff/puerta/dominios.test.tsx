@@ -71,3 +71,51 @@ describe('cada dominio sirve lo suyo', () => {
     expect(reemplazar).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * El hotel que vive en el dominio compartido.
+ *
+ * ── EL FALLO QUE ESTO AGARRA ────────────────────────────────────────────
+ * Tony, 24 de noviembre de 2026: «acá el app de recepción tira a enlace
+ * malo», sobre `guestexp.liderax10.com/demo`.
+ *
+ * El botón «Recepción» terminaba en `staff.stayhumaya.com/demo/staff`, y se
+ * equivocaba en las dos mitades a la vez:
+ *
+ *  1. EL DOMINIO. `MARCA.dominioPersonal` salía de una variable de entorno
+ *     fijada al compilar, que es la de HUMAYA. `aplicarHotel()` pisaba el
+ *     nombre y el correo del hotel, pero no los dominios — el propio
+ *     router.tsx lo tenía anotado como advertencia desde el 21 de noviembre.
+ *  2. LA RUTA. El prefijo del hotel (`/demo`) solo existe del lado del
+ *     huésped. Del lado de recepción el hotel lo dice la cuenta, y la
+ *     dirección es `/staff` pelada.
+ *
+ * Verificado en vivo antes de arreglar: salía «Esta dirección no existe».
+ */
+describe('un hotel del dominio compartido', () => {
+  it('manda recepción a SU dominio, no al de HUMAYA, y sin el prefijo', async () => {
+    const { aplicarDominios } = await import('@/marca');
+    aplicarDominios({ huesped: 'guestexp.liderax10.com', personal: 'hotelexp.liderax10.com' });
+    enLaDireccion('/demo/staff');
+
+    renderRoutes(createRoutes({ includeDevUi: false, lado: 'huesped', base: '/demo' }), {
+      route: '/staff',
+    });
+
+    expect(reemplazar).toHaveBeenCalledWith('https://hotelexp.liderax10.com/staff');
+    // Lo que pasaba antes, las dos mitades del error:
+    expect(reemplazar).not.toHaveBeenCalledWith('https://staff.stayhumaya.com/demo/staff');
+  });
+
+  it('en el dominio propio de un hotel el prefijo no existe y nada cambia', async () => {
+    const { aplicarDominios } = await import('@/marca');
+    aplicarDominios({ huesped: 'experience.stayhumaya.com', personal: 'staff.stayhumaya.com' });
+    enLaDireccion('/staff');
+
+    renderRoutes(createRoutes({ includeDevUi: false, lado: 'huesped', base: '' }), {
+      route: '/staff',
+    });
+
+    expect(reemplazar).toHaveBeenCalledWith('https://staff.stayhumaya.com/staff');
+  });
+});

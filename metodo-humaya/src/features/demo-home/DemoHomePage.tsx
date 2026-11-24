@@ -37,7 +37,11 @@ export function DemoHomePage() {
           </Link>
         </nav>
 
-        <p className="m-0 max-w-md text-xs leading-relaxed text-muted-soft">{copy.disclaimer}</p>
+        {/* Solo la demo avisa que sus datos son ficticios. Un hotel real no
+            tiene nada que avisar, y decirlo seria mentira. */}
+        {copy.disclaimer ? (
+          <p className="m-0 max-w-md text-xs leading-relaxed text-muted-soft">{copy.disclaimer}</p>
+        ) : null}
 
         <Link to="/entrada" className="text-sm text-gold no-underline">
           {copy.entradaCta}

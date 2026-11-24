@@ -23,6 +23,7 @@ const HUMAYA = {
   marcaExperiencia: 'HUMAYA Experience',
   marcaHotel: 'HUMAYA',
   correo: 'reservations@stayhumaya.com',
+  esDemo: false,
 };
 
 function enHotel(marcaHotel: string, tema: Tema | null) {

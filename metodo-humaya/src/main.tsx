@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { crearRouter } from '@/router';
 import { FaltaElHotel } from '@/components/FaltaElHotel';
-import { aplicarHotel } from '@/marca';
+import { aplicarDominios, aplicarHotel } from '@/marca';
 import { codigoDeLaRuta, resolverHotel } from '@/services/hotel';
 import { alDiaConElServidor } from '@/services/actualizar';
 import '@/i18n';
@@ -45,6 +45,9 @@ if (!rootElement) {
  */
 async function arrancar() {
   const donde = await resolverHotel(window.location.hostname, window.location.pathname);
+  // Los dominios primero y aparte: `aplicarHotel()` reconstruye la marca
+  // desde los valores por defecto, que son los de HUMAYA.
+  aplicarDominios(donde.dominios);
   aplicarHotel(donde.hotel);
 
   const raiz = createRoot(rootElement!);

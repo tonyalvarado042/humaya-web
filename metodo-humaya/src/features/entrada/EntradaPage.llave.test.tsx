@@ -147,6 +147,7 @@ describe('en otro hotel', () => {
       marcaExperiencia: 'Demo Experience',
       marcaHotel: 'HOTEL DEMO',
       correo: 'demo@liderax10.com',
+      esDemo: false,
       tema: null,
     });
     conLaLlave({ found: true, guestName: 'Ana', reserva: 'R1' });

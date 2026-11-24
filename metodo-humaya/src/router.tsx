@@ -38,12 +38,19 @@ interface CreateRoutesOptions {
    * experience.* el huésped, en staff.* el personal, y en local los dos.
    */
   lado?: Lado;
+  /**
+   * El prefijo del hotel en el dominio compartido (`/demo`), para que la
+   * mudanza a recepción no se lo lleve puesto: del lado del personal el
+   * hotel lo dice la cuenta, y `/demo/staff` ahí no existe.
+   */
+  base?: string;
 }
 
 /** Construye las rutas y permite verificar por separado el árbol de producción. */
 export function createRoutes({
   includeDevUi = import.meta.env.DEV,
   lado = ladoDe(window.location.hostname),
+  base = '',
 }: CreateRoutesOptions = {}): RouteObject[] {
   /**
    * Recepción no se sirve desde el dominio del huésped. Hasta hoy sí:
@@ -54,7 +61,13 @@ export function createRoutes({
     lado === 'huesped' && MARCA.dominiosSeparados
       ? {
           path: '/staff/*',
-          element: <Mudanza base={MARCA.dominioPersonal} aviso="Taking you to the front desk…" />,
+          element: (
+            <Mudanza
+              base={MARCA.dominioPersonal}
+              quitar={base}
+              aviso="Taking you to the front desk…"
+            />
+          ),
         }
       : {
           path: '/staff',
@@ -176,7 +189,10 @@ export const routes = createRoutes();
  * Router le pone ese prefijo a cada enlace solo. En el dominio propio de un
  * hotel vale vacio y todo queda exactamente como estaba.
  */
-export function crearRouter(opciones: CreateRoutesOptions & { base?: string } = {}) {
+export function crearRouter(opciones: CreateRoutesOptions = {}) {
   const { base = '', ...resto } = opciones;
-  return createBrowserRouter(createRoutes(resto), base ? { basename: base } : undefined);
+  return createBrowserRouter(
+    createRoutes({ ...resto, base }),
+    base ? { basename: base } : undefined,
+  );
 }

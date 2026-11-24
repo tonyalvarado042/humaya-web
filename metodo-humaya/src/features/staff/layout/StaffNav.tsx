@@ -3,7 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { cn } from '@/components/ui/cn';
 import { useConciergeConversations } from '@/hooks';
 import { salir } from '@/services/sesion';
-import { useIdiomaRecepcion, useQuienEntro } from '../puerta/contexto';
+import { useCambiarHotel, useIdiomaRecepcion, useQuienEntro } from '../puerta/contexto';
 import { STAFF_NAV, staffCopy } from './nav';
 
 interface StaffNavProps {
@@ -25,6 +25,7 @@ export function StaffNav({ onNavigate }: StaffNavProps) {
   const [idioma, cambiarIdioma] = useIdiomaRecepcion();
   const copy = staffCopy[idioma];
   const persona = useQuienEntro();
+  const cambiarHotel = useCambiarHotel();
 
   const conversations = useConciergeConversations();
   const unreadTotal = (conversations.data ?? []).reduce(
@@ -83,6 +84,17 @@ export function StaffNav({ onNavigate }: StaffNavProps) {
           >
             {copy.cambiarIdioma}
           </button>
+          {/* Solo si hay a dónde cambiar: un botón que no lleva a ninguna
+              parte no se ofrece. */}
+          {cambiarHotel ? (
+            <button
+              type="button"
+              onClick={cambiarHotel}
+              className="text-[13px] text-ink-muted underline-offset-4 transition-colors hover:text-on-ink hover:underline"
+            >
+              {copy.cambiarHotel}
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => void salir()}

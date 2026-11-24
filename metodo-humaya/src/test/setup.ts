@@ -56,6 +56,7 @@ beforeEach(async () => {
     marcaExperiencia: 'HUMAYA Experience',
     marcaHotel: 'HUMAYA',
     correo: 'reservations@stayhumaya.com',
+    esDemo: false,
     // Los colores quedan en los de siempre —el tema de un hotel se prueba
     // aparte, en tema.test.ts— pero el LOGO va, porque en produccion HUMAYA
     // lo tiene en su tema desde el 21 de noviembre de 2026. Sin esto los

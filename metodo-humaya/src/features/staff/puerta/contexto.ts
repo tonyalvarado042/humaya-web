@@ -6,6 +6,13 @@ export interface Recepcion {
   persona: Persona;
   idioma: Idioma;
   cambiarIdioma: () => void;
+  /**
+   * Volver a elegir hotel, o null cuando esta cuenta trabaja en uno solo.
+   *
+   * Null y no una función que no hace nada: la regla de la casa es que un
+   * botón que se sabe que no lleva a ninguna parte no se ofrece.
+   */
+  cambiarHotel: (() => void) | null;
 }
 
 /**
@@ -58,4 +65,9 @@ export function useEsAdministrador(): boolean {
 export function useIdiomaRecepcion(): [Idioma, () => void] {
   const { idioma, cambiarIdioma } = useRecepcion();
   return [idioma, cambiarIdioma];
+}
+
+/** Volver a elegir hotel, o null si esta cuenta solo tiene uno. */
+export function useCambiarHotel(): (() => void) | null {
+  return useRecepcion().cambiarHotel;
 }

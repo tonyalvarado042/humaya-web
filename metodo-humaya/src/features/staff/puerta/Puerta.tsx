@@ -2,6 +2,15 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { LogoDelHotel } from '@/components/LogoDelHotel';
 import { Button, Input } from '@/components/ui';
 import { useIdiomaElegido } from '@/hooks/useIdiomaElegido';
+import { aplicarHotel, negocioActual } from '@/marca';
+import type { Hotel } from '@/services/hotel';
+import {
+  cualAbrir,
+  misHoteles,
+  olvidarHotel,
+  recordarHotel,
+  hotelRecordado,
+} from '@/services/misHoteles';
 import {
   alCambiar,
   entrar,
@@ -16,7 +25,14 @@ import { PuertaContexto } from './contexto';
 
 const LLAVE_IDIOMA = 'humaya.recepcion.idioma';
 
-type Estado = { fase: 'revisando' } | { fase: 'fuera' } | { fase: 'adentro'; persona: Persona };
+type Estado =
+  | { fase: 'revisando' }
+  | { fase: 'fuera' }
+  | { fase: 'buscandoHoteles'; persona: Persona }
+  | { fase: 'elegirHotel'; persona: Persona; hoteles: Hotel[] }
+  | { fase: 'sinHotel'; persona: Persona }
+  | { fase: 'hotelesFallaron'; persona: Persona }
+  | { fase: 'adentro'; persona: Persona; varios: boolean };
 
 function mensajeDe(motivo: FalloDeEntrada, copy: PuertaTextos): string {
   switch (motivo) {
@@ -166,6 +182,89 @@ function SinAcceso({
   );
 }
 
+/** Un aviso con título, cuerpo y un botón. Sirve a tres de las fases. */
+function Aviso({
+  copy,
+  onIdioma,
+  titulo,
+  cuerpo,
+  pista,
+  boton,
+  onBoton,
+}: {
+  copy: PuertaTextos;
+  onIdioma: () => void;
+  titulo: string;
+  cuerpo: string;
+  pista?: string;
+  boton: string;
+  onBoton: () => void;
+}) {
+  return (
+    <Marco>
+      <BotonIdioma copy={copy} onClick={onIdioma} />
+      <Encabezado copy={copy} />
+      <div className="flex flex-col gap-3 text-center">
+        <h1 className="m-0 text-[22px] text-text">{titulo}</h1>
+        <p className="m-0 text-[14px] text-muted">{cuerpo}</p>
+        {pista ? <p className="m-0 text-[13px] text-muted-soft">{pista}</p> : null}
+      </div>
+      <Button variant="outline" onClick={onBoton}>
+        {boton}
+      </Button>
+    </Marco>
+  );
+}
+
+/**
+ * En qué hotel está esta persona.
+ *
+ * Solo aparece cuando la cuenta trabaja en más de uno: con uno solo se abre
+ * sin preguntar, porque preguntar algo que tiene una sola respuesta es un
+ * trámite, no una elección.
+ */
+function ElegirHotel({
+  copy,
+  hoteles,
+  onIdioma,
+  onElegir,
+  onSalir,
+}: {
+  copy: PuertaTextos;
+  hoteles: Hotel[];
+  onIdioma: () => void;
+  onElegir: (hotel: Hotel) => void;
+  onSalir: () => void;
+}) {
+  return (
+    <Marco>
+      <BotonIdioma copy={copy} onClick={onIdioma} />
+      <Encabezado copy={copy} />
+      <div className="flex flex-col gap-2 text-center">
+        <h1 className="m-0 text-[22px] text-text">{copy.elegirHotelTitle}</h1>
+        <p className="m-0 text-[14px] text-muted">{copy.elegirHotelBody}</p>
+      </div>
+      <ul className="m-0 flex list-none flex-col gap-2 p-0">
+        {hoteles.map((hotel) => (
+          <li key={hotel.negocioId}>
+            <button
+              type="button"
+              onClick={() => onElegir(hotel)}
+              className="flex min-h-12 w-full items-center justify-between rounded-xl border border-line-strong px-4 text-left text-[15px] text-text transition-colors hover:border-text"
+            >
+              <span>{hotel.marcaHotel || hotel.codigo}</span>
+              <span className="text-[13px] text-muted-soft">{hotel.codigo}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <Button variant="outline" onClick={onSalir}>
+        {copy.salir}
+      </Button>
+    </Marco>
+  );
+}
+
 /**
  * La puerta de /staff.
  *
@@ -173,21 +272,70 @@ function SinAcceso({
  * respondía 200 a cualquiera. El cuarto estaba vacío —la bandeja solo conocía
  * las dos estadías de demo—, pero las pantallas que siguen traen 48 reservas
  * reales con nombres y correos. Esto va antes que esos datos, no después.
+ *
+ * ── Y DE QUÉ HOTEL ES ESTA PANTALLA ─────────────────────────────────────
+ * En el dominio del huésped lo dice la ruta. Acá no: `hotelexp.liderax10.com`
+ * es la misma dirección para todos los hoteles, así que lo dice la cuenta.
+ *
+ * Eso estaba anunciado en `hotel.ts` y nunca escrito. Comprobado entrando el
+ * 24 de noviembre de 2026: TODA la recepción del dominio compartido mostraba
+ * «No pudimos cargar esta pantalla · Puede ser un problema de conexión»,
+ * porque `elNegocio()` lanzaba `sin_hotel_resuelto` antes de pedir nada.
  */
 export function Puerta({ children }: { children: ReactNode }) {
   const [idioma, setIdioma] = useIdiomaElegido(LLAVE_IDIOMA);
   const copy = puertaCopy[idioma];
   const [estado, setEstado] = useState<Estado>({ fase: 'revisando' });
 
+  /**
+   * Con el hotel ya resuelto por el dominio no hay nada que preguntar; sin
+   * él hay que buscarlo en la cuenta.
+   */
+  const resolverElHotel = useCallback(async (persona: Persona) => {
+    if (negocioActual()) {
+      setEstado({ fase: 'adentro', persona, varios: false });
+      return;
+    }
+    setEstado({ fase: 'buscandoHoteles', persona });
+    let hoteles: Hotel[];
+    try {
+      hoteles = await misHoteles();
+    } catch {
+      setEstado({ fase: 'hotelesFallaron', persona });
+      return;
+    }
+    if (hoteles.length === 0) {
+      setEstado({ fase: 'sinHotel', persona });
+      return;
+    }
+    const elegido = cualAbrir(hoteles, hotelRecordado());
+    if (!elegido) {
+      setEstado({ fase: 'elegirHotel', persona, hoteles });
+      return;
+    }
+    aplicarHotel(elegido);
+    recordarHotel(elegido.codigo);
+    setEstado({ fase: 'adentro', persona, varios: hoteles.length > 1 });
+  }, []);
+
   const revisar = useCallback(async () => {
     try {
       const persona = await quienSoy();
-      setEstado(persona ? { fase: 'adentro', persona } : { fase: 'fuera' });
+      if (!persona) {
+        setEstado({ fase: 'fuera' });
+        return;
+      }
+      // Sin rol no se pregunta por hoteles: no hay nada que pueda ver.
+      if (!persona.entra) {
+        setEstado({ fase: 'adentro', persona, varios: false });
+        return;
+      }
+      await resolverElHotel(persona);
     } catch {
       // Si no se puede preguntar, se queda afuera. Falla cerrado.
       setEstado({ fase: 'fuera' });
     }
-  }, []);
+  }, [resolverElHotel]);
 
   useEffect(() => {
     let vivo = true;
@@ -215,11 +363,19 @@ export function Puerta({ children }: { children: ReactNode }) {
 
   const cambiarIdioma = () => setIdioma(idioma === 'en' ? 'es' : 'en');
 
-  if (estado.fase === 'revisando') {
+  /** Volver a preguntar en cuál hotel está. Lo ofrece el menú de recepción. */
+  const cambiarHotel = useCallback(() => {
+    olvidarHotel();
+    aplicarHotel(null);
+    setEstado({ fase: 'revisando' });
+    void revisar();
+  }, [revisar]);
+
+  if (estado.fase === 'revisando' || estado.fase === 'buscandoHoteles') {
     return (
       <Marco>
         <p aria-live="polite" className="m-0 text-center text-[14px] text-muted">
-          {copy.revisando}
+          {estado.fase === 'buscandoHoteles' ? copy.buscandoHoteles : copy.revisando}
         </p>
       </Marco>
     );
@@ -227,6 +383,49 @@ export function Puerta({ children }: { children: ReactNode }) {
 
   if (estado.fase === 'fuera') {
     return <Formulario copy={copy} onIdioma={cambiarIdioma} onEntro={revisar} />;
+  }
+
+  if (estado.fase === 'elegirHotel') {
+    return (
+      <ElegirHotel
+        copy={copy}
+        hoteles={estado.hoteles}
+        onIdioma={cambiarIdioma}
+        onElegir={(hotel) => {
+          aplicarHotel(hotel);
+          recordarHotel(hotel.codigo);
+          setEstado({ fase: 'adentro', persona: estado.persona, varios: true });
+        }}
+        onSalir={() => void salir()}
+      />
+    );
+  }
+
+  if (estado.fase === 'sinHotel') {
+    return (
+      <Aviso
+        copy={copy}
+        onIdioma={cambiarIdioma}
+        titulo={copy.sinHotelTitle}
+        cuerpo={copy.sinHotelBody(estado.persona.correo)}
+        pista={copy.sinHotelHint}
+        boton={copy.salir}
+        onBoton={() => void salir()}
+      />
+    );
+  }
+
+  if (estado.fase === 'hotelesFallaron') {
+    return (
+      <Aviso
+        copy={copy}
+        onIdioma={cambiarIdioma}
+        titulo={copy.hotelesFallaronTitle}
+        cuerpo={copy.hotelesFallaronBody}
+        boton={copy.reintentar}
+        onBoton={() => void revisar()}
+      />
+    );
   }
 
   if (!estado.persona.entra) {
@@ -241,7 +440,14 @@ export function Puerta({ children }: { children: ReactNode }) {
   }
 
   return (
-    <PuertaContexto.Provider value={{ persona: estado.persona, idioma, cambiarIdioma }}>
+    <PuertaContexto.Provider
+      value={{
+        persona: estado.persona,
+        idioma,
+        cambiarIdioma,
+        cambiarHotel: estado.varios ? cambiarHotel : null,
+      }}
+    >
       {children}
     </PuertaContexto.Provider>
   );

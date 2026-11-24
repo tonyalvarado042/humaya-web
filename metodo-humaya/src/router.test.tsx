@@ -41,8 +41,59 @@ describe('rutas base', () => {
     expect(screen.getByRole('heading', { name: 'Become More Human' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'App del huésped' })).toHaveAttribute('href', '/app');
     expect(screen.getByRole('link', { name: 'Recepción' })).toHaveAttribute('href', '/staff');
-    expect(screen.getByText(/Demo con datos ficticios/)).toBeVisible();
     await waitFor(() => expect(document.documentElement.lang).toBe('es'));
+  });
+
+  /**
+   * La portada del dominio compartido es la de CUALQUIER hotel que viva ahí,
+   * no «la página de la demo». Hasta el 24 de noviembre de 2026 decía siempre
+   * «Demo de {experiencia}» y «Demo con datos ficticios»: en el hotel demo
+   * salía «Demo de Demo Experience», y en un hotel real habría dicho que los
+   * datos de sus huéspedes son inventados.
+   *
+   * Este test iba al revés: exigía el aviso montando la portada con HUMAYA,
+   * que no es una demo. Defendía el error.
+   */
+  describe('la portada y el aviso de datos ficticios', () => {
+    it('en un hotel de verdad no dice «demo» en ninguna parte', async () => {
+      const { aplicarHotel } = await import('@/marca');
+      aplicarHotel({
+        negocioId: 'n-1',
+        codigo: 'arenal',
+        marcaExperiencia: 'Arenal Experience',
+        marcaHotel: 'ARENAL',
+        correo: 'hola@arenal.com',
+        esDemo: false,
+        tema: null,
+      });
+
+      renderAt('/');
+
+      expect(screen.queryByText(/Demo con datos ficticios/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Demo de/)).not.toBeInTheDocument();
+      expect(screen.getByText('Arenal Experience')).toBeVisible();
+    });
+
+    it('en la demo sí lo avisa, y no repite el nombre', async () => {
+      const { aplicarHotel } = await import('@/marca');
+      aplicarHotel({
+        negocioId: 'n-2',
+        codigo: 'demo',
+        marcaExperiencia: 'Demo Experience',
+        marcaHotel: 'HOTEL DEMO',
+        correo: 'demo@liderax10.com',
+        esDemo: true,
+        tema: null,
+      });
+
+      renderAt('/');
+
+      expect(screen.getByText(/Demo con datos ficticios/)).toBeVisible();
+      // «DEMO DE DEMO EXPERIENCE» era lo que se veía en vivo. Sigue siendo
+      // feo, pero es la marca que eligió el hotel: lo que no puede pasar es
+      // que esta línea aparezca en un hotel real.
+      expect(screen.getByText('Demo de Demo Experience')).toBeVisible();
+    });
   });
 
   it('monta /entrada', () => {

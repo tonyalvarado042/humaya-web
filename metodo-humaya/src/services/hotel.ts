@@ -34,6 +34,12 @@ export interface Hotel {
   correo: string;
   /** Colores y tipografia propios, o null para la paleta de siempre. */
   tema: Tema | null;
+  /**
+   * Hotel de demostracion. La portada del dominio compartido lo dice y
+   * avisa que los datos son ficticios; en un hotel de verdad eso seria
+   * mentira, y ademas el huesped la lee.
+   */
+  esDemo: boolean;
 }
 
 export type Lado = 'huesped' | 'personal' | 'ambos';
@@ -49,6 +55,14 @@ export interface Resolucion {
   base: string;
   /** Si el dominio es del producto y no de un hotel en particular. */
   compartido: boolean;
+  /**
+   * Los dos dominios de ESTE juego: el del huésped y el de recepción, o null
+   * cuando la base no los conoce.
+   *
+   * Salían de variables de entorno fijadas al compilar, y por eso un hotel
+   * del dominio compartido mandaba su recepción al dominio de HUMAYA.
+   */
+  dominios: { huesped: string | null; personal: string | null };
 }
 
 /**
@@ -86,7 +100,13 @@ interface FilaDominio {
   marca_hotel: string | null;
   correo: string | null;
   tema: unknown;
+  es_demo: boolean | null;
+  dominio_huesped: string | null;
+  dominio_personal: string | null;
 }
+
+/** Sin fila o sin red: no se inventa ningun dominio. */
+const SIN_DOMINIOS = { huesped: null, personal: null } as const;
 
 interface FilaCodigo {
   negocio_id: string;
@@ -95,6 +115,7 @@ interface FilaCodigo {
   marca_hotel: string;
   correo: string;
   tema: unknown;
+  es_demo?: boolean;
 }
 
 const aHotel = (f: FilaCodigo): Hotel => ({
@@ -104,6 +125,7 @@ const aHotel = (f: FilaCodigo): Hotel => ({
   marcaHotel: f.marca_hotel,
   correo: f.correo,
   tema: comoTema(f.tema),
+  esDemo: f.es_demo ?? false,
 });
 
 /**
@@ -148,7 +170,7 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
   try {
     [fila] = await rpc<FilaDominio>('humaya_hotel_de_dominio', { p_dominio: hostname });
   } catch {
-    return { lado, hotel: null, base: '', compartido: false };
+    return { lado, hotel: null, base: '', compartido: false, dominios: { ...SIN_DOMINIOS } };
   }
 
   // Dominio propio de un hotel: la dirección ya dice quién es.
@@ -162,14 +184,20 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
         marca_hotel: fila.marca_hotel ?? '',
         correo: fila.correo ?? '',
         tema: fila.tema,
+        es_demo: fila.es_demo ?? false,
       }),
       base: '',
       compartido: false,
+      dominios: { huesped: fila.dominio_huesped, personal: fila.dominio_personal },
     };
   }
 
   const compartido = fila?.compartido ?? false;
   const ladoFinal = fila?.lado ?? lado;
+  const dominios = {
+    huesped: fila?.dominio_huesped ?? null,
+    personal: fila?.dominio_personal ?? null,
+  };
 
   // Dominio compartido: del lado del huésped el hotel lo dice la ruta. Del
   // lado de recepción lo dice la cuenta, y eso se resuelve después de entrar.
@@ -177,11 +205,13 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
   if (compartido && ladoFinal === 'huesped' && codigo) {
     try {
       const [hotel] = await rpc<FilaCodigo>('humaya_hotel_de_codigo', { p_codigo: codigo });
-      if (hotel) return { lado: ladoFinal, hotel: aHotel(hotel), base: `/${codigo}`, compartido };
+      if (hotel) {
+        return { lado: ladoFinal, hotel: aHotel(hotel), base: `/${codigo}`, compartido, dominios };
+      }
     } catch {
       // Sin red se sigue sin hotel; la pantalla lo dice.
     }
   }
 
-  return { lado: ladoFinal, hotel: null, base: '', compartido };
+  return { lado: ladoFinal, hotel: null, base: '', compartido, dominios };
 }

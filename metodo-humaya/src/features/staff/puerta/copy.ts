@@ -40,6 +40,22 @@ export interface PuertaTextos {
   revisando: string;
   /** El botón dice el idioma AL QUE lleva, no el que está puesto. */
   cambiarIdioma: string;
+  /**
+   * En el dominio compartido la dirección no dice de qué hotel es la
+   * pantalla: lo dice la cuenta. Con más de uno hay que preguntar.
+   */
+  buscandoHoteles: string;
+  elegirHotelTitle: string;
+  elegirHotelBody: string;
+  cambiarHotel: string;
+  /** Tiene rol, pero nadie lo puso en ningún hotel. */
+  sinHotelTitle: string;
+  sinHotelBody: (correo: string) => string;
+  sinHotelHint: string;
+  /** La lista no se pudo leer. Esto SÍ puede ser la conexión. */
+  hotelesFallaronTitle: string;
+  hotelesFallaronBody: string;
+  reintentar: string;
 }
 
 export const puertaCopy: Record<Idioma, PuertaTextos> = {
@@ -68,6 +84,17 @@ export const puertaCopy: Record<Idioma, PuertaTextos> = {
     salir: 'Sign out',
     revisando: 'Checking your session…',
     cambiarIdioma: 'Español',
+    buscandoHoteles: 'Looking up your hotels…',
+    elegirHotelTitle: 'Which hotel?',
+    elegirHotelBody: 'Your account works at more than one. Pick the one you are at.',
+    cambiarHotel: 'Switch hotel',
+    sinHotelTitle: 'Your account is not at any hotel',
+    sinHotelBody: (correo) =>
+      `You're signed in as ${correo} with a valid role, but no hotel has been assigned to it.`,
+    sinHotelHint: 'Ask an administrator to add your account to a hotel.',
+    hotelesFallaronTitle: "We couldn't load your hotels",
+    hotelesFallaronBody: 'This one may be the connection. Try again in a moment.',
+    reintentar: 'Try again',
   },
   es: {
     get eyebrow() {
@@ -94,5 +121,16 @@ export const puertaCopy: Record<Idioma, PuertaTextos> = {
     salir: 'Salir',
     revisando: 'Revisando tu sesión…',
     cambiarIdioma: 'English',
+    buscandoHoteles: 'Buscando tus hoteles…',
+    elegirHotelTitle: '¿En cuál hotel?',
+    elegirHotelBody: 'Tu cuenta trabaja en más de uno. Elegí en el que estás.',
+    cambiarHotel: 'Cambiar de hotel',
+    sinHotelTitle: 'Tu cuenta no está en ningún hotel',
+    sinHotelBody: (correo) =>
+      `Entraste como ${correo} y tenés rol, pero nadie asignó esa cuenta a un hotel.`,
+    sinHotelHint: 'Pedile a un administrador que agregue tu cuenta a un hotel.',
+    hotelesFallaronTitle: 'No pudimos cargar tus hoteles',
+    hotelesFallaronBody: 'Esto sí puede ser la conexión. Probá de nuevo en un momento.',
+    reintentar: 'Probar de nuevo',
   },
 };

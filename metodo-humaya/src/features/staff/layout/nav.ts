@@ -43,6 +43,8 @@ export interface StaffMarcoTextos {
   soonHint: string;
   cambiarIdioma: string;
   salir: string;
+  /** Solo aparece si la cuenta trabaja en mas de un hotel. */
+  cambiarHotel: string;
 }
 
 export const staffCopy: Record<Idioma, StaffMarcoTextos> = {
@@ -55,6 +57,7 @@ export const staffCopy: Record<Idioma, StaffMarcoTextos> = {
     soonHint: 'Coming soon',
     cambiarIdioma: 'Español',
     salir: 'Sign out',
+    cambiarHotel: 'Switch hotel',
   },
   es: {
     area: 'Recepción',
@@ -65,5 +68,6 @@ export const staffCopy: Record<Idioma, StaffMarcoTextos> = {
     soonHint: 'Próximamente',
     cambiarIdioma: 'English',
     salir: 'Salir',
+    cambiarHotel: 'Cambiar de hotel',
   },
 };
