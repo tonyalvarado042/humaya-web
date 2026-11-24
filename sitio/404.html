@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>404 · Esta página no existe · Humaya Wellness Hotel</title>
+<meta name="description" content="La dirección que pediste no está en stayhumaya.com. Volvé a la portada de Humaya Wellness Hotel, en La Fortuna de San Carlos, al pie del Volcán Arenal.">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="humaya-version" content="1.7.11">
+<link rel="icon" href="/assets/img/mark-gold.png">
+
+<!-- Esta página se sirve con status 404 para CUALQUIER ruta que no exista, así
+     que no tiene una URL propia ni canonical: no es una página del sitio, es la
+     respuesta a un error. `noindex` es cinturón y tirantes — el 404 de verdad ya
+     basta para que Google no la indexe — y `follow` deja que siga los enlaces de
+     vuelta al sitio. No se agrega a sitemap.xml a propósito. -->
+<meta name="robots" content="noindex, follow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/paginas.css?v=1.7.11">
+
+<!-- ⚠️ FALTA UNA LÍNEA, A PROPÓSITO. Las 20 páginas llevan, aquí al final del
+     head, el rastreador de origen:
+
+         <script src="/assets/origen.js?v=1.7.9" defer></script>
+
+     No se puso porque `assets/origen.js` todavía NO está en esta rama: está
+     sin commitear en el árbol principal, esperando el OK de Tony. Apuntar a un
+     archivo que no existe haría que esta página pidiera un 404 de verdad.
+
+     Cuando esa entrega se publique, esta página necesita esa línea igual que
+     las otras, y con MÁS razón: el razonamiento que la puso en las 20 es que en
+     la segunda página el referrer ya es el propio sitio. Quien cae aquí desde
+     un anuncio viejo o un resultado de Google con la URL cambiada y de ahí se
+     va a la portada, se registraría como «Directo» y se pierde el canal. -->
+
+
+<style>
+/* Lo único que esta página necesita y la hoja compartida no tiene. Va en línea
+   y no en paginas.css para no tocar un archivo del que cuelgan las 20 páginas
+   en vivo por un recuadro que solo usa el 404. */
+
+/* Aquí vivía un «404» gigante detrás del título. Se quitó: sobre el atardecer
+   de la foto quedaba ilegible y además empujaba el kicker a la franja clara,
+   donde tampoco se leía. El hero queda igual al de las otras 20 páginas —
+   kicker, título y bajada abajo, sobre el degradado oscuro. */
+
+/* la ficha de las páginas, pero clicable entera */
+a.ficha{ display:block; text-decoration:none; color:inherit; transition:background .35s var(--ease); }
+a.ficha:hover{ background:var(--ink-3); }
+a.ficha h3{ transition:color .3s; }
+a.ficha:hover h3{ color:var(--gold); }
+a.ficha .ir{
+  display:block; margin-top:clamp(14px,1.8vw,20px);
+  font-family:var(--display); font-size:10.5px; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--gold); opacity:.75; transition:opacity .3s;
+}
+a.ficha:hover .ir{ opacity:1; }
+
+/* las dos salidas grandes */
+.salidas{ display:flex; flex-wrap:wrap; gap:14px; margin-top:clamp(32px,4vw,52px); }
+</style>
+</head>
+
+<body>
+<header id="hdr">
+  <div class="wrap">
+    <a href="/" class="brand" data-ruta="home" aria-label="Humaya Wellness Hotel">
+      <img class="mk" src="/assets/img/mark-gold.png" alt="Humaya">
+      <img class="wm" src="/assets/img/wordmark-white.png" alt="">
+    </a>
+    <nav class="links" id="navlinks">
+      <a href="/#villas" data-ruta="villas" data-i18n="nav.villas">Villas</a>
+      <a href="/bienestar/" data-ruta="bienestar" data-i18n="nav.wellness">Bienestar</a>
+      <a href="/experiencia/" data-ruta="experiencia" data-i18n="nav.exp">Experience</a>
+      <a href="/huerta/" data-ruta="huerta" data-i18n="nav.garden">La huerta</a>
+      <a href="/proposito/" data-ruta="proposito" data-i18n="nav.purpose">Propósito</a>
+      <a href="/#reservar" data-ruta="contacto" data-i18n="nav.contact">Contacto</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang" id="lang">
+        <button class="lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false">
+          <span id="langCur">ES</span>
+          <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" fill="none" stroke-width="1.4"/></svg>
+        </button>
+        <!-- Botones y no enlaces: un 404 no tiene versión por idioma a la que
+             navegar, así que el selector cambia el texto de ESTA página. -->
+        <div class="lang-menu" id="langMenu" role="menu">
+          <button data-lang="es" role="menuitem" aria-current="true">Español</button>
+          <button data-lang="en" role="menuitem" aria-current="false">English</button>
+          <button data-lang="de" role="menuitem" aria-current="false">Deutsch</button>
+          <button data-lang="fr" role="menuitem" aria-current="false">Français</button>
+        </div>
+      </div>
+      <a href="/reservar" class="btn" data-ruta="reservar" data-i18n="nav.book">Reservar</a>
+      <button class="burger" id="burger" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- Sin clases .rv en toda la página, a propósito. El .rv arranca en opacity:0
+     y lo enciende un IntersectionObserver: si el script se cae, el texto queda
+     invisible para siempre. En las otras páginas es un riesgo aceptable; en la
+     página que existe para rescatar a alguien que ya se perdió, no. -->
+<section class="top">
+  <div class="top-bg"><picture>
+    <source media="(max-width:760px)" srcset="/assets/img/hero-villas-movil.jpg">
+    <img src="/assets/img/hero-villas.jpg" alt="Las villas de HUMAYA al atardecer, con el Volcán Arenal al fondo" fetchpriority="high">
+  </picture></div>
+  <div class="wrap">
+    <p class="kicker" data-i18n="e.kicker">Error 404</p>
+    <h1 data-i18n="e.title">Esta página <em>no existe.</em></h1>
+    <p class="lede" data-i18n="e.lede">La dirección que pediste no está en el sitio: puede ser un enlace viejo o un error de dedo. El hotel sigue donde estaba, al pie del Volcán Arenal — acá abajo está todo.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 data-i18n="e.q">¿Para dónde <em>ibas?</em></h2>
+    </div>
+
+    <div class="fichas dos">
+      <a class="ficha" href="/bienestar/" data-ruta="bienestar">
+        <p class="n">01</p>
+        <h3 data-i18n="c.wellness.t">Bienestar</h3>
+        <p data-i18n="c.wellness.p">Cold plunge, sauna, piscina con vista al volcán, terapia de luz infrarroja y gimnasio.</p>
+        <span class="ir" data-i18n="c.go">Ir →</span>
+      </a>
+      <a class="ficha" href="/experiencia/" data-ruta="experiencia">
+        <p class="n">02</p>
+        <h3 data-i18n="c.exp.t">HUMAYA Experience</h3>
+        <p data-i18n="c.exp.p">Los cinco pilares y los Momentos HUMAYA: lo que se hace en Humaya, y por qué.</p>
+        <span class="ir" data-i18n="c.go">Ir →</span>
+      </a>
+      <a class="ficha" href="/huerta/" data-ruta="huerta">
+        <p class="n">03</p>
+        <h3 data-i18n="c.garden.t">La huerta</h3>
+        <p data-i18n="c.garden.p">La huerta, las clases de cocina y las caminatas.</p>
+        <span class="ir" data-i18n="c.go">Ir →</span>
+      </a>
+      <a class="ficha" href="/proposito/" data-ruta="proposito">
+        <p class="n">04</p>
+        <h3 data-i18n="c.purpose.t">Propósito</h3>
+        <p data-i18n="c.purpose.p">Lo que el hotel se propone hacer con el bosque y con la gente de la zona.</p>
+        <span class="ir" data-i18n="c.go">Ir →</span>
+      </a>
+    </div>
+
+    <div class="salidas">
+      <a href="/" class="btn solid lg" data-ruta="home" data-i18n="e.home">Ir a la portada</a>
+      <a href="/reservar" class="btn lg" data-ruta="reservar" data-i18n="e.book">Reservar</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div>
+        <a href="/" class="brand" data-ruta="home"><img class="mk" src="/assets/img/mark-gold.png" alt="Humaya"><img class="wm" src="/assets/img/wordmark-white.png" alt=""></a>
+        <p class="foot-tag" data-i18n="foot.tag">Un lugar para llegar a ser quien fuiste creado para ser. La Fortuna, Costa Rica.</p>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot.nav">Navegación</h4>
+        <a href="/bienestar/" data-ruta="bienestar" data-i18n="nav.wellness">Bienestar</a>
+        <a href="/experiencia/" data-ruta="experiencia" data-i18n="foot.exp">HUMAYA Experience</a>
+        <a href="/proposito/" data-ruta="proposito" data-i18n="foot.purpose">Nuestro propósito</a>
+        <a href="/huerta/" data-ruta="huerta" data-i18n="nav.garden">La huerta</a>
+        <a href="/reservar" data-ruta="reservar" data-i18n="nav.book">Reservar</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot.contact">Contacto</h4>
+        <a href="mailto:reservations@stayhumaya.com">reservations@stayhumaya.com</a>
+        <a href="tel:+50664446939">+506 6444 6939</a>
+        <p>La Fortuna, San Carlos<br>Alajuela · Costa Rica</p>
+        <a href="https://instagram.com/stayhumaya" target="_blank" rel="noopener noreferrer">@stayhumaya</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Humaya Wellness Hotel</span>
+      <span>Become More Human</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------- los cuatro idiomas en un solo archivo ----------
+   Las otras 20 páginas tienen una URL por idioma y el texto horneado en el
+   HTML. Esta no puede: Cloudflare Pages sirve este mismo 404.html para toda
+   ruta que no exista, incluidas las que empiezan en /en/, /de/ y /fr/. Así que
+   el idioma se deduce de la ruta que el visitante pidió y, si la ruta no dice
+   nada, del idioma del navegador.
+
+   El español va horneado en el HTML y los enlaces ya apuntan a las URLs en
+   español: si este script no corre, la página se lee igual y todo navega. */
+
+const I18N = {
+es:{
+ "meta.title":"404 · Esta página no existe · Humaya Wellness Hotel",
+ "nav.villas":"Villas","nav.wellness":"Bienestar","nav.exp":"Experience",
+ "nav.garden":"La huerta","nav.purpose":"Propósito","nav.contact":"Contacto","nav.book":"Reservar",
+ "e.kicker":"Error 404",
+ "e.title":"Esta página <em>no existe.</em>",
+ "e.lede":"La dirección que pediste no está en el sitio: puede ser un enlace viejo o un error de dedo. El hotel sigue donde estaba, al pie del Volcán Arenal — acá abajo está todo.",
+ "e.q":"¿Para dónde <em>ibas?</em>",
+ "c.go":"Ir →",
+ "c.wellness.t":"Bienestar","c.wellness.p":"Cold plunge, sauna, piscina con vista al volcán, terapia de luz infrarroja y gimnasio.",
+ "c.exp.t":"HUMAYA Experience","c.exp.p":"Los cinco pilares y los Momentos HUMAYA: lo que se hace en Humaya, y por qué.",
+ "c.garden.t":"La huerta","c.garden.p":"La huerta, las clases de cocina y las caminatas.",
+ "c.purpose.t":"Propósito","c.purpose.p":"Lo que el hotel se propone hacer con el bosque y con la gente de la zona.",
+ "e.home":"Ir a la portada","e.book":"Reservar",
+ "foot.tag":"Un lugar para llegar a ser quien fuiste creado para ser. La Fortuna, Costa Rica.",
+ "foot.nav":"Navegación","foot.contact":"Contacto",
+ "foot.exp":"HUMAYA Experience","foot.purpose":"Nuestro propósito"
+},
+en:{
+ "meta.title":"404 · This page doesn't exist · Humaya Wellness Hotel",
+ "nav.villas":"Villas","nav.wellness":"Wellness","nav.exp":"Experience",
+ "nav.garden":"The garden","nav.purpose":"Purpose","nav.contact":"Contact","nav.book":"Book",
+ "e.kicker":"Error 404",
+ "e.title":"This page <em>doesn't exist.</em>",
+ "e.lede":"The address you asked for isn't on this site: an old link, or a typo. The hotel is still where it was, at the foot of the Arenal Volcano — everything is right below.",
+ "e.q":"Where were <em>you headed?</em>",
+ "c.go":"Go →",
+ "c.wellness.t":"Wellness","c.wellness.p":"Cold plunge, sauna, pool facing the volcano, infrared light therapy and gym.",
+ "c.exp.t":"HUMAYA Experience","c.exp.p":"The five pillars and the Momentos HUMAYA: what happens at Humaya, and why.",
+ "c.garden.t":"The garden","c.garden.p":"The garden, the cooking classes and the walks.",
+ "c.purpose.t":"Purpose","c.purpose.p":"What the hotel intends to do for the forest and for the people around it.",
+ "e.home":"Go to the homepage","e.book":"Book",
+ "foot.tag":"A place to become who you were created to be. La Fortuna, Costa Rica.",
+ "foot.nav":"Navigation","foot.contact":"Contact",
+ "foot.exp":"HUMAYA Experience","foot.purpose":"Our purpose"
+},
+de:{
+ "meta.title":"404 · Diese Seite gibt es nicht · Humaya Wellness Hotel",
+ "nav.villas":"Villen","nav.wellness":"Wellness","nav.exp":"Experience",
+ "nav.garden":"Der Garten","nav.purpose":"Zweck","nav.contact":"Kontakt","nav.book":"Buchen",
+ "e.kicker":"Fehler 404",
+ "e.title":"Diese Seite <em>gibt es nicht.</em>",
+ "e.lede":"Die Adresse, die du aufgerufen hast, existiert auf dieser Seite nicht: ein alter Link oder ein Tippfehler. Das Hotel liegt weiterhin am Fuße des Vulkans Arenal — hier unten findest du alles.",
+ "e.q":"Wo wolltest <em>du hin?</em>",
+ "c.go":"Ansehen →",
+ "c.wellness.t":"Wellness","c.wellness.p":"Cold Plunge, Sauna, Pool mit Blick auf den Vulkan, Infrarotlicht und Gym.",
+ "c.exp.t":"HUMAYA Experience","c.exp.p":"Die fünf Säulen und die Momentos HUMAYA: was in Humaya passiert, und warum.",
+ "c.garden.t":"Der Garten","c.garden.p":"Der Garten, die Kochkurse und die Wanderungen.",
+ "c.purpose.t":"Zweck","c.purpose.p":"Was das Hotel für den Wald und die Menschen in der Umgebung vorhat.",
+ "e.home":"Zur Startseite","e.book":"Buchen",
+ "foot.tag":"Ein Ort, um zu werden, wofür du geschaffen wurdest. La Fortuna, Costa Rica.",
+ "foot.nav":"Navigation","foot.contact":"Kontakt",
+ "foot.exp":"HUMAYA Experience","foot.purpose":"Unser Zweck"
+},
+fr:{
+ "meta.title":"404 · Cette page n'existe pas · Humaya Wellness Hotel",
+ "nav.villas":"Villas","nav.wellness":"Bien-être","nav.exp":"Experience",
+ "nav.garden":"Le potager","nav.purpose":"Engagement","nav.contact":"Contact","nav.book":"Réserver",
+ "e.kicker":"Erreur 404",
+ "e.title":"Cette page <em>n'existe pas.</em>",
+ "e.lede":"L'adresse demandée ne se trouve pas sur ce site : un ancien lien, ou une faute de frappe. L'hôtel est toujours au pied du volcan Arenal — vous trouverez tout ci-dessous.",
+ "e.q":"Où alliez-<em>vous ?</em>",
+ "c.go":"Voir →",
+ "c.wellness.t":"Bien-être","c.wellness.p":"Cold plunge, sauna, piscine face au volcan, lumière infrarouge et salle de sport.",
+ "c.exp.t":"HUMAYA Experience","c.exp.p":"Les cinq piliers et les Momentos HUMAYA : ce que l'on fait à Humaya, et pourquoi.",
+ "c.garden.t":"Le potager","c.garden.p":"Le potager, les cours de cuisine et les randonnées.",
+ "c.purpose.t":"Engagement","c.purpose.p":"Ce que l'hôtel entend faire pour la forêt et pour les gens de la région.",
+ "e.home":"Aller à l'accueil","e.book":"Réserver",
+ "foot.tag":"Un lieu pour devenir qui vous avez été créé pour être. La Fortuna, Costa Rica.",
+ "foot.nav":"Navigation","foot.contact":"Contact",
+ "foot.exp":"HUMAYA Experience","foot.purpose":"Notre engagement"
+}
+};
+
+/* Las cuatro secciones tienen una URL distinta en cada idioma, así que los
+   enlaces se reescriben junto con el texto. Tomadas de las páginas reales. */
+const RUTAS = {
+ es:{ home:"/", villas:"/#villas", bienestar:"/bienestar/",    experiencia:"/experiencia/",   huerta:"/huerta/",  proposito:"/proposito/",  contacto:"/#reservar",     reservar:"/reservar" },
+ en:{ home:"/en/", villas:"/en/#villas", bienestar:"/en/wellness/", experiencia:"/en/experience/", huerta:"/en/garden/", proposito:"/en/purpose/", contacto:"/en/#reservar", reservar:"/reservar" },
+ de:{ home:"/de/", villas:"/de/#villas", bienestar:"/de/wellness/", experiencia:"/de/erlebnis/",   huerta:"/de/garten/", proposito:"/de/zweck/",   contacto:"/de/#reservar", reservar:"/reservar" },
+ fr:{ home:"/fr/", villas:"/fr/#villas", bienestar:"/fr/bien-etre/", experiencia:"/fr/experience/", huerta:"/fr/potager/", proposito:"/fr/engagement/", contacto:"/fr/#reservar", reservar:"/reservar" }
+};
+
+const LANGS = { es:"ES", en:"EN", de:"DE", fr:"FR" };
+
+function applyLang(code){
+  const dict = I18N[code], rutas = RUTAS[code];
+  if(!dict || !rutas) return;
+  document.documentElement.lang = code;
+  document.title = dict["meta.title"];
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const v = dict[el.dataset.i18n];
+    if(v == null) return;
+    if(/<em>|<br>/.test(v)) el.innerHTML = v; else el.textContent = v;
+  });
+  document.querySelectorAll("[data-ruta]").forEach(el=>{
+    const v = rutas[el.dataset.ruta];
+    if(v != null) el.setAttribute("href", v);
+  });
+  const cur = document.getElementById("langCur");
+  if(cur) cur.textContent = LANGS[code];
+  document.querySelectorAll("#langMenu button").forEach(b=>{
+    b.setAttribute("aria-current", b.dataset.lang === code ? "true" : "false");
+  });
+}
+
+/* El idioma de la ruta que se pidió: alguien que escribió mal una dirección
+   bajo /de/ lee alemán. Es la única señal honesta que hay. */
+function idiomaDeLaRuta(){
+  const p = location.pathname.toLowerCase();
+  for(const c of ["en","de","fr"]){
+    if(p === "/" + c || p.indexOf("/" + c + "/") === 0) return c;
+  }
+  return null;
+}
+function idiomaDelNavegador(){
+  const lista = (navigator.languages && navigator.languages.length)
+    ? navigator.languages : [navigator.language || ""];
+  for(const l of lista){
+    const c = String(l).slice(0,2).toLowerCase();
+    if(I18N[c]) return c;
+  }
+  return null;
+}
+applyLang(idiomaDeLaRuta() || idiomaDelNavegador() || "es");
+
+/* cabecera sólida al bajar */
+const hdr = document.getElementById("hdr");
+const alBajar = () => hdr.classList.toggle("solid", window.scrollY > 40);
+alBajar(); addEventListener("scroll", alBajar, { passive:true });
+
+/* menú de idioma */
+const lang = document.getElementById("lang");
+const langBtn = document.getElementById("langBtn");
+langBtn.addEventListener("click", e => {
+  e.stopPropagation();
+  const abierto = lang.classList.toggle("open");
+  langBtn.setAttribute("aria-expanded", abierto);
+});
+document.querySelectorAll("#langMenu button").forEach(b => {
+  b.addEventListener("click", e => {
+    e.stopPropagation();
+    applyLang(b.dataset.lang);
+    lang.classList.remove("open");
+    langBtn.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("menu-open");
+  });
+});
+document.addEventListener("click", () => {
+  lang.classList.remove("open");
+  langBtn.setAttribute("aria-expanded", "false");
+});
+
+/* menú móvil: los cuatro caminos de salida (botón, enlace, tocar fuera,
+   Escape y rotar el teléfono). Si falta alguno la página queda congelada,
+   porque el menú abierto pone overflow:hidden en el body. */
+const burger = document.getElementById("burger");
+const navlinks = document.getElementById("navlinks");
+const cerrarMenu = () => document.body.classList.remove("menu-open");
+if (burger && navlinks) {
+  burger.addEventListener("click", e => {
+    e.stopPropagation();
+    document.body.classList.toggle("menu-open");
+  });
+  navlinks.querySelectorAll("a").forEach(a => a.addEventListener("click", cerrarMenu));
+  document.addEventListener("click", e => {
+    if (!document.body.classList.contains("menu-open")) return;
+    if (e.target === navlinks) { cerrarMenu(); return; }   /* el fondo del menu */
+    if (navlinks.contains(e.target) || burger.contains(e.target)) return;
+    cerrarMenu();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarMenu(); });
+  addEventListener("resize", () => { if (innerWidth > 860) cerrarMenu(); }, { passive:true });
+}
+</script>
+</body>
+</html>
