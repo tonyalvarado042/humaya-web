@@ -3,13 +3,13 @@ import { ladoDe, MARCA, type Lado } from '@/marca';
 import { Mudanza } from '@/components/Mudanza';
 import { Placeholder } from '@/components/Placeholder';
 import { DemoHomePage } from '@/features/demo-home/DemoHomePage';
+import { PuertaDelHuesped } from '@/features/guest-app/PuertaDelHuesped';
 import { UiKitPage } from '@/features/dev/UiKitPage';
 import { EntradaPage } from '@/features/entrada/EntradaPage';
 import { BookingsPage } from '@/features/guest-app/bookings/BookingsPage';
 import { ConciergePage } from '@/features/guest-app/concierge/ConciergePage';
 import { HomePage } from '@/features/guest-app/home/HomePage';
 import { InterviewPage } from '@/features/guest-app/interview/InterviewPage';
-import { GuestLayout } from '@/features/guest-app/layout/GuestLayout';
 import { MovePage } from '@/features/guest-app/move/MovePage';
 import { SessionPlayerPage } from '@/features/guest-app/move/SessionPlayerPage';
 import { MyDataPage } from '@/features/guest-app/resumen/MyDataPage';
@@ -136,7 +136,9 @@ export function createRoutes({
         }
       : {
           path: '/app',
-          element: <GuestLayout />,
+          // Un hotel de verdad no abre la app: todavia corre con estadias
+          // de ejemplo. Ver PuertaDelHuesped.
+          element: <PuertaDelHuesped />,
           children: [
             { index: true, element: <HomePage /> },
             { path: 'resumen', element: <MyDataPage /> },
@@ -152,9 +154,26 @@ export function createRoutes({
   return [
     {
       path: '/',
-      // En el dominio del personal la raíz es recepción: nadie que entre a
-      // staff.stayhumaya.com está buscando la demo.
-      element: lado === 'personal' ? <Navigate to="/staff" replace /> : <DemoHomePage />,
+      /**
+       * Cada dominio abre lo suyo, sin preguntar.
+       *
+       * Tony, 24 de noviembre de 2026: «si entro a Hotel Experience es la
+       * parte de recepción, y si entro a Guest Experience es la parte de
+       * Guest». Hasta hoy la raíz del dominio del HUÉSPED mostraba una
+       * portada con dos botones —«App del huésped» y «Recepción»—, así que
+       * el huésped de un hotel veía un enlace a la recepción de ese hotel.
+       *
+       * En `ambos` (local y los previews, donde no hay dos dominios) la
+       * portada sigue: ahí sirve de índice para trabajar.
+       */
+      element:
+        lado === 'personal' ? (
+          <Navigate to="/staff" replace />
+        ) : lado === 'huesped' ? (
+          <Navigate to="/app" replace />
+        ) : (
+          <DemoHomePage />
+        ),
     },
     {
       path: '/entrada',

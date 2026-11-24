@@ -4,6 +4,7 @@ import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-rout
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRoutes, routes } from '@/router';
 import { stubAdminApi } from '@/test/adminApiStub';
+import { renderRoutes } from '@/test/renderWithProviders';
 
 function renderAt(path: string, routeSet: RouteObject[] = routes) {
   const router = createMemoryRouter(routeSet, { initialEntries: [path] });
@@ -186,5 +187,85 @@ describe('rutas base', () => {
   it('muestra el 404 en una ruta que no existe', () => {
     renderAt('/no-existe');
     expect(screen.getByRole('heading', { name: 'Esta dirección no existe' })).toBeInTheDocument();
+  });
+});
+
+/**
+ * Cada dominio abre lo suyo, y ningún hotel real muestra huéspedes inventados.
+ *
+ * ── DE DÓNDE SALE ──────────────────────────────────────────────────────
+ * Tony, 24 de noviembre de 2026, después de crear Bike & Bed desde el panel:
+ * «cuando entro al hotel me salen dos opciones, lo cual no debería ser así.
+ * Si entro a Hotel Experience es la parte de recepción, y si entro a Guest
+ * Experience es la parte de Guest. Y cuando le doy clic al link me devuelve
+ * a la página de Humaya».
+ *
+ * Lo segundo era peor de lo que se veía: `/bikeandbed/app` no «devolvía a
+ * Humaya», mostraba **las estadías de ejemplo de Humaya dentro de Bike &
+ * Bed** — «Hola, Valeria. Llegás hoy. Ya tenemos lista la Villa 04.»
+ *
+ * El manual del equipo lo prohíbe con todas las letras: «usar IA para
+ * simular empatía o **inventar datos del huésped**».
+ */
+describe('cada dominio abre lo suyo', () => {
+  it('en el dominio del huésped la raíz abre la app, sin ofrecer recepción', async () => {
+    const { router } = renderRoutes(createRoutes({ includeDevUi: false, lado: 'huesped' }), {
+      route: '/',
+    });
+
+    await waitFor(() => expect(router.state.location.pathname).not.toBe('/'));
+    // EL PUNTO: ya no hay una portada con «App del huésped» y «Recepción».
+    expect(screen.queryByRole('link', { name: 'Recepción' })).not.toBeInTheDocument();
+  });
+
+  it('en el dominio de recepción la raíz abre recepción', async () => {
+    const { router } = renderRoutes(createRoutes({ includeDevUi: false, lado: 'personal' }), {
+      route: '/',
+    });
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/staff'));
+  });
+});
+
+describe('un hotel de verdad no abre la app con huéspedes de ejemplo', () => {
+  const REAL = {
+    negocioId: 'n-real',
+    codigo: 'bikeandbed',
+    marcaExperiencia: 'Bike & Bed Experience',
+    marcaHotel: 'Bike & Bed',
+    correo: 'hola@bikeandbed.com',
+    esDemo: false,
+    portadaTitulo: null,
+    portadaBajada: null,
+    tema: null,
+  };
+
+  it('manda a buscar la estadía en vez de saludar a Valeria', async () => {
+    const { aplicarHotel } = await import('@/marca');
+    aplicarHotel(REAL);
+
+    const { router } = renderRoutes(createRoutes({ includeDevUi: false, lado: 'ambos' }), {
+      route: '/app',
+    });
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/entrada'));
+    // Lo que se veía en vivo en Bike & Bed, y que no puede volver:
+    expect(screen.queryByText(/Valeria/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Hannah/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Huésped de la demo/)).not.toBeInTheDocument();
+  });
+
+  it('la demo sí la abre: para eso existe', async () => {
+    const { aplicarHotel } = await import('@/marca');
+    aplicarHotel({ ...REAL, codigo: 'demo', esDemo: true });
+
+    const { router } = renderRoutes(createRoutes({ includeDevUi: false, lado: 'ambos' }), {
+      route: '/app',
+    });
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app'));
+    expect(
+      await screen.findByRole('navigation', { name: 'Navegación principal' }),
+    ).toBeInTheDocument();
   });
 });

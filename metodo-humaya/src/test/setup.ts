@@ -56,7 +56,13 @@ beforeEach(async () => {
     marcaExperiencia: 'HUMAYA Experience',
     marcaHotel: 'HUMAYA',
     correo: 'reservations@stayhumaya.com',
-    esDemo: false,
+    // Demo a proposito: la app del huesped que montan estos tests corre con
+    // DEMO_STAYS —Valeria, Hannah—, o sea que lo que se prueba ES la demo.
+    // Con `false`, /app redirige a /entrada (ver PuertaDelHuesped) y los
+    // tests de rutas no tendrian nada que montar. El caso contrario —un
+    // hotel de verdad NO abre la app— se prueba aparte, aplicando su propio
+    // hotel, en router.test.tsx.
+    esDemo: true,
     portadaTitulo: null,
     portadaBajada: null,
     // Los colores quedan en los de siempre —el tema de un hotel se prueba
