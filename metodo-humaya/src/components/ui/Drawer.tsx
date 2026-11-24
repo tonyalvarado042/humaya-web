@@ -11,6 +11,32 @@ interface DrawerProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
+  /**
+   * El tema con el que se pinta. **Obligatorio a propósito.**
+   *
+   * ── EL FALLO QUE ESTO ARREGLA ─────────────────────────────────────────
+   * Tony, 24 de noviembre de 2026, con una captura del menú de recepción en
+   * el teléfono: «sigue el error en mobile de menú, no probaste».
+   *
+   * El menú salía **transparente**: el nombre de cada destino encima de los
+   * números de la pantalla, ilegible. Medido en el navegador:
+   *
+   *   dentro de [data-theme] → false
+   *   fondo del panel        → rgba(0, 0, 0, 0)
+   *   --nav en el panel      → (vacía)
+   *
+   * La causa es `createPortal(..., document.body)`: el panel se monta fuera
+   * del `<div data-theme="staff">`, y los colores de este proyecto viven en
+   * variables declaradas DENTRO de ese atributo —a propósito, para poder
+   * mostrar los dos temas a la vez en /dev/ui—. Sin el atributo no hay
+   * variables, y `bg-nav` no pinta nada.
+   *
+   * Por eso es obligatorio y no tiene valor por omisión: un portal sin tema
+   * se ve roto, y eso tiene que fallar al compilar y no en el teléfono de
+   * alguien. Es el único `createPortal` del proyecto; el día que haya otro,
+   * esta prop le recuerda el problema.
+   */
+  tema: 'staff' | 'guest';
 }
 
 /**
@@ -21,7 +47,7 @@ interface DrawerProps {
  * nativo esto atrapa el foco a mano: mismo patrón que usan por debajo Radix
  * y la mayoría de los "sheet" accesibles.
  */
-export function Drawer({ open, onClose, title, children }: DrawerProps) {
+export function Drawer({ open, onClose, title, children, tema }: DrawerProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<Element | null>(null);
 
@@ -66,7 +92,9 @@ export function Drawer({ open, onClose, title, children }: DrawerProps) {
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50">
+    // El tema va acá y no en el panel: el fondo oscuro también usa una
+    // variable, y este div es la raíz de todo lo que el portal monta.
+    <div data-theme={tema} className="fixed inset-0 z-50">
       <div aria-hidden="true" onClick={onClose} className="absolute inset-0 bg-black/50" />
       <div
         ref={panelRef}

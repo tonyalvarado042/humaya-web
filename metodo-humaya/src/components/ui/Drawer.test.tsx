@@ -12,7 +12,7 @@ function Harness() {
       <button type="button" onClick={() => setOpen(true)}>
         Abrir menú
       </button>
-      <Drawer open={open} onClose={() => setOpen(false)} title="Recepción">
+      <Drawer open={open} onClose={() => setOpen(false)} title="Recepción" tema="staff">
         <a href="#llegadas">Llegadas</a>
         <a href="#spa">Spa</a>
       </Drawer>
@@ -79,5 +79,58 @@ describe('Drawer', () => {
 
     await userEvent.tab();
     expect(screen.getByRole('button', { name: 'Cerrar menú' })).toHaveFocus();
+  });
+});
+
+/**
+ * El menú tiene que llevarse el tema puesto.
+ *
+ * ── EL FALLO QUE ESTO AGARRA ────────────────────────────────────────────
+ * Tony, 24 de noviembre de 2026, con una captura del teléfono: «sigue el
+ * error en mobile de menú, no probaste».
+ *
+ * El menú de recepción salía TRANSPARENTE en el teléfono: los nombres de
+ * los destinos encima de los números de la pantalla, ilegible. Medido en el
+ * navegador antes de arreglarlo:
+ *
+ *   dentro de [data-theme] → false
+ *   fondo del panel        → rgba(0, 0, 0, 0)
+ *   --nav en el panel      → (vacía)
+ *
+ * `createPortal(..., document.body)` monta el panel FUERA del
+ * `<div data-theme="staff">`, y en este proyecto los colores viven en
+ * variables declaradas dentro de ese atributo —a propósito, para mostrar
+ * los dos temas a la vez en /dev/ui—. Sin atributo no hay variables, y
+ * `bg-nav` no pinta nada.
+ *
+ * ── POR QUÉ SE PRUEBA EL ATRIBUTO Y NO EL COLOR ─────────────────────────
+ * Porque jsdom no resuelve variables CSS de hojas externas: preguntarle el
+ * `backgroundColor` devolvería vacío con el arreglo puesto y sin él, y el
+ * test diría que sí siempre. El atributo es lo que de verdad decide, y es
+ * lo que se puede comprobar acá. El color se miró en el navegador.
+ */
+describe('el tema del portal', () => {
+  it('el panel queda dentro de un data-theme, no suelto en el body', async () => {
+    render(<Harness />);
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
+
+    const panel = screen.getByRole('dialog');
+    const conTema = panel.closest('[data-theme]');
+
+    // EL PUNTO: sin esto el menú se ve transparente en el teléfono.
+    expect(conTema).not.toBeNull();
+    expect(conTema).toHaveAttribute('data-theme', 'staff');
+  });
+
+  it('el velo oscuro también queda dentro del tema', async () => {
+    // El fondo semitransparente usa una variable igual que el panel: si
+    // quedara fuera, tampoco pintaría.
+    render(<Harness />);
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menú' }));
+
+    const panel = screen.getByRole('dialog');
+    const raiz = panel.parentElement;
+
+    expect(raiz).toHaveAttribute('data-theme', 'staff');
   });
 });

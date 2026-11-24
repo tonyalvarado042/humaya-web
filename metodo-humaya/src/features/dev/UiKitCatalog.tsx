@@ -256,7 +256,12 @@ export function UiKitCatalog({ themeName }: UiKitCatalogProps) {
         <Button variant="outline" onClick={() => setDrawerOpen(true)}>
           Abrir menú de ejemplo
         </Button>
-        <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title="Recepción">
+        <Drawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          title="Recepción"
+          tema="staff"
+        >
           <p className="m-0 text-sm text-ink-muted">
             Acá va la navegación del dashboard en pantallas angostas.
           </p>

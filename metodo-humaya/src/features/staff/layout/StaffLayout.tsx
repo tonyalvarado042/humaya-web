@@ -71,7 +71,12 @@ export function StaffLayout() {
         </div>
       </div>
 
-      <Drawer open={menuOpen} onClose={() => setMenuOpen(false)} title={copy.menuTitle}>
+      <Drawer
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        title={copy.menuTitle}
+        tema="staff"
+      >
         <StaffNav onNavigate={() => setMenuOpen(false)} />
       </Drawer>
     </div>
