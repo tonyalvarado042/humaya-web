@@ -33,9 +33,14 @@ import { cliente } from './sesion';
 export interface Enlace {
   id: string;
   /**
-   * Los sembrados la llevan (`recepcion`, `guest`, `vision`, `cloudbeds`,
-   * `sitio`); los que agregue el hotel van en null. No se muestra: existe
-   * para que sembrar dos veces no duplique.
+   * Los sembrados la llevan; los que agregue el hotel van en null. No se
+   * muestra: existe para que sembrar dos veces no duplique.
+   *
+   * Hoy siembra `humaya_sembrar_hotel`: `recepcion`, `guest`, `vision`,
+   * `cloudbeds` (solo si el PMS del hotel es Cloudbeds) y `destino`
+   * (visitlafortunacr.com, agregado el 24 de noviembre de 2026). `sitio` NO
+   * se siembra: hoy la tiene solo HUMAYA, puesta a mano — cada hotel agrega
+   * la suya desde Admin → Portada interna.
    */
   clave: string | null;
   etiqueta: string;
