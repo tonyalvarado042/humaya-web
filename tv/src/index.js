@@ -38,8 +38,24 @@ const FN_POR_DEFECTO = "https://mlhhhwbgymobcxiklnoz.supabase.co/functions/v1";
  */
 const CLIMA = { place: "La Fortuna", lat: 10.4678, lon: -84.6427, tz: "America/Costa_Rica" };
 
-/** La foto que se usa mientras una villa no tenga la suya. */
-const FOTO_POR_DEFECTO = "humaya-own-hero";
+/**
+ * Un hotel sin foto se queda SIN foto.
+ *
+ * Aca habia un `FOTO_POR_DEFECTO = "humaya-own-hero"`, y esa foto trae el
+ * logotipo de HUMAYA quemado dentro de la imagen. El 25 de noviembre de 2026,
+ * al colgar las cinco pantallas de Bike & Bed, cada cabana recibio al huesped
+ * con «HUMAYA» en letras de un palmo: el hotel de otra empresa, en la pared
+ * de su cuarto. No era un detalle de diseno — era decirle que esta en otro
+ * hotel, el mismo fallo que `LogoDelHotel` ya habia tenido en recepcion.
+ *
+ * La foto de HUMAYA no se borro: paso a ser un DATO suyo, en
+ * `humaya_tv_ajustes.foto`, igual que la de cualquier otro hotel. Lo que se
+ * fue es el respaldo escrito en el codigo, que convertia a un hotel en otro.
+ *
+ * Sin foto la pantalla queda negra y se lee entera —hora, bienvenida, clima,
+ * los QR y las apps—; medido en vivo antes de hacer este cambio. Un fondo
+ * negro no le miente a nadie.
+ */
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" };
 const json = (data, status = 200, extra = {}) =>
@@ -75,8 +91,8 @@ async function estadoDe(env, url) {
   const cuerpo = await r.json().catch(() => ({}));
   if (!r.ok) return { error: cuerpo.error || "no_autorizado", status: r.status };
 
-  // Sin foto propia, la que viene dentro del Worker.
-  const hero = (cuerpo.photos && cuerpo.photos.hero) || FOTO_POR_DEFECTO;
+  // Sin foto propia, ninguna: nunca la de otro hotel.
+  const hero = (cuerpo.photos && cuerpo.photos.hero) || "";
   cuerpo.photos = { hero, inside: hero, area: hero };
 
   // La direccion que termina dentro del QR. Si la villa esta ocupada ahora,

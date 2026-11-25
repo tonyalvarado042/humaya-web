@@ -710,7 +710,10 @@
       '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;' +
       'justify-content:center;gap:1.5rem;text-align:center;padding:4rem;background:#0A0A0A;' +
       'color:#F4F1EA;font-family:Inter,Helvetica,Arial,sans-serif">' +
-      '<div style="letter-spacing:.35em;color:#C8AD85;font-size:1.1rem">HUMAYA</div>' +
+      // Sin marca: aqui NO se sabe de que hotel es la pantalla. Si la clave
+      // esta mal, la villa no se resolvio, y hasta el 25 de noviembre de 2026
+      // esta pantalla decia «HUMAYA» — el nombre de otra empresa, en el
+      // televisor de un hotel cliente que copio mal la direccion.
       '<h1 style="font-size:2.6rem;font-weight:500;margin:0">Esta pantalla todavia no esta configurada</h1>' +
       '<p style="font-size:1.3rem;line-height:1.7;max-width:46rem;margin:0;opacity:.75">' +
       (falta
