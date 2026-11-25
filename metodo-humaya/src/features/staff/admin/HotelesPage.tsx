@@ -33,18 +33,85 @@ import { hotelesCopy, type HotelesTextos } from './copyHoteles';
 
 const ORIGENES: OrigenReservas[] = ['cloudbeds', 'airbnb_ical', 'ninguno'];
 
+/**
+ * Una de las dos direcciones del hotel, con su botón de copiar.
+ *
+ * ── POR QUÉ SE MUESTRAN LAS DOS ─────────────────────────────────────────
+ * Tony, 24 de noviembre de 2026: «no sale ambos enlaces de huésped y de
+ * staff, ¿por qué?». Tenía razón: la ficha mostraba una sola, y encima
+ * armada a mano pegándole el código a `guestexp.liderax10.com`. Para HUMAYA
+ * eso era falso —su dirección es `experience.stayhumaya.com`— y la de
+ * recepción no aparecía en ninguna parte.
+ *
+ * Son dos direcciones distintas de verdad: el huésped y el personal viven
+ * separados desde el 15 de noviembre. Mandarle a un hotel la del huésped
+ * cuando pidió la de su recepción es mandarlo a la pantalla equivocada.
+ */
+function Direccion({
+  etiqueta,
+  url,
+  copy,
+}: {
+  etiqueta: string;
+  url: string | null;
+  copy: HotelesTextos;
+}) {
+  const [copiada, setCopiada] = useState(false);
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-[12px] text-muted-soft">{etiqueta}</span>
+      {url ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="font-mono text-[13px] break-all text-text underline-offset-4 hover:underline"
+          >
+            {url}
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              // Sin `navigator.clipboard` —http sin candado, un navegador
+              // viejo— el enlace sigue a la vista para copiarlo a mano. No se
+              // dice «Copiada» si no se copió.
+              void navigator.clipboard
+                ?.writeText(url)
+                .then(() => setCopiada(true))
+                .catch(() => setCopiada(false));
+            }}
+            className="rounded-pill border border-line-strong px-2.5 py-0.5 text-[12px] text-muted transition-colors hover:text-text"
+          >
+            {copiada ? copy.copiada : copy.copiar}
+          </button>
+        </div>
+      ) : (
+        <span className="text-[13px] text-muted-soft">{copy.sinDireccion}</span>
+      )}
+    </div>
+  );
+}
+
 function Ficha({
   hotel,
   copy,
-  dominio,
+  abierto,
+  miembros,
   onOrigen,
   onEquipo,
+  onCerrarEquipo,
+  onCambiarMiembro,
 }: {
   hotel: HotelDelPanel;
   copy: HotelesTextos;
-  dominio: string;
+  abierto: boolean;
+  miembros: MiembroDelEquipo[];
   onOrigen: (origen: OrigenReservas) => void;
   onEquipo: () => void;
+  onCerrarEquipo: () => void;
+  onCambiarMiembro: (usuarioId: string, asignado: boolean) => void;
 }) {
   return (
     <li className="flex flex-col gap-3 rounded-xl border border-line-strong p-4">
@@ -56,9 +123,10 @@ function Ficha({
           </span>
         ) : null}
       </div>
-      <p className="m-0 font-mono text-[13px] break-all text-muted">
-        {dominio}/{hotel.codigo}
-      </p>
+
+      <Direccion etiqueta={copy.dondeEntraElHuesped} url={hotel.urlHuesped} copy={copy} />
+      <Direccion etiqueta={copy.dondeEntraRecepcion} url={hotel.urlPersonal} copy={copy} />
+
       <p className="m-0 text-[13px] text-muted">{copy.cuantos(hotel.usuarios, hotel.reservas)}</p>
       <label className="flex flex-col gap-1.5 text-[13px] text-text">
         {copy.origenLabel}
@@ -79,9 +147,17 @@ function Ficha({
           {copy.avisoAirbnb}
         </p>
       ) : null}
-      <Button variant="outline" onClick={onEquipo}>
-        {copy.verEquipo}
+
+      {/* El equipo se abre ACÁ ADENTRO, no al final de la página.
+          Tony, 24 de noviembre de 2026: «botones sin click». El botón sí
+          funcionaba: abría un panel pegado al final de la lista, debajo de
+          los tres hoteles y muchas veces fuera de la pantalla, sin decir
+          siquiera de qué hotel era. Clic sin cambio visible es, para quien
+          lo usa, un botón que no hace nada. */}
+      <Button variant="outline" onClick={abierto ? onCerrarEquipo : onEquipo}>
+        {abierto ? copy.cerrarEquipo : copy.verEquipo}
       </Button>
+      {abierto ? <Equipo copy={copy} miembros={miembros} onCambiar={onCambiarMiembro} /> : null}
     </li>
   );
 }
@@ -90,38 +166,36 @@ function Equipo({
   copy,
   miembros,
   onCambiar,
-  onCerrar,
 }: {
   copy: HotelesTextos;
   miembros: MiembroDelEquipo[];
   onCambiar: (usuarioId: string, asignado: boolean) => void;
-  onCerrar: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-line-strong p-4">
-      <h3 className="m-0 text-[17px] text-text">{copy.equipoTitulo}</h3>
-      <p className="m-0 text-[13px] text-muted">{copy.equipoCuerpo}</p>
-      <ul className="m-0 flex list-none flex-col gap-2 p-0">
-        {miembros.map((m) => (
-          <li key={m.usuarioId} className="flex items-center justify-between gap-3">
-            <span className="text-[14px] text-text">
-              {m.nombre ?? m.correo}
-              <span className="ml-2 text-[12px] text-muted-soft">{m.rol}</span>
-            </span>
-            <label className="flex items-center gap-2 text-[13px] text-muted">
-              <input
-                type="checkbox"
-                checked={m.asignado}
-                onChange={(e) => onCambiar(m.usuarioId, e.target.checked)}
-              />
-              {copy.entra}
-            </label>
-          </li>
-        ))}
-      </ul>
-      <Button variant="outline" onClick={onCerrar}>
-        {copy.cerrar}
-      </Button>
+    <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-sunken p-3">
+      <p className="m-0 text-[13px] leading-relaxed text-muted">{copy.equipoCuerpo}</p>
+      {miembros.length === 0 ? (
+        <p className="m-0 text-[13px] text-muted-soft">{copy.cargando}</p>
+      ) : (
+        <ul className="m-0 flex list-none flex-col gap-2 p-0">
+          {miembros.map((m) => (
+            <li key={m.usuarioId} className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-[14px] text-text">
+                {m.nombre ?? m.correo}
+                <span className="ml-2 text-[12px] text-muted-soft">{m.rol}</span>
+              </span>
+              <label className="flex items-center gap-2 text-[13px] text-muted">
+                <input
+                  type="checkbox"
+                  checked={m.asignado}
+                  onChange={(e) => onCambiar(m.usuarioId, e.target.checked)}
+                />
+                {copy.entra}
+              </label>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -144,7 +218,20 @@ export function HotelesPage() {
   const [creando, setCreando] = useState(false);
   const [errorCrear, setErrorCrear] = useState<string | null>(null);
 
-  const dominio = 'https://guestexp.liderax10.com';
+  /**
+   * Dónde va a vivir un hotel NUEVO.
+   *
+   * Esto sí se arma acá y no sale de la base, porque el hotel todavía no
+   * existe: no hay fila en `humaya_dominios` que consultar. Un hotel nuevo
+   * nace siempre en el dominio compartido —«debe ser en lidera los hoteles
+   * nuevos», Tony, 24 de noviembre de 2026—, así que la dirección es
+   * predecible. Las de los hoteles que YA existen salen de la base, porque
+   * ahí sí hay hoteles con dominio propio.
+   */
+  const DOMINIO_NUEVO = {
+    huesped: 'https://guestexp.liderax10.com',
+    personal: 'https://hotelexp.liderax10.com/staff',
+  };
 
   const cargar = useCallback(async () => {
     try {
@@ -194,9 +281,25 @@ export function HotelesPage() {
     }
   }
 
+  /**
+   * Se vacía la lista ANTES de pedirla: sin eso, abrir el equipo de un hotel
+   * mostraba por un instante quién trabaja en el anterior — con sus casillas
+   * marcadas, que es lo peor que puede mostrar de más esta pantalla.
+   *
+   * Y si la consulta falla se dice, en vez de dejar la ficha abierta y vacía
+   * para siempre: una lista vacía se lee como «no hay nadie», que es otra
+   * cosa muy distinta de «no se pudo preguntar».
+   */
   async function abrirEquipo(negocioId: string) {
     setAbierto(negocioId);
-    setMiembros(await equipoDelHotel(negocioId));
+    setMiembros([]);
+    setFallo(null);
+    try {
+      setMiembros(await equipoDelHotel(negocioId));
+    } catch {
+      setAbierto(null);
+      setFallo(copy.noSePudoLeer);
+    }
   }
 
   return (
@@ -221,7 +324,9 @@ export function HotelesPage() {
           onChange={(e) => setCodigo(e.target.value)}
         />
         <p className="m-0 font-mono text-[12px] break-all text-muted-soft">
-          {dominio}/{codigo.trim().toLowerCase() || copy.codigoPlaceholder}
+          {DOMINIO_NUEVO.huesped}/{codigo.trim().toLowerCase() || copy.codigoPlaceholder}
+          <br />
+          {DOMINIO_NUEVO.personal}
         </p>
         <Input
           label={copy.marcaExperienciaLabel}
@@ -271,31 +376,26 @@ export function HotelesPage() {
         {hoteles === null && !fallo ? (
           <p className="m-0 text-[14px] text-muted">{copy.cargando}</p>
         ) : null}
-        <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2">
+        <ul className="m-0 grid list-none items-start gap-3 p-0 sm:grid-cols-2">
           {(hoteles ?? []).map((h) => (
             <Ficha
               key={h.negocioId}
               hotel={h}
               copy={copy}
-              dominio={dominio}
+              abierto={abierto === h.negocioId}
+              miembros={abierto === h.negocioId ? miembros : []}
               onOrigen={(o) => void cambiarOrigen(h.negocioId, o).then(cargar)}
               onEquipo={() => void abrirEquipo(h.negocioId)}
+              onCerrarEquipo={() => setAbierto(null)}
+              onCambiarMiembro={(usuarioId, asignado) =>
+                void asignarAlHotel(h.negocioId, usuarioId, asignado)
+                  .then(() => equipoDelHotel(h.negocioId))
+                  .then(setMiembros)
+                  .then(cargar)
+              }
             />
           ))}
         </ul>
-        {abierto ? (
-          <Equipo
-            copy={copy}
-            miembros={miembros}
-            onCambiar={(usuarioId, asignado) =>
-              void asignarAlHotel(abierto, usuarioId, asignado)
-                .then(() => equipoDelHotel(abierto))
-                .then(setMiembros)
-                .then(cargar)
-            }
-            onCerrar={() => setAbierto(null)}
-          />
-        ) : null}
       </div>
     </section>
   );

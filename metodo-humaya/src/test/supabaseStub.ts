@@ -39,6 +39,19 @@ export const supabaseStub = {
   consultas: [] as { tabla: string; filtros: string[] }[],
   /** Cuántas veces se firmó la salida. */
   salidas: 0,
+  /**
+   * Qué contesta cada función de la base, por nombre. El valor puede ser el
+   * dato tal cual, o una función de los argumentos para las que dependen de
+   * lo que se les pide (`humaya_equipo_del_hotel`, por ejemplo).
+   *
+   * Un nombre que no esté acá contesta error, igual que PostgREST con una
+   * función que no existe. Eso importa: `soyPlataforma()` falla cerrado, y
+   * una prueba que no siembre la respuesta tiene que ver «no es de
+   * plataforma», no un `true` de regalo.
+   */
+  rpcs: {} as Record<string, unknown>,
+  /** Para afirmar sobre qué funciones se llamaron y con qué. */
+  llamadas: [] as { nombre: string; args: Record<string, unknown> }[],
 };
 
 export const USUARIO_RECEPCION: FilaUsuario = {
@@ -54,6 +67,8 @@ export function resetSupabaseStub(): void {
   supabaseStub.errorAlEntrar = null;
   supabaseStub.consultas = [];
   supabaseStub.salidas = 0;
+  supabaseStub.rpcs = {};
+  supabaseStub.llamadas = [];
 }
 
 /** Deja una sesión abierta con rol de recepción. Lo normal en los tests. */
@@ -282,5 +297,21 @@ export function clienteFalso() {
       },
     },
     from: (tabla: string) => new Consulta(tabla, supabaseStub.tablas[tabla] ?? []),
+
+    /**
+     * Las funciones de la base. Lo que no esté sembrado contesta error, como
+     * PostgREST con una función que no existe: así una prueba que se olvidó
+     * de sembrar algo lo ve, en vez de recibir `null` y seguir como si nada.
+     */
+    rpc: async (nombre: string, args: Record<string, unknown> = {}) => {
+      supabaseStub.llamadas.push({ nombre, args });
+      const respuesta = supabaseStub.rpcs[nombre];
+      if (respuesta === undefined) {
+        return { data: null, error: { message: `rpc_no_sembrada: ${nombre}`, code: 'PGRST202' } };
+      }
+      const data =
+        typeof respuesta === 'function' ? (respuesta as (a: Fila) => unknown)(args) : respuesta;
+      return { data, error: null };
+    },
   };
 }

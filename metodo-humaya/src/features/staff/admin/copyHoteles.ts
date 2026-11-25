@@ -35,7 +35,16 @@ export interface HotelesTextos {
   noSePudoLeer: string;
   etiquetaDemo: string;
   cuantos: (usuarios: number, reservas: number) => string;
+
+  /** Las DOS direcciones del hotel. Antes solo se mostraba la del huésped. */
+  dondeEntraElHuesped: string;
+  dondeEntraRecepcion: string;
+  sinDireccion: string;
+  copiar: string;
+  copiada: string;
+
   verEquipo: string;
+  cerrarEquipo: string;
   equipoTitulo: string;
   equipoCuerpo: string;
   entra: string;
@@ -81,7 +90,15 @@ export const hotelesCopy: Record<Idioma, HotelesTextos> = {
     etiquetaDemo: 'Demo',
     cuantos: (usuarios, reservas) =>
       `${usuarios} ${usuarios === 1 ? 'person' : 'people'} · ${reservas} bookings`,
+
+    dondeEntraElHuesped: 'The guest enters here',
+    dondeEntraRecepcion: 'The front desk enters here',
+    sinDireccion: 'No address yet',
+    copiar: 'Copy',
+    copiada: 'Copied',
+
     verEquipo: 'Who works here',
+    cerrarEquipo: 'Hide who works here',
     equipoTitulo: 'Who works here',
     equipoCuerpo:
       'Only these accounts can open this hotel at the front desk. A platform account always can.',
@@ -126,7 +143,15 @@ export const hotelesCopy: Record<Idioma, HotelesTextos> = {
     etiquetaDemo: 'Demo',
     cuantos: (usuarios, reservas) =>
       `${usuarios} ${usuarios === 1 ? 'persona' : 'personas'} · ${reservas} reservas`,
+
+    dondeEntraElHuesped: 'Por acá entra el huésped',
+    dondeEntraRecepcion: 'Por acá entra recepción',
+    sinDireccion: 'Todavía sin dirección',
+    copiar: 'Copiar',
+    copiada: 'Copiada',
+
     verEquipo: 'Quién trabaja acá',
+    cerrarEquipo: 'Ocultar quién trabaja acá',
     equipoTitulo: 'Quién trabaja acá',
     equipoCuerpo:
       'Solo estas cuentas pueden abrir este hotel en recepción. Una cuenta de plataforma siempre puede.',

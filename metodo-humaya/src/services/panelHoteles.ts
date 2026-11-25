@@ -35,6 +35,20 @@ export interface HotelDelPanel {
   activo: boolean;
   usuarios: number;
   reservas: number;
+  /**
+   * Las DOS direcciones de este hotel, tal como las arma la base.
+   *
+   * ── POR QUÉ VIENEN DE LA BASE Y NO SE ARMAN ACÁ ────────────────────
+   * Porque acá estaban escritas a mano —`'https://guestexp.liderax10.com'`
+   * para todos— y eso ya se había equivocado: HUMAYA aparecía en el panel
+   * como `guestexp.liderax10.com/humaya` cuando su dirección de verdad es
+   * `experience.stayhumaya.com`. Un hotel con dominio propio no vive en el
+   * dominio compartido, y solo la tabla `humaya_dominios` sabe cuál es cuál.
+   *
+   * Null cuando la base todavía no tiene un dominio para ese lado.
+   */
+  urlHuesped: string | null;
+  urlPersonal: string | null;
 }
 
 export interface MiembroDelEquipo {
@@ -111,6 +125,8 @@ export async function todosLosHoteles(): Promise<HotelDelPanel[]> {
     activo: f.activo !== false,
     usuarios: Number(f.usuarios ?? 0),
     reservas: Number(f.reservas ?? 0),
+    urlHuesped: (f.url_huesped as string | null) ?? null,
+    urlPersonal: (f.url_personal as string | null) ?? null,
   }));
 }
 
@@ -173,12 +189,11 @@ export async function asignarAlHotel(
   if (error) throw new Error('no_se_pudo_asignar');
 }
 
-/**
- * La dirección del huésped de un hotel, para poder copiarla y mandarla.
- *
- * Los hoteles nuevos viven en el dominio compartido, como pidió Tony: «debe
- * ser en lidera los hoteles nuevos».
+/*
+ * Acá vivía `puertaDelHuesped(codigo, dominio)`, que pegaba el código al
+ * dominio compartido. Se quitó el 24 de noviembre de 2026: nadie la llamaba,
+ * y era una TERCERA copia de la regla de las direcciones — la misma que, en
+ * el panel, mostraba HUMAYA como `guestexp.liderax10.com/humaya` cuando su
+ * dirección es `experience.stayhumaya.com`. Ahora las dos direcciones las da
+ * la base, en `humaya_direcciones_del_hotel`, y hay una sola copia.
  */
-export function puertaDelHuesped(codigo: string, dominio: string): string {
-  return `${dominio}/${codigo}`;
-}
