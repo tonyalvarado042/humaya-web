@@ -38,6 +38,8 @@ const HOTELES = [
     // Dominio propio: NO vive en el compartido.
     url_huesped: 'https://experience.stayhumaya.com',
     url_personal: 'https://staff.stayhumaya.com/staff',
+    // Dominio propio: la portada NO lleva `?hotel=`, no hay nada que elegir.
+    url_portada: 'https://staff.stayhumaya.com/staff/inicio',
   },
   {
     negocio_id: 'n-bikeandbed',
@@ -53,6 +55,7 @@ const HOTELES = [
     reservas: 0,
     url_huesped: 'https://guestexp.liderax10.com/bikeandbed',
     url_personal: 'https://hotelexp.liderax10.com/staff',
+    url_portada: 'https://hotelexp.liderax10.com/staff/inicio?hotel=bikeandbed',
   },
 ];
 
@@ -100,6 +103,32 @@ describe('las direcciones de cada hotel', () => {
     expect(bike.getByText('Por acá entra recepción')).toBeInTheDocument();
     expect(
       bike.getByRole('link', { name: 'https://hotelexp.liderax10.com/staff' }),
+    ).toBeInTheDocument();
+  });
+
+  /**
+   * La tercera direccion, la que Tony no encontraba.
+   *
+   * «No veo la direccion de landing de Bike & Bed. No es ninguna de estas»,
+   * dijo el 24 de noviembre de 2026 sobre la tabla de dos columnas. Tenia
+   * razon: la portada vive en `/staff/inicio` y en el dominio compartido le
+   * hace falta `?hotel=<codigo>` para decir de que hotel es.
+   */
+  it('muestra la direccion de la landing, y en el dominio compartido con su hotel', async () => {
+    renderWithProviders(<HotelesPage />, { recepcion: 'es' });
+    await screen.findByRole('heading', { name: 'Bike & Bed by Humaya', level: 3 });
+
+    const bike = ficha('Bike & Bed by Humaya');
+    expect(bike.getByText('La landing del hotel (todos sus enlaces)')).toBeInTheDocument();
+    expect(
+      bike.getByRole('link', {
+        name: 'https://hotelexp.liderax10.com/staff/inicio?hotel=bikeandbed',
+      }),
+    ).toBeInTheDocument();
+
+    // Y con dominio propio, sin parametro: ahi lo dice el dominio.
+    expect(
+      ficha('HUMAYA').getByRole('link', { name: 'https://staff.stayhumaya.com/staff/inicio' }),
     ).toBeInTheDocument();
   });
 

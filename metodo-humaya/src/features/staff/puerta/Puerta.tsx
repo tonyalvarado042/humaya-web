@@ -6,6 +6,7 @@ import { aplicarHotel, negocioActual } from '@/marca';
 import type { Hotel } from '@/services/hotel';
 import {
   cualAbrir,
+  hotelDeLaDireccion,
   misHoteles,
   olvidarHotel,
   recordarHotel,
@@ -308,7 +309,11 @@ export function Puerta({ children }: { children: ReactNode }) {
       setEstado({ fase: 'sinHotel', persona });
       return;
     }
-    const elegido = cualAbrir(hoteles, hotelRecordado());
+    // La dirección manda sobre lo recordado: quien abre
+    // `/staff/inicio?hotel=bikeandbed` quiere ESE hotel, no el de la vez
+    // pasada. Un código que esta cuenta no puede ver no abre nada: `cualAbrir`
+    // busca dentro de la lista que dio la base.
+    const elegido = cualAbrir(hoteles, hotelDeLaDireccion() ?? hotelRecordado());
     if (!elegido) {
       setEstado({ fase: 'elegirHotel', persona, hoteles });
       return;

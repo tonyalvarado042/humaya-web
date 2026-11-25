@@ -83,6 +83,8 @@ beforeEach(() => {
   salir.mockReset();
   // El punto de partida es el del dominio compartido: sin hotel.
   aplicarHotel(null);
+  // Y sin `?hotel=` en la direccion: cada prueba pone el suyo.
+  window.history.replaceState({}, '', '/staff/inicio');
 });
 
 afterEach(() => {
@@ -183,5 +185,65 @@ describe('en el dominio propio de un hotel', () => {
 
     expect(await screen.findByText('Recepción abierta')).toBeInTheDocument();
     expect(misHoteles).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * La direccion de la portada de UN hotel.
+ *
+ * ── DE DONDE SALE ───────────────────────────────────────────────────────
+ * Tony, 24 de noviembre de 2026, leyendo la tabla de direcciones que le
+ * mande: «no veo la direccion de landing de Bike & Bed. No es ninguna de
+ * estas».
+ *
+ * No existia. En el dominio compartido `hotelexp.liderax10.com/staff/inicio`
+ * es la misma direccion para los tres hoteles, asi que con una cuenta de
+ * plataforma abria el que quedo recordado la vez pasada. Un enlace que lleva
+ * a un hotel distinto segun quien lo toque no es una direccion.
+ */
+describe('cuando la direccion dice de que hotel es la portada', () => {
+  it('abre ESE hotel sin preguntar, aunque la cuenta vea varios', async () => {
+    misHoteles.mockResolvedValue([DEMO, HUMAYA]);
+    window.history.replaceState({}, '', '/staff/inicio?hotel=humaya');
+
+    montar();
+
+    expect(await screen.findByText('Recepción abierta')).toBeInTheDocument();
+    expect(negocioActual()).toBe('n-humaya');
+    // Sin esto salia el selector, y el enlace no abria nada en concreto.
+    expect(screen.queryByText('Which hotel?')).not.toBeInTheDocument();
+  });
+
+  it('le gana a lo recordado: el enlace dice a donde se quiere ir', async () => {
+    misHoteles.mockResolvedValue([DEMO, HUMAYA]);
+    localStorage.setItem(LLAVE_HOTEL, 'humaya');
+    window.history.replaceState({}, '', '/staff/inicio?hotel=demo');
+
+    montar();
+
+    expect(await screen.findByText('Recepción abierta')).toBeInTheDocument();
+    expect(negocioActual()).toBe('n-demo');
+  });
+
+  it('no sirve para entrar a un hotel que la cuenta no puede ver', async () => {
+    // EL PUNTO: esto no elige el hotel, elige entre los que dio la base.
+    // La lista no trae `bikeandbed`, asi que el parametro no abre nada.
+    misHoteles.mockResolvedValue([DEMO, HUMAYA]);
+    window.history.replaceState({}, '', '/staff/inicio?hotel=bikeandbed');
+
+    montar();
+
+    expect(await screen.findByText('Which hotel?')).toBeInTheDocument();
+    expect(negocioActual()).toBeNull();
+  });
+
+  it('escrito con mayusculas abre igual', async () => {
+    misHoteles.mockResolvedValue([DEMO, HUMAYA]);
+    window.history.replaceState({}, '', '/staff/inicio?hotel=HUMAYA');
+
+    montar();
+
+    expect(await screen.findByText('Recepción abierta')).toBeInTheDocument();
+    expect(negocioActual()).toBe('n-humaya');
   });
 });

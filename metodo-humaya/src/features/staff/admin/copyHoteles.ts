@@ -37,6 +37,7 @@ export interface HotelesTextos {
   cuantos: (usuarios: number, reservas: number) => string;
 
   /** Las DOS direcciones del hotel. Antes solo se mostraba la del huésped. */
+  laPortadaDelHotel: string;
   dondeEntraElHuesped: string;
   dondeEntraRecepcion: string;
   sinDireccion: string;
@@ -91,6 +92,7 @@ export const hotelesCopy: Record<Idioma, HotelesTextos> = {
     cuantos: (usuarios, reservas) =>
       `${usuarios} ${usuarios === 1 ? 'person' : 'people'} · ${reservas} bookings`,
 
+    laPortadaDelHotel: 'The hotel landing page (all its links)',
     dondeEntraElHuesped: 'The guest enters here',
     dondeEntraRecepcion: 'The front desk enters here',
     sinDireccion: 'No address yet',
@@ -144,6 +146,7 @@ export const hotelesCopy: Record<Idioma, HotelesTextos> = {
     cuantos: (usuarios, reservas) =>
       `${usuarios} ${usuarios === 1 ? 'persona' : 'personas'} · ${reservas} reservas`,
 
+    laPortadaDelHotel: 'La landing del hotel (todos sus enlaces)',
     dondeEntraElHuesped: 'Por acá entra el huésped',
     dondeEntraRecepcion: 'Por acá entra recepción',
     sinDireccion: 'Todavía sin dirección',

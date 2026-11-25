@@ -49,6 +49,18 @@ export interface HotelDelPanel {
    */
   urlHuesped: string | null;
   urlPersonal: string | null;
+  /**
+   * La portada interna de este hotel: la landing con todos sus enlaces.
+   *
+   * ── POR QUÉ NO SE ARMA PEGÁNDOLE `/inicio` A `urlPersonal` ──────────
+   * Porque en el dominio compartido no alcanza. `hotelexp.liderax10.com/
+   * staff/inicio` es la misma dirección para los tres hoteles —de ese lado
+   * el hotel lo dice la cuenta—, así que le hace falta `?hotel=<codigo>`
+   * para decir cuál se quiere abrir. En un hotel con dominio propio no lleva
+   * parámetro, porque ahí no hay nada que elegir. Esa diferencia la sabe la
+   * tabla `humaya_dominios`, no esta pantalla.
+   */
+  urlPortada: string | null;
 }
 
 export interface MiembroDelEquipo {
@@ -127,6 +139,7 @@ export async function todosLosHoteles(): Promise<HotelDelPanel[]> {
     reservas: Number(f.reservas ?? 0),
     urlHuesped: (f.url_huesped as string | null) ?? null,
     urlPersonal: (f.url_personal as string | null) ?? null,
+    urlPortada: (f.url_portada as string | null) ?? null,
   }));
 }
 

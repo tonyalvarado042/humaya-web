@@ -34,7 +34,15 @@ import { hotelesCopy, type HotelesTextos } from './copyHoteles';
 const ORIGENES: OrigenReservas[] = ['cloudbeds', 'airbnb_ical', 'ninguno'];
 
 /**
- * Una de las dos direcciones del hotel, con su botón de copiar.
+ * Una de las TRES direcciones del hotel, con su botón de copiar.
+ *
+ * ── LA TERCERA, LA LANDING ──────────────────────────────────────────────
+ * Tony, horas después del arreglo de abajo: «no veo la dirección de landing
+ * de Bike & Bed. No es ninguna de estas». Tenía razón otra vez: esta
+ * pantalla mostraba por dónde entra el huésped y por dónde entra recepción,
+ * pero no la portada interna —la landing que él pidió—, que vive en
+ * `/staff/inicio`. Y para un hotel del dominio compartido esa dirección ni
+ * existía: hacía falta `?hotel=<codigo>` para decir de cuál es.
  *
  * ── POR QUÉ SE MUESTRAN LAS DOS ─────────────────────────────────────────
  * Tony, 24 de noviembre de 2026: «no sale ambos enlaces de huésped y de
@@ -124,6 +132,10 @@ function Ficha({
         ) : null}
       </div>
 
+      {/* La portada va PRIMERA: es la que uno manda cuando le dice a un
+          hotel «entrá acá y de ahí sale todo», y es la que Tony no encontraba
+          en esta pantalla. Las otras dos salen de ella. */}
+      <Direccion etiqueta={copy.laPortadaDelHotel} url={hotel.urlPortada} copy={copy} />
       <Direccion etiqueta={copy.dondeEntraElHuesped} url={hotel.urlHuesped} copy={copy} />
       <Direccion etiqueta={copy.dondeEntraRecepcion} url={hotel.urlPersonal} copy={copy} />
 
