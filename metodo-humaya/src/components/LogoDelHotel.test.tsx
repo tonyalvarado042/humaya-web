@@ -86,6 +86,40 @@ describe('un hotel sin logo propio', () => {
   });
 });
 
+describe('la medida la pide la pantalla, no el logo', () => {
+  /**
+   * ── EL FALLO QUE ESTO AGARRA ──────────────────────────────────────────
+   * Tony, 25 de noviembre de 2026, con una foto de `staff.stayhumaya.com` en
+   * el teléfono: el monograma de HUMAYA ocupaba toda la pantalla y empujaba
+   * las reservas fuera de la vista.
+   *
+   * La barra de recepción pide `h-8`, pero el `<img>` traía además `h-auto`
+   * suyo. `cn()` no resuelve conflictos —solo pega las clases— así que cuál
+   * gana lo decide el orden del CSS compilado, y ganaba `h-auto`: el PNG se
+   * pintaba a su tamaño natural, 642×792, en un teléfono de 390 de ancho.
+   *
+   * Por eso la prueba NO mira que esté `h-8`: mira que no haya DOS alturas.
+   * Un `getComputedStyle` acá no sirve —jsdom no carga Tailwind— y afirmar
+   * «tiene h-8» pasaba también con el fallo puesto.
+   */
+  const medidas = (el: HTMLElement, eje: 'h' | 'w') =>
+    el.className.split(/\s+/).filter((clase) => new RegExp(`^${eje}-`).test(clase));
+
+  it('no le suma al logo una altura propia que le gane a la pedida', () => {
+    enHotel('HUMAYA', { logoMarca: '/mark-gold.png' });
+    render(<LogoDelHotel variant="mark" className="h-8 w-auto shrink-0" />);
+
+    expect(medidas(screen.getByRole('img'), 'h')).toEqual(['h-8']);
+  });
+
+  it('tampoco un ancho propio', () => {
+    enHotel('HUMAYA', { logo: '/wordmark-white.png' });
+    render(<LogoDelHotel className="w-30" />);
+
+    expect(medidas(screen.getByRole('img'), 'w')).toEqual(['w-30']);
+  });
+});
+
 describe('lo que viene de la base no entra sin mirarlo', () => {
   /**
    * `tema` lo escribe un administrador y es `jsonb`: puede traer cualquier

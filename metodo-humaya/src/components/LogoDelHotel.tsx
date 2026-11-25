@@ -28,6 +28,26 @@ interface LogoDelHotelProps {
  * El logo propio se carga en `humaya_hoteles.tema` (`logo`, `logoMarca`), que
  * es donde ya viven los colores y las letras. Subirlo desde Admin todavía no
  * existe: hoy se pone la ruta a mano.
+ *
+ * ── POR QUÉ LA IMAGEN NO TRAE SU PROPIA ALTURA ────────────────────
+ * Porque traía `h-auto` y eso le ganaba a la altura que pide la pantalla.
+ *
+ * Tony, 25 de noviembre de 2026, con una foto de `staff.stayhumaya.com` en el
+ * teléfono: el monograma de HUMAYA ocupaba la pantalla entera y empujaba las
+ * reservas fuera de la vista. La barra de recepción pide
+ * `variant="mark" className="h-8 w-auto"`, y el `<img>` salía con `h-auto` y
+ * `h-8` a la vez: `cn()` solo pega las clases una detrás de otra —no resuelve
+ * conflictos como `tailwind-merge`— así que la que gana la decide el orden de
+ * la hoja de estilos, y en el CSS compilado gana `h-auto`. Medido en vivo:
+ * `/mark-gold.png` (642×792) se pintaba a 642×792 en un teléfono de 390.
+ *
+ * `height: auto` ya es el valor por defecto de CSS, así que la clase no
+ * aportaba nada: lo único que hacía era pisar lo que pidiera quien lo usa.
+ * Sin ella, la misma barra mide 26×32. Los demás usos piden ancho (`w-30`,
+ * `w-52`…) y no cambian.
+ *
+ * Falló callado porque los otros dos hoteles no tienen logo en imagen: sólo
+ * HUMAYA, y sólo por debajo de 1024 px, que es donde vive esa barra.
  */
 export function LogoDelHotel({
   variant = 'wordmark',
@@ -42,7 +62,7 @@ export function LogoDelHotel({
       <img
         src={propio.trim()}
         alt={decorative ? '' : MARCA.hotel}
-        className={cn('block h-auto object-contain', className)}
+        className={cn('block object-contain', className)}
       />
     );
   }
