@@ -76,7 +76,6 @@ async function arrancar() {
   const router = crearRouter({
     lado: donde.lado,
     base: donde.base,
-    compartido: donde.compartido,
   });
 
   raiz.render(

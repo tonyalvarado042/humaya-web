@@ -41,21 +41,12 @@ interface CreateRoutesOptions {
    * experience.* el huésped, en staff.* el personal, y en local los dos.
    */
   lado?: Lado;
-  /**
-   * ¿El dominio desde el que se sale lo comparten varios hoteles?
-   *
-   * Decide si la mudanza a la app del huésped le pone el código del hotel
-   * a la ruta. En `hotelexp.liderax10.com` sí; en el dominio propio de un
-   * hotel, no.
-   */
-  compartido?: boolean;
 }
 
 /** Construye las rutas y permite verificar por separado el árbol de producción. */
 export function createRoutes({
   includeDevUi = import.meta.env.DEV,
   lado = ladoDe(window.location.hostname),
-  compartido = false,
 }: CreateRoutesOptions = {}): RouteObject[] {
   /**
    * Recepción no se sirve desde el dominio del huésped. Hasta hoy sí:
@@ -160,7 +151,7 @@ export function createRoutes({
     lado === 'personal' && MARCA.dominiosSeparados
       ? {
           path: '/app/*',
-          element: <MudanzaAlHuesped compartido={compartido} />,
+          element: <MudanzaAlHuesped />,
         }
       : {
           path: '/app',
