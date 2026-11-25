@@ -12,13 +12,24 @@ import { StaffNav } from './StaffNav';
 /**
  * El título que muestra la barra superior en los anchos angostos. Sale de la
  * misma lista que el menú, así no hay dos lugares donde traducir lo mismo.
+ *
+ * ── POR QUÉ EL RESPALDO ES `/staff` Y NO EL PRIMERO DE LA LISTA ───────
+ * Porque `/staff` se saca del `find` a propósito —si no, calzaría con todo—,
+ * así que es justamente el caso que cae al respaldo. Con `destinos[0]` el
+ * respaldo era «Home», que es OTRA pantalla: en la de reservas, la barra del
+ * teléfono decía «Home» mientras el título decía «Bookings». Comprobado
+ * entrando, el 25 de noviembre de 2026.
+ *
+ * Una barra que dice dónde estoy y se equivoca es peor que una barra sin
+ * texto: en el teléfono es lo único que lo dice, porque el menú está cerrado.
  */
 function currentLabel(pathname: string, idioma: Idioma): string {
   const destinos = STAFF_NAV[idioma];
   const calza = destinos.find(
     (destino) => destino.to !== '/staff' && pathname.startsWith(destino.to),
   );
-  return calza?.label ?? destinos[0].label;
+  const reservas = destinos.find((destino) => destino.to === '/staff');
+  return calza?.label ?? reservas?.label ?? destinos[0].label;
 }
 
 /**
@@ -57,7 +68,15 @@ export function StaffLayout() {
             >
               <Menu size={20} strokeWidth={1.8} aria-hidden="true" />
             </button>
-            <LogoDelHotel variant="mark" className="h-8 w-auto shrink-0" />
+            {/* La caja de 32 px la pone el envoltorio y no el logo, para que
+                el monograma quede centrado sea una imagen o sea una letra.
+                Con `h-8` en el logo, la letra se pintaba pegada arriba
+                —`leading-none`— y le quedaba 8 px más alta que el título de al
+                lado. Medido el 25 de noviembre de 2026. Se ve en los hoteles
+                SIN logo propio, que son los dos que compraron la app. */}
+            <span className="flex h-8 shrink-0 items-center">
+              <LogoDelHotel variant="mark" className="max-h-8 w-auto" />
+            </span>
             <div className="flex min-w-0 flex-col">
               <span className="truncate text-[13px] text-muted">
                 {currentLabel(pathname, idioma)}

@@ -147,4 +147,24 @@ describe('barra superior', () => {
     const header = await screen.findByRole('banner');
     expect(within(header).getByText('Schedule')).toBeInTheDocument();
   });
+
+  /**
+   * ── EL FALLO QUE ESTO AGARRA ────────────────────────────────
+   * En `/staff` la barra decía «Home» mientras el título de la pantalla
+   * decía «Bookings». Comprobado entrando, el 25 de noviembre de 2026.
+   *
+   * `/staff` se saca del `find` a propósito —si no, calzaría con todo—, así
+   * que es el único caso que cae al respaldo, y el respaldo era el PRIMERO de
+   * la lista. El test de arriba no lo veía: `/staff/spa` sí calza.
+   *
+   * En el teléfono esa barra es lo único que dice dónde estoy, porque el menú
+   * está cerrado.
+   */
+  it('en la pantalla de reservas dice «Bookings», no el primero del menú', async () => {
+    renderRoutes(routes, { route: '/staff' });
+
+    const header = await screen.findByRole('banner');
+    expect(within(header).getByText('Bookings')).toBeInTheDocument();
+    expect(within(header).queryByText('Home')).not.toBeInTheDocument();
+  });
 });
