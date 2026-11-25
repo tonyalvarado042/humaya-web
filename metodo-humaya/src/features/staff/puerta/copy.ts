@@ -14,6 +14,33 @@
 import { MARCA } from '@/marca';
 import type { Idioma } from '@/hooks/useIdiomaElegido';
 
+/**
+ * El ejemplo que va dentro del campo de correo, con el dominio DEL HOTEL.
+ *
+ * ── POR QUÉ NO ESTÁ ESCRITO A MANO ────────────────────────────
+ * Porque lo estaba: decía `you@stayhumaya.com` SIEMPRE. Visto el 25 de
+ * noviembre de 2026 abriendo `hotelexp.liderax10.com/bikeandbed/staff`, la
+ * puerta de Bike & Bed le proponía a su recepción el correo de otra empresa.
+ * Es el mismo fallo del logo y del título de la pestaña: un texto de HUMAYA
+ * que se cuela en la pantalla de un hotel que compró la app.
+ *
+ * ── POR QUÉ VACÍO Y NO UNO INVENTADO ──────────────────────────
+ * Sin dominio no hay ejemplo que dar, y un `you@example.com` sería enseñarle
+ * una dirección falsa a quien va a escribir la suya. El campo ya dice
+ * «Correo» y es `type="email"`: sin ejemplo se entiende igual.
+ *
+ * Hoy esa rama no se usa: `MARCA.correo` nunca queda vacío porque un hotel
+ * sin correo propio cae al de respaldo (`marca.ts`). Eso es un problema
+ * aparte —y de fondo—: el respaldo es el de HUMAYA, así que un hotel sin
+ * correo cargado mostraría el de otra empresa, acá y en `/entrada`. Los tres
+ * hoteles de hoy tienen el suyo, así que no se ve en vivo. Esto no lo tapa:
+ * lo deja listo para cuando se arregle donde corresponde.
+ */
+function ejemploDeCorreo(usuario: string): string {
+  const dominio = MARCA.correo.split('@')[1]?.trim();
+  return dominio ? `${usuario}@${dominio}` : '';
+}
+
 export interface PuertaTextos {
   eyebrow: string;
   area: string;
@@ -67,7 +94,9 @@ export const puertaCopy: Record<Idioma, PuertaTextos> = {
     title: 'Sign in',
     description: 'Use your CRM account — the same email and password.',
     correoLabel: 'Email',
-    correoPlaceholder: 'you@stayhumaya.com',
+    get correoPlaceholder() {
+      return ejemploDeCorreo('you');
+    },
     claveLabel: 'Password',
     clavePlaceholder: 'Your password',
     submit: 'Sign in',
@@ -104,7 +133,9 @@ export const puertaCopy: Record<Idioma, PuertaTextos> = {
     title: 'Entrá',
     description: 'Con tu cuenta del CRM — el mismo correo y la misma clave.',
     correoLabel: 'Correo',
-    correoPlaceholder: 'vos@stayhumaya.com',
+    get correoPlaceholder() {
+      return ejemploDeCorreo('vos');
+    },
     claveLabel: 'Clave',
     clavePlaceholder: 'Tu clave',
     submit: 'Entrar',
