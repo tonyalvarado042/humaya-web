@@ -144,6 +144,15 @@ async function avisarALosTextos(experiencia: string): Promise<void> {
  * Null mientras no se haya resuelto. Quien escriba una fila tiene que
  * mandarlo: las tablas dejaron de tener HUMAYA como valor por defecto justo
  * para que una fila sin hotel se note en vez de caer callada en Humaya.
+ *
+ * ⚠️ **Corregido el 24 de noviembre de 2026.** Esa frase estaba acá desde el
+ * 20 y era FALSA. Medido ese día: ONCE tablas `humaya_*` seguían con
+ * `negocio_id default '4cb80ad6…'::uuid` —el uuid de HUMAYA escrito en el
+ * esquema—, así que toda fila insertada sin decir de qué hotel era caía
+ * dentro de HUMAYA sin un solo error. Ahora la frase sí es verdad: los once
+ * valores por defecto se quitaron, y una fila sin hotel rebota, comprobado
+ * metiendo el error a propósito. Ver
+ * `supabase/migraciones-aplicadas/2026-11-24-hotel-nuevo-nace-completo.sql`.
  */
 export function negocioActual(): string | null {
   return negocio;
