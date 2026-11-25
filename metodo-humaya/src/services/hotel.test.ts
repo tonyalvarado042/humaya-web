@@ -258,6 +258,10 @@ describe('el dominio compartido de recepción', () => {
     });
 
     expect(M.hotel).toBe('Bike & Bed');
+    // Y la pestaña también: `index.html` dice «Humaya» fijo, así que sin
+    // esto la landing de Bike & Bed se guardaba en favoritos con el nombre
+    // de otro hotel.
+    expect(document.title).toBe('Bike & Bed');
     // EL PUNTO: sigue sin saber de quién son los datos.
     expect(negocioActual()).toBeNull();
   });

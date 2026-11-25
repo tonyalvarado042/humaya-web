@@ -123,10 +123,33 @@ export function aplicarHotel(hotel: Hotel | null): void {
     portada = { titulo: null, bajada: null };
     tema = null;
     aplicarTema(null);
+    ponerTitulo(PORDEFECTO.hotel);
     void avisarALosTextos(PORDEFECTO.experiencia);
     return;
   }
   ponerHotel(hotel, true);
+}
+
+/**
+ * El nombre del hotel en la pestaña del navegador.
+ *
+ * ── POR QUÉ HACE FALTA ──────────────────────────────────────────────────
+ * `index.html` trae `<title>Humaya</title>` fijo y nadie lo cambiaba, así
+ * que la pestaña de CUALQUIER hotel decía «Humaya» — en los dos dominios.
+ * Visto el 24 de noviembre de 2026 en la puerta de Bike & Bed, junto con el
+ * logotipo, que se arregló en el mismo rato.
+ *
+ * Importa más de lo que parece: el título es el nombre con el que queda
+ * guardada la dirección cuando alguien la pone en favoritos o la manda. La
+ * landing de Bike & Bed se guardaba llamándose «Humaya».
+ */
+function ponerTitulo(nombre: string): void {
+  try {
+    document.title = nombre;
+  } catch {
+    // Sin documento no hay pestaña que nombrar, y no es motivo para tumbar
+    // el arranque de la app.
+  }
 }
 
 /**
@@ -144,6 +167,7 @@ function ponerHotel(hotel: Hotel, conNegocio: boolean): void {
     correo: hotel.correo || PORDEFECTO.correo,
   };
   if (conNegocio) negocio = hotel.negocioId;
+  ponerTitulo(actual.hotel);
   codigo = hotel.codigo;
   esDemo = hotel.esDemo;
   portada = { titulo: hotel.portadaTitulo, bajada: hotel.portadaBajada };
