@@ -142,6 +142,88 @@ describe('el dominio compartido del producto', () => {
   });
 });
 
+/**
+ * El codigo del hotel en la ruta de RECEPCION.
+ *
+ * Tony, 24 de noviembre de 2026: «para mi esta mal. No deberia ser esta:
+ * hotelexp.liderax10.com/bikeandbed para staff». Hasta ese momento, de este
+ * lado el hotel lo decia solo la cuenta y ninguna pantalla de recepcion tenia
+ * direccion propia.
+ */
+describe('el dominio compartido de recepción', () => {
+  const COMPARTIDO_PERSONAL = {
+    dominio: 'hotelexp.liderax10.com',
+    lado: 'personal',
+    compartido: true,
+    negocio_id: null,
+    codigo: null,
+    marca_experiencia: null,
+    marca_hotel: null,
+    correo: null,
+    esDemo: false,
+    portadaTitulo: null,
+    portadaBajada: null,
+  };
+
+  const BIKE = {
+    negocio_id: 'otro-id',
+    codigo: 'bikeandbed',
+    marca_experiencia: 'Bike & Bed Experience',
+    marca_hotel: 'Bike & Bed',
+    correo: 'hola@bikeandbed.test',
+    esDemo: false,
+    portadaTitulo: null,
+    portadaBajada: null,
+  };
+
+  it('le pone el código de prefijo a las rutas', async () => {
+    stubBase([COMPARTIDO_PERSONAL], [BIKE]);
+    const donde = await resolverHotel('hotelexp.liderax10.com', '/bikeandbed/staff');
+
+    expect(donde.base).toBe('/bikeandbed');
+    expect(donde.lado).toBe('personal');
+  });
+
+  /**
+   * ESTA ES LA PRUEBA QUE IMPORTA.
+   *
+   * El codigo en la ruta da el prefijo, NO el hotel. Si `resolverHotel`
+   * devolviera el hotel acá, la Puerta se lo creería sin preguntarle a la
+   * base si esta cuenta trabaja ahí —`if (negocioActual()) return`— y
+   * cualquiera abriría el hotel de al lado escribiendo su código en la barra.
+   */
+  it('NO resuelve el hotel: eso lo decide la cuenta, no la barra de direcciones', async () => {
+    stubBase([COMPARTIDO_PERSONAL], [BIKE]);
+    const donde = await resolverHotel('hotelexp.liderax10.com', '/bikeandbed/staff');
+
+    expect(donde.hotel).toBeNull();
+  });
+
+  it('la raíz del hotel también lleva prefijo: ahí vive su landing', async () => {
+    stubBase([COMPARTIDO_PERSONAL], [BIKE]);
+    const donde = await resolverHotel('hotelexp.liderax10.com', '/bikeandbed');
+
+    expect(donde.base).toBe('/bikeandbed');
+  });
+
+  it('sin código sigue funcionando: el hotel lo dice la cuenta', async () => {
+    stubBase([COMPARTIDO_PERSONAL]);
+    const donde = await resolverHotel('hotelexp.liderax10.com', '/staff');
+
+    expect(donde.base).toBe('');
+    expect(donde.hotel).toBeNull();
+  });
+
+  it('un código que no es de nadie no se vuelve prefijo', async () => {
+    // Sin esto, `/notexiste/staff` montaria toda la recepcion bajo un
+    // prefijo inventado en vez de caer en «Esta dirección no existe».
+    stubBase([COMPARTIDO_PERSONAL], []);
+    const donde = await resolverHotel('hotelexp.liderax10.com', '/notexiste/staff');
+
+    expect(donde.base).toBe('');
+  });
+});
+
 describe('los textos siguen al hotel', () => {
   it('un texto que lee la marca NO se queda con la del hotel anterior', async () => {
     // El fallo que esto agarra: los objetos de `copy.ts` se construyen al

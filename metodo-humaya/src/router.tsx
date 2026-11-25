@@ -42,12 +42,6 @@ interface CreateRoutesOptions {
    */
   lado?: Lado;
   /**
-   * El prefijo del hotel en el dominio compartido (`/demo`), para que la
-   * mudanza a recepción no se lo lleve puesto: del lado del personal el
-   * hotel lo dice la cuenta, y `/demo/staff` ahí no existe.
-   */
-  base?: string;
-  /**
    * ¿El dominio desde el que se sale lo comparten varios hoteles?
    *
    * Decide si la mudanza a la app del huésped le pone el código del hotel
@@ -61,7 +55,6 @@ interface CreateRoutesOptions {
 export function createRoutes({
   includeDevUi = import.meta.env.DEV,
   lado = ladoDe(window.location.hostname),
-  base = '',
   compartido = false,
 }: CreateRoutesOptions = {}): RouteObject[] {
   /**
@@ -73,13 +66,19 @@ export function createRoutes({
     lado === 'huesped' && MARCA.dominiosSeparados
       ? {
           path: '/staff/*',
-          element: (
-            <Mudanza
-              base={MARCA.dominioPersonal}
-              quitar={base}
-              aviso="Taking you to the front desk…"
-            />
-          ),
+          /**
+           * El prefijo del hotel VIAJA al otro lado.
+           *
+           * Antes se quitaba, porque del lado de recepción el hotel no iba en
+           * la ruta. Desde el 24 de noviembre de 2026 sí va, de los dos
+           * lados: `guestexp.liderax10.com/bikeandbed/staff` termina en
+           * `hotelexp.liderax10.com/bikeandbed/staff`, y no en la recepción
+           * «de nadie».
+           *
+           * En el dominio propio de un hotel no hay prefijo que llevar:
+           * `base` es vacío porque la dirección no tiene código.
+           */
+          element: <Mudanza base={MARCA.dominioPersonal} aviso="Taking you to the front desk…" />,
         }
       : {
           path: '/staff',
@@ -197,7 +196,24 @@ export function createRoutes({
        */
       element:
         lado === 'personal' ? (
-          <Navigate to="/staff" replace />
+          /**
+           * La dirección pelada del hotel abre su LANDING, no el panel.
+           *
+           * Tony lo eligió así el 24 de noviembre de 2026: la dirección más
+           * corta es la que se manda —«entrá acá y de ahí sale todo»—, y el
+           * panel lo guarda recepción, que lo usa todo el día. Con el código
+           * en la ruta eso da `hotelexp.liderax10.com/bikeandbed` para la
+           * landing y `/bikeandbed/staff` para el panel; en el dominio propio
+           * de un hotel, `staff.stayhumaya.com` y `staff.stayhumaya.com/staff`.
+           *
+           * Antes esto redirigía a `/staff`. Se cambió, no se agregó: dos
+           * direcciones para la misma pantalla es lo que hay que evitar. La
+           * portada sigue además en `/staff/inicio`, que es donde vive dentro
+           * del árbol de recepción y lo que usan los enlaces de adentro.
+           */
+          <Puerta>
+            <PortadaPage />
+          </Puerta>
         ) : lado === 'huesped' ? (
           <Navigate to="/app" replace />
         ) : (
@@ -241,11 +257,22 @@ export const routes = createRoutes();
  * tocar una sola ruta: en guestexp.liderax10.com vale `/humaya` y React
  * Router le pone ese prefijo a cada enlace solo. En el dominio propio de un
  * hotel vale vacio y todo queda exactamente como estaba.
+ *
+ * Desde el 24 de noviembre de 2026 tambien vale en el dominio compartido de
+ * recepcion: `hotelexp.liderax10.com/bikeandbed/staff`. Por eso `base` vive
+ * en esta firma y NO en `CreateRoutesOptions` — las rutas no lo usan, lo usa
+ * el router. Mientras estuvo en las dos, la mudanza lo manoseaba.
  */
-export function crearRouter(opciones: CreateRoutesOptions = {}) {
+interface CrearRouterOptions extends CreateRoutesOptions {
+  /** El prefijo del hotel en el dominio compartido (`/bikeandbed`). */
+  base?: string;
+}
+
+export function crearRouter(opciones: CrearRouterOptions = {}) {
   const { base = '', ...resto } = opciones;
-  return createBrowserRouter(
-    createRoutes({ ...resto, base }),
-    base ? { basename: base } : undefined,
-  );
+  // `base` es SOLO el basename: desde el 24 de noviembre de 2026 las rutas no
+  // lo necesitan. React Router le pone el prefijo a cada enlace solo, de los
+  // dos lados — antes la mudanza a recepción tenía que quitarlo, porque de
+  // ese lado el hotel no iba en la ruta. Ahora va.
+  return createBrowserRouter(createRoutes(resto), base ? { basename: base } : undefined);
 }

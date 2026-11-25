@@ -204,7 +204,7 @@ describe('en el dominio propio de un hotel', () => {
 describe('cuando la direccion dice de que hotel es la portada', () => {
   it('abre ESE hotel sin preguntar, aunque la cuenta vea varios', async () => {
     misHoteles.mockResolvedValue([DEMO, HUMAYA]);
-    window.history.replaceState({}, '', '/staff/inicio?hotel=humaya');
+    window.history.replaceState({}, '', '/humaya/staff');
 
     montar();
 
@@ -217,7 +217,7 @@ describe('cuando la direccion dice de que hotel es la portada', () => {
   it('le gana a lo recordado: el enlace dice a donde se quiere ir', async () => {
     misHoteles.mockResolvedValue([DEMO, HUMAYA]);
     localStorage.setItem(LLAVE_HOTEL, 'humaya');
-    window.history.replaceState({}, '', '/staff/inicio?hotel=demo');
+    window.history.replaceState({}, '', '/demo/staff');
 
     montar();
 
@@ -229,12 +229,39 @@ describe('cuando la direccion dice de que hotel es la portada', () => {
     // EL PUNTO: esto no elige el hotel, elige entre los que dio la base.
     // La lista no trae `bikeandbed`, asi que el parametro no abre nada.
     misHoteles.mockResolvedValue([DEMO, HUMAYA]);
-    window.history.replaceState({}, '', '/staff/inicio?hotel=bikeandbed');
+    window.history.replaceState({}, '', '/bikeandbed/staff');
 
     montar();
 
     expect(await screen.findByText('Which hotel?')).toBeInTheDocument();
     expect(negocioActual()).toBeNull();
+  });
+
+  it('la raiz del hotel tambien lo dice: /bikeandbed, sin /staff', async () => {
+    // La landing vive en la direccion pelada del hotel, asi que el codigo
+    // tiene que resolverse ahi tambien.
+    misHoteles.mockResolvedValue([DEMO, HUMAYA]);
+    window.history.replaceState({}, '', '/demo');
+
+    montar();
+
+    expect(await screen.findByText('Recepción abierta')).toBeInTheDocument();
+    expect(negocioActual()).toBe('n-demo');
+  });
+
+  /**
+   * El parametro viejo se sigue leyendo, de segundo. Estuvo en vivo unas
+   * horas y alcance a mandarselo a Tony por chat: un enlace que ya salio no
+   * se rompe porque cambiamos de opinion.
+   */
+  it('sigue aceptando el `?hotel=` viejo, para no romper un enlace ya mandado', async () => {
+    misHoteles.mockResolvedValue([DEMO, HUMAYA]);
+    window.history.replaceState({}, '', '/staff/inicio?hotel=humaya');
+
+    montar();
+
+    expect(await screen.findByText('Recepción abierta')).toBeInTheDocument();
+    expect(negocioActual()).toBe('n-humaya');
   });
 
   it('escrito con mayusculas abre igual', async () => {

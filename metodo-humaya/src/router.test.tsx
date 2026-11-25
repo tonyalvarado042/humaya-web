@@ -218,12 +218,29 @@ describe('cada dominio abre lo suyo', () => {
     expect(screen.queryByRole('link', { name: 'Recepción' })).not.toBeInTheDocument();
   });
 
-  it('en el dominio de recepción la raíz abre recepción', async () => {
+  /**
+   * La raiz del dominio de recepcion abre la LANDING del hotel, no el panel.
+   *
+   * Lo eligio Tony el 24 de noviembre de 2026, cuando el codigo del hotel
+   * paso a ir en la ruta tambien de este lado: asi
+   * `hotelexp.liderax10.com/bikeandbed` —la direccion mas corta, la que se
+   * manda— abre su landing, y el panel queda en `/bikeandbed/staff`, que es
+   * el que recepcion se guarda.
+   *
+   * Antes esto redirigia a `/staff`.
+   */
+  it('en el dominio de recepción la raíz abre la landing del hotel, detrás de la puerta', async () => {
     const { router } = renderRoutes(createRoutes({ includeDevUi: false, lado: 'personal' }), {
       route: '/',
     });
 
-    await waitFor(() => expect(router.state.location.pathname).toBe('/staff'));
+    // La portada interna, no el panel: su pie ofrece ir a recepcion.
+    expect(await screen.findByRole('link', { name: 'Go to the front desk' })).toHaveAttribute(
+      'href',
+      '/staff',
+    );
+    // Y se queda en la raiz: ya no se va para /staff.
+    expect(router.state.location.pathname).toBe('/');
   });
 });
 

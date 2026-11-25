@@ -86,33 +86,41 @@ describe('cada dominio sirve lo suyo', () => {
  *     fijada al compilar, que es la de HUMAYA. `aplicarHotel()` pisaba el
  *     nombre y el correo del hotel, pero no los dominios — el propio
  *     router.tsx lo tenía anotado como advertencia desde el 21 de noviembre.
- *  2. LA RUTA. El prefijo del hotel (`/demo`) solo existe del lado del
- *     huésped. Del lado de recepción el hotel lo dice la cuenta, y la
- *     dirección es `/staff` pelada.
+ *  2. LA RUTA. El prefijo del hotel (`/demo`) solo existía del lado del
+ *     huésped, así que había que quitarlo al mudarse.
  *
  * Verificado en vivo antes de arreglar: salía «Esta dirección no existe».
+ *
+ * ── CORREGIDO EL MISMO DÍA, HORAS DESPUÉS ───────────────────────────────
+ * La mitad 2 dejó de ser cierta. Tony: «para mí está mal. No debería ser
+ * esta: hotelexp.liderax10.com/bikeandbed para staff». El código ahora va en
+ * la ruta de LOS DOS lados, así que el prefijo ya no se quita: viaja. Lo que
+ * NO cambió es que el hotel lo sigue decidiendo la cuenta — el prefijo es el
+ * prefijo de las rutas, no un permiso.
  */
 describe('un hotel del dominio compartido', () => {
-  it('manda recepción a SU dominio, no al de HUMAYA, y sin el prefijo', async () => {
+  it('manda recepción a SU dominio, no al de HUMAYA, y CON el prefijo del hotel', async () => {
     const { aplicarDominios } = await import('@/marca');
     aplicarDominios({ huesped: 'guestexp.liderax10.com', personal: 'hotelexp.liderax10.com' });
     enLaDireccion('/demo/staff');
 
-    renderRoutes(createRoutes({ includeDevUi: false, lado: 'huesped', base: '/demo' }), {
+    renderRoutes(createRoutes({ includeDevUi: false, lado: 'huesped' }), {
       route: '/staff',
     });
 
-    expect(reemplazar).toHaveBeenCalledWith('https://hotelexp.liderax10.com/staff');
-    // Lo que pasaba antes, las dos mitades del error:
+    expect(reemplazar).toHaveBeenCalledWith('https://hotelexp.liderax10.com/demo/staff');
+    // El dominio equivocado, que es lo que salía en vivo:
     expect(reemplazar).not.toHaveBeenCalledWith('https://staff.stayhumaya.com/demo/staff');
+    // Y la recepción «de nadie», que es a donde llevaba el arreglo anterior:
+    expect(reemplazar).not.toHaveBeenCalledWith('https://hotelexp.liderax10.com/staff');
   });
 
-  it('en el dominio propio de un hotel el prefijo no existe y nada cambia', async () => {
+  it('en el dominio propio de un hotel no hay prefijo que llevar', async () => {
     const { aplicarDominios } = await import('@/marca');
     aplicarDominios({ huesped: 'experience.stayhumaya.com', personal: 'staff.stayhumaya.com' });
     enLaDireccion('/staff');
 
-    renderRoutes(createRoutes({ includeDevUi: false, lado: 'huesped', base: '' }), {
+    renderRoutes(createRoutes({ includeDevUi: false, lado: 'huesped' }), {
       route: '/staff',
     });
 

@@ -192,14 +192,26 @@ describe('cada dominio sirve su lado', () => {
     expect(reemplazar).toHaveBeenCalledWith('https://staff.stayhumaya.com/staff/concierge');
   });
 
-  it('en el dominio del personal, la raíz es recepción', async () => {
+  /**
+   * Desde el 24 de noviembre de 2026 la raíz del dominio de recepción abre la
+   * LANDING del hotel, no el panel: `hotelexp.liderax10.com/bikeandbed` es la
+   * dirección corta que se manda, y el panel —`/bikeandbed/staff`— es el que
+   * recepción se guarda. Antes esto redirigía a `/staff`.
+   */
+  it('en el dominio del personal, la raíz es la landing del hotel', async () => {
     // Acá lo que se prueba es a dónde lleva la raíz, no la puerta: con sesión.
     stubSesionAbierta();
     const { router } = renderRoutes(createRoutes({ includeDevUi: false, lado: 'personal' }), {
       route: '/',
     });
 
-    await screen.findByRole('link', { name: DENTRO });
-    expect(router.state.location.pathname).toBe('/staff');
+    // La portada, detrás de la puerta, y sin salirse de la raíz.
+    expect(await screen.findByRole('link', { name: 'Go to the front desk' })).toHaveAttribute(
+      'href',
+      '/staff',
+    );
+    expect(router.state.location.pathname).toBe('/');
+    // Y no es el panel: el menú de recepción no está.
+    expect(screen.queryByRole('link', { name: DENTRO })).not.toBeInTheDocument();
   });
 });

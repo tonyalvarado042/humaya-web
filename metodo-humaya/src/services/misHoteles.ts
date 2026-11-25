@@ -1,4 +1,4 @@
-import type { Hotel } from './hotel';
+import { codigoDeLaRuta, type Hotel } from './hotel';
 import { cliente } from './sesion';
 import { comoTema } from './tema';
 
@@ -93,32 +93,39 @@ export function olvidarHotel(): void {
 }
 
 /**
- * El hotel que pide la DIRECCIÓN, con `?hotel=<codigo>`.
+ * El hotel que pide la DIRECCIÓN: `hotelexp.liderax10.com/bikeandbed/staff`.
  *
  * ── POR QUÉ EXISTE ──────────────────────────────────────────────────────
  * Tony, 24 de noviembre de 2026: «no veo la dirección de landing de Bike &
- * Bed». No existía. En el dominio compartido,
- * `hotelexp.liderax10.com/staff/inicio` es la misma dirección para todos los
- * hoteles —de ese lado el hotel lo dice la cuenta—, así que no había manera
- * de mandarle a nadie un enlace que abriera la portada de UN hotel. Con una
- * cuenta de plataforma, que ve los tres, esa dirección abría el que quedó
- * recordado la vez pasada: un enlace que lleva a un hotel distinto según
- * quién lo toque no es una dirección.
+ * Bed». No existía. En el dominio compartido, `hotelexp.liderax10.com/staff`
+ * era la misma dirección para todos los hoteles —de ese lado el hotel lo
+ * decía solo la cuenta—, así que no había manera de mandarle a nadie un
+ * enlace que abriera la portada de UN hotel: con una cuenta de plataforma,
+ * que ve los tres, abría el que quedó recordado la vez pasada. Un enlace que
+ * lleva a un hotel distinto según quién lo toque no es una dirección.
  *
- * La arma la base, en `humaya_direcciones_del_hotel`, y la muestra el panel
- * de hoteles. En un hotel con dominio propio no se pone: ahí el hotel lo
- * dice el dominio.
+ * El primer intento fue `?hotel=<codigo>`. Tony lo rechazó el mismo día —
+ * «para mí está mal, no debería ser esta»— y tenía razón: del lado del
+ * huésped el código va en la RUTA, y dos lados de la misma app no pueden
+ * numerar distinto. Ahora va en la ruta de los dos.
+ *
+ * El parámetro se sigue leyendo, de segundo, para no romper un enlace que ya
+ * se haya mandado.
  *
  * ── POR QUÉ ESTO NO ABRE NINGUNA PUERTA ─────────────────────────────────
  * Porque no elige el hotel: elige entre los que la BASE ya dijo que esta
  * cuenta puede ver. `humaya_hoteles_de_la_cuenta()` es `security definer` y
  * filtra por `auth.uid()`, y esto se lee DESPUÉS, sobre esa lista. Un código
  * que no esté ahí no abre nada: `cualAbrir` devuelve null y se pregunta, como
- * siempre. Poner `?hotel=` de otro hotel no da acceso a nada.
+ * siempre. Escribir en la barra el código del hotel de al lado no da acceso a
+ * nada — y hay una prueba que lo fija, porque es la que importa.
  */
 export function hotelDeLaDireccion(): string | null {
   try {
-    const pedido = new URLSearchParams(window.location.search).get('hotel');
+    const { pathname, search } = window.location;
+    const deLaRuta = codigoDeLaRuta(pathname);
+    if (deLaRuta) return deLaRuta;
+    const pedido = new URLSearchParams(search).get('hotel');
     // Minúsculas porque los códigos son minúsculas: `?hotel=BikeAndBed`
     // escrito a mano tiene que abrir igual.
     return pedido?.trim().toLowerCase() || null;

@@ -242,8 +242,11 @@ export function HotelesPage() {
    */
   const DOMINIO_NUEVO = {
     huesped: 'https://guestexp.liderax10.com',
-    personal: 'https://hotelexp.liderax10.com/staff',
+    personal: 'https://hotelexp.liderax10.com',
   };
+
+  /** Lo que se escribió, o el ejemplo, para que la vista previa no quede coja. */
+  const codigoPrevio = codigo.trim().toLowerCase() || copy.codigoPlaceholder;
 
   const cargar = useCallback(async () => {
     try {
@@ -335,17 +338,18 @@ export function HotelesPage() {
           placeholder={copy.codigoPlaceholder}
           onChange={(e) => setCodigo(e.target.value)}
         />
-        <p className="m-0 font-mono text-[12px] break-all text-muted-soft">
-          {/* La landing primero, que es la que uno manda. Nace en el dominio
-              compartido, así que lleva `?hotel=` igual que la de los otros
-              hoteles de ahí. */}
-          {DOMINIO_NUEVO.personal}/inicio?hotel=
-          {codigo.trim().toLowerCase() || copy.codigoPlaceholder}
-          <br />
-          {DOMINIO_NUEVO.huesped}/{codigo.trim().toLowerCase() || copy.codigoPlaceholder}
-          <br />
-          {DOMINIO_NUEVO.personal}
-        </p>
+        {/* Las tres, en el mismo orden que la ficha de un hotel que ya
+            existe: la landing primero, que es la que uno manda. El código va
+            en la ruta de los dos lados.
+
+            Cada dirección es UN solo texto y no un `{dominio}/{codigo}`
+            partido en pedazos: así se lee de una pieza, se puede seleccionar
+            con el doble clic, y una prueba la puede buscar entera. */}
+        <ul className="m-0 flex list-none flex-col gap-0.5 p-0 font-mono text-[12px] break-all text-muted-soft">
+          <li>{`${DOMINIO_NUEVO.personal}/${codigoPrevio}`}</li>
+          <li>{`${DOMINIO_NUEVO.huesped}/${codigoPrevio}`}</li>
+          <li>{`${DOMINIO_NUEVO.personal}/${codigoPrevio}/staff`}</li>
+        </ul>
         <Input
           label={copy.marcaExperienciaLabel}
           value={marcaExperiencia}

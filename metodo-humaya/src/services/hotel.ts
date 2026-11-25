@@ -217,14 +217,40 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
     personal: fila?.dominio_personal ?? null,
   };
 
-  // Dominio compartido: del lado del huésped el hotel lo dice la ruta. Del
-  // lado de recepción lo dice la cuenta, y eso se resuelve después de entrar.
+  /**
+   * Dominio compartido: el código del hotel va en la ruta, de LOS DOS LADOS.
+   *
+   * ── POR QUÉ TAMBIÉN DEL LADO DE RECEPCIÓN ─────────────────────────────
+   * Tony, 24 de noviembre de 2026, sobre la tabla de direcciones: «para mí
+   * está mal. No debería ser esta: hotelexp.liderax10.com/bikeandbed para
+   * staff». Tenía razón. Hasta ese momento, de este lado el hotel lo decía
+   * solo la cuenta, así que NINGUNA pantalla de recepción tenía dirección
+   * propia: `hotelexp.liderax10.com/staff` era la misma para los tres
+   * hoteles. El parche fue `?hotel=`, y un parámetro no es una dirección.
+   *
+   * ── LA DIFERENCIA ENTRE LOS DOS LADOS, QUE SIGUE EN PIE ───────────────
+   * Del lado del huésped el código ES el hotel: no hay cuenta que preguntar,
+   * y la marca se aplica antes de pintar.
+   *
+   * Del lado del personal el código da el PREFIJO de las rutas y nada más.
+   * Devolver `hotel` acá sería un agujero: la Puerta se lo creería sin
+   * preguntarle a la base si esta cuenta trabaja en ese hotel, y cualquiera
+   * abriría el hotel de al lado escribiendo su código en la barra. Quién
+   * entra lo sigue decidiendo la cuenta — la Puerta lee el código de la
+   * dirección como PREFERENCIA y lo verifica contra `misHoteles()`.
+   */
   const codigo = codigoDeLaRuta(pathname);
-  if (compartido && ladoFinal === 'huesped' && codigo) {
+  if (compartido && codigo) {
     try {
       const [hotel] = await rpc<FilaCodigo>('humaya_hotel_de_codigo', { p_codigo: codigo });
       if (hotel) {
-        return { lado: ladoFinal, hotel: aHotel(hotel), base: `/${codigo}`, compartido, dominios };
+        return {
+          lado: ladoFinal,
+          hotel: ladoFinal === 'huesped' ? aHotel(hotel) : null,
+          base: `/${codigo}`,
+          compartido,
+          dominios,
+        };
       }
     } catch {
       // Sin red se sigue sin hotel; la pantalla lo dice.

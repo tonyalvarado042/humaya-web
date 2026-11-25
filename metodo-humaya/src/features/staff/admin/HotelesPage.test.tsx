@@ -38,8 +38,8 @@ const HOTELES = [
     // Dominio propio: NO vive en el compartido.
     url_huesped: 'https://experience.stayhumaya.com',
     url_personal: 'https://staff.stayhumaya.com/staff',
-    // Dominio propio: la portada NO lleva `?hotel=`, no hay nada que elegir.
-    url_portada: 'https://staff.stayhumaya.com/staff/inicio',
+    // Dominio propio: la landing es el dominio pelado, sin codigo de hotel.
+    url_portada: 'https://staff.stayhumaya.com',
   },
   {
     negocio_id: 'n-bikeandbed',
@@ -54,8 +54,8 @@ const HOTELES = [
     usuarios: 0,
     reservas: 0,
     url_huesped: 'https://guestexp.liderax10.com/bikeandbed',
-    url_personal: 'https://hotelexp.liderax10.com/staff',
-    url_portada: 'https://hotelexp.liderax10.com/staff/inicio?hotel=bikeandbed',
+    url_personal: 'https://hotelexp.liderax10.com/bikeandbed/staff',
+    url_portada: 'https://hotelexp.liderax10.com/bikeandbed',
   },
 ];
 
@@ -102,7 +102,7 @@ describe('las direcciones de cada hotel', () => {
     ).toBeInTheDocument();
     expect(bike.getByText('Por acá entra recepción')).toBeInTheDocument();
     expect(
-      bike.getByRole('link', { name: 'https://hotelexp.liderax10.com/staff' }),
+      bike.getByRole('link', { name: 'https://hotelexp.liderax10.com/bikeandbed/staff' }),
     ).toBeInTheDocument();
   });
 
@@ -112,23 +112,27 @@ describe('las direcciones de cada hotel', () => {
    * «No veo la direccion de landing de Bike & Bed. No es ninguna de estas»,
    * dijo el 24 de noviembre de 2026 sobre la tabla de dos columnas. Tenia
    * razon: la portada vive en `/staff/inicio` y en el dominio compartido le
-   * hace falta `?hotel=<codigo>` para decir de que hotel es.
+   * tenia que decir de que hotel es. El primer intento fue `?hotel=`; el
+   * mismo dia Tony lo rechazo —«para mi esta mal»— y el codigo paso a la
+   * ruta, como del lado del huesped.
    */
-  it('muestra la direccion de la landing, y en el dominio compartido con su hotel', async () => {
+  it('muestra la direccion de la landing: el codigo del hotel va en la ruta', async () => {
     renderWithProviders(<HotelesPage />, { recepcion: 'es' });
     await screen.findByRole('heading', { name: 'Bike & Bed by Humaya', level: 3 });
 
     const bike = ficha('Bike & Bed by Humaya');
     expect(bike.getByText('La landing del hotel (todos sus enlaces)')).toBeInTheDocument();
     expect(
-      bike.getByRole('link', {
-        name: 'https://hotelexp.liderax10.com/staff/inicio?hotel=bikeandbed',
-      }),
+      bike.getByRole('link', { name: 'https://hotelexp.liderax10.com/bikeandbed' }),
     ).toBeInTheDocument();
+    // El primer intento fue `?hotel=bikeandbed`. Tony lo rechazo: del lado
+    // del huesped el codigo va en la ruta, y los dos lados tienen que
+    // numerar igual.
+    expect(bike.queryByText(/\?hotel=/)).not.toBeInTheDocument();
 
-    // Y con dominio propio, sin parametro: ahi lo dice el dominio.
+    // Con dominio propio, la landing es el dominio pelado.
     expect(
-      ficha('HUMAYA').getByRole('link', { name: 'https://staff.stayhumaya.com/staff/inicio' }),
+      ficha('HUMAYA').getByRole('link', { name: 'https://staff.stayhumaya.com' }),
     ).toBeInTheDocument();
   });
 
@@ -149,6 +153,27 @@ describe('las direcciones de cada hotel', () => {
       humaya.getByRole('link', { name: 'https://staff.stayhumaya.com/staff' }),
     ).toBeInTheDocument();
     expect(humaya.queryByText(/guestexp\.liderax10\.com\/humaya/)).not.toBeInTheDocument();
+  });
+});
+
+/**
+ * La vista previa del formulario de hotel nuevo.
+ *
+ * Esta es la UNICA copia de la regla de direcciones que no sale de la base,
+ * y tiene que ser asi: el hotel todavia no existe, no hay fila que consultar.
+ * Por eso necesita prueba — ya se quedo vieja una vez el mismo dia que nacio,
+ * cuando el codigo paso de `?hotel=` a la ruta.
+ */
+describe('antes de crear el hotel', () => {
+  it('muestra las tres direcciones que va a tener, con el código en la ruta', async () => {
+    renderWithProviders(<HotelesPage />, { recepcion: 'es' });
+    await screen.findByRole('heading', { name: 'HUMAYA', level: 3 });
+
+    await userEvent.type(screen.getByLabelText('Código para la dirección'), 'arenal');
+
+    expect(screen.getByText('https://hotelexp.liderax10.com/arenal')).toBeInTheDocument();
+    expect(screen.getByText('https://guestexp.liderax10.com/arenal')).toBeInTheDocument();
+    expect(screen.getByText('https://hotelexp.liderax10.com/arenal/staff')).toBeInTheDocument();
   });
 });
 
