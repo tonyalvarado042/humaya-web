@@ -187,16 +187,35 @@ describe('el dominio compartido de recepción', () => {
   /**
    * ESTA ES LA PRUEBA QUE IMPORTA.
    *
-   * El codigo en la ruta da el prefijo, NO el hotel. Si `resolverHotel`
-   * devolviera el hotel acá, la Puerta se lo creería sin preguntarle a la
-   * base si esta cuenta trabaja ahí —`if (negocioActual()) return`— y
-   * cualquiera abriría el hotel de al lado escribiendo su código en la barra.
+   * El codigo en la ruta da la marca y el prefijo, NO el hotel resuelto. Si
+   * saliera confirmado, `main.tsx` llamaria a `aplicarHotel()`, la Puerta se
+   * lo creeria sin preguntarle a la base —`if (negocioActual()) return`— y
+   * cualquiera abriria el hotel de al lado escribiendo su codigo en la barra.
    */
-  it('NO resuelve el hotel: eso lo decide la cuenta, no la barra de direcciones', async () => {
+  it('NO lo da por confirmado: eso lo decide la cuenta, no la barra de direcciones', async () => {
     stubBase([COMPARTIDO_PERSONAL], [BIKE]);
     const donde = await resolverHotel('hotelexp.liderax10.com', '/bikeandbed/staff');
 
-    expect(donde.hotel).toBeNull();
+    expect(donde.hotelConfirmado).toBe(false);
+  });
+
+  /**
+   * Y aun asi la marca sale, porque la puerta de Bike & Bed no puede decir
+   * «Humaya». Comprobado en vivo el 24 de noviembre de 2026: decia eso.
+   */
+  it('sí da la marca, para que la puerta no muestre el nombre de otro hotel', async () => {
+    stubBase([COMPARTIDO_PERSONAL], [BIKE]);
+    const donde = await resolverHotel('hotelexp.liderax10.com', '/bikeandbed/staff');
+
+    expect(donde.hotel?.marcaHotel).toBe('Bike & Bed');
+    expect(donde.hotel?.codigo).toBe('bikeandbed');
+  });
+
+  it('del lado del huésped sí queda confirmado: ahí no hay cuenta que preguntar', async () => {
+    stubBase([COMPARTIDO_HUESPED], [BIKE]);
+    const donde = await resolverHotel('guestexp.liderax10.com', '/bikeandbed/app');
+
+    expect(donde.hotelConfirmado).toBe(true);
   });
 
   it('la raíz del hotel también lleva prefijo: ahí vive su landing', async () => {
@@ -214,13 +233,43 @@ describe('el dominio compartido de recepción', () => {
     expect(donde.hotel).toBeNull();
   });
 
-  it('un código que no es de nadie no se vuelve prefijo', async () => {
+  /**
+   * La garantia, probada donde de verdad vive: `negocio`.
+   *
+   * `aplicarMarcaDelHotel()` pone el nombre y los colores y NO pone
+   * `negocio`, que es lo que `elNegocio()` devuelve y lo que la Puerta mira
+   * para saber si todavia tiene que preguntarle a la base de quien es esta
+   * pantalla. Esto es lo que hace que la marca en la puerta sea cosmetica y
+   * el codigo de la barra no sea un permiso.
+   */
+  it('poner la marca NO resuelve de quién son los datos', async () => {
+    const { aplicarMarcaDelHotel, negocioActual, MARCA: M } = await import('@/marca');
+
+    aplicarMarcaDelHotel({
+      negocioId: 'n-bike',
+      codigo: 'bikeandbed',
+      marcaExperiencia: 'Bike & Bed Experience',
+      marcaHotel: 'Bike & Bed',
+      correo: 'hola@bikeandbed.test',
+      tema: null,
+      esDemo: false,
+      portadaTitulo: null,
+      portadaBajada: null,
+    });
+
+    expect(M.hotel).toBe('Bike & Bed');
+    // EL PUNTO: sigue sin saber de quién son los datos.
+    expect(negocioActual()).toBeNull();
+  });
+
+  it('un código que no es de nadie no se vuelve prefijo ni marca', async () => {
     // Sin esto, `/notexiste/staff` montaria toda la recepcion bajo un
     // prefijo inventado en vez de caer en «Esta dirección no existe».
     stubBase([COMPARTIDO_PERSONAL], []);
     const donde = await resolverHotel('hotelexp.liderax10.com', '/notexiste/staff');
 
     expect(donde.base).toBe('');
+    expect(donde.hotel).toBeNull();
   });
 });
 

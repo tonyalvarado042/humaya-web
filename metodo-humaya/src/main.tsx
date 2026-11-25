@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { crearRouter } from '@/router';
 import { FaltaElHotel } from '@/components/FaltaElHotel';
-import { aplicarDominios, aplicarHotel } from '@/marca';
+import { aplicarDominios, aplicarHotel, aplicarMarcaDelHotel } from '@/marca';
 import { codigoDeLaRuta, resolverHotel } from '@/services/hotel';
 import { alDiaConElServidor } from '@/services/actualizar';
 import '@/i18n';
@@ -48,7 +48,15 @@ async function arrancar() {
   // Los dominios primero y aparte: `aplicarHotel()` reconstruye la marca
   // desde los valores por defecto, que son los de HUMAYA.
   aplicarDominios(donde.dominios);
-  aplicarHotel(donde.hotel);
+  // La marca sí, el hotel solo si la dirección lo decide.
+  //
+  // En `hotelexp.liderax10.com/bikeandbed` el código de la ruta alcanza para
+  // poner la marca de Bike & Bed en la puerta —antes decía «Humaya», la de
+  // otro hotel— pero NO para dar por resuelto el hotel: de ese lado quién
+  // entra lo decide la cuenta, y la Puerta tiene que preguntárselo a la base.
+  // Ver `hotelConfirmado` en services/hotel.ts.
+  if (donde.hotel && !donde.hotelConfirmado) aplicarMarcaDelHotel(donde.hotel);
+  else aplicarHotel(donde.hotel);
 
   const raiz = createRoot(rootElement!);
 

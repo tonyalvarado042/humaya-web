@@ -90,6 +90,29 @@ export function aplicarDominios(dominios: {
   };
 }
 
+/**
+ * Deja puesta la MARCA de un hotel sin dar por resuelto el hotel.
+ *
+ * ── POR QUÉ HACEN FALTA DOS FUNCIONES ───────────────────────────────────
+ * 24 de noviembre de 2026. En `hotelexp.liderax10.com/bikeandbed` la puerta
+ * de recepción decía «Humaya»: la marca por defecto, porque del lado del
+ * personal el hotel NO se resuelve desde la ruta a propósito — si se
+ * resolviera, la Puerta se lo creería sin preguntarle a la base si esta
+ * cuenta trabaja ahí, y el código en la barra sería un permiso.
+ *
+ * Pero mostrarle a alguien el nombre de OTRO hotel en la puerta del suyo es
+ * el mismo error que arreglamos ese día en la app del huésped. Así que la
+ * marca sí se aplica —el nombre, los colores, el correo, el código— y lo
+ * único que NO se pone es `negocio`, que es lo que decide de quién son los
+ * datos. Mientras `negocio` esté en null, `elNegocio()` sigue fallando y la
+ * Puerta sigue obligada a preguntarle a la base.
+ *
+ * La marca no es un secreto: la app del huésped la muestra sin cuenta.
+ */
+export function aplicarMarcaDelHotel(hotel: Hotel): void {
+  ponerHotel(hotel, false);
+}
+
 /** Deja puesto el hotel resuelto. Lo llama `main.tsx` antes de pintar. */
 export function aplicarHotel(hotel: Hotel | null): void {
   if (!hotel) {
@@ -103,13 +126,24 @@ export function aplicarHotel(hotel: Hotel | null): void {
     void avisarALosTextos(PORDEFECTO.experiencia);
     return;
   }
+  ponerHotel(hotel, true);
+}
+
+/**
+ * El cuerpo que comparten las dos.
+ *
+ * `conNegocio` es la única diferencia, y es la que importa: `negocio` es lo
+ * que `elNegocio()` devuelve y lo que la Puerta mira para saber si todavía
+ * tiene que preguntarle a la base de quién es esta pantalla.
+ */
+function ponerHotel(hotel: Hotel, conNegocio: boolean): void {
   actual = {
     ...PORDEFECTO,
     experiencia: hotel.marcaExperiencia || PORDEFECTO.experiencia,
     hotel: hotel.marcaHotel || PORDEFECTO.hotel,
     correo: hotel.correo || PORDEFECTO.correo,
   };
-  negocio = hotel.negocioId;
+  if (conNegocio) negocio = hotel.negocioId;
   codigo = hotel.codigo;
   esDemo = hotel.esDemo;
   portada = { titulo: hotel.portadaTitulo, bajada: hotel.portadaBajada };

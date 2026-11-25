@@ -66,6 +66,27 @@ export interface Resolucion {
   /** Si el dominio es del producto y no de un hotel en particular. */
   compartido: boolean;
   /**
+   * Si `hotel` ya está decidido, o si todavía falta que la cuenta lo
+   * confirme.
+   *
+   * ── POR QUÉ NO ALCANZA CON `hotel` ──────────────────────────────────
+   * Porque el mismo dato llega por dos caminos que NO valen lo mismo:
+   *
+   *  - El dominio propio de un hotel, o el código en la ruta del lado del
+   *    huésped: ahí la dirección ES el hotel. No hay cuenta que preguntar.
+   *    `true`.
+   *  - El código en la ruta del lado de RECEPCIÓN: ahí el código sirve para
+   *    poner la marca correcta en la puerta y para el prefijo de las rutas,
+   *    pero quién entra lo decide la cuenta. `false`.
+   *
+   * `main.tsx` mira esto para elegir entre `aplicarHotel()` —que deja
+   * `negocio` puesto— y `aplicarMarcaDelHotel()` —que no—. Si acá saliera
+   * `true` del lado de recepción, la Puerta se creería el hotel de la barra
+   * de direcciones sin preguntarle a la base, y escribir el código del hotel
+   * de al lado alcanzaría para abrirlo.
+   */
+  hotelConfirmado: boolean;
+  /**
    * Los dos dominios de ESTE juego: el del huésped y el de recepción, o null
    * cuando la base no los conoce.
    *
@@ -186,7 +207,14 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
   try {
     [fila] = await rpc<FilaDominio>('humaya_hotel_de_dominio', { p_dominio: hostname });
   } catch {
-    return { lado, hotel: null, base: '', compartido: false, dominios: { ...SIN_DOMINIOS } };
+    return {
+      lado,
+      hotel: null,
+      base: '',
+      compartido: false,
+      hotelConfirmado: false,
+      dominios: { ...SIN_DOMINIOS },
+    };
   }
 
   // Dominio propio de un hotel: la dirección ya dice quién es.
@@ -206,6 +234,7 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
       }),
       base: '',
       compartido: false,
+      hotelConfirmado: true,
       dominios: { huesped: fila.dominio_huesped, personal: fila.dominio_personal },
     };
   }
@@ -246,9 +275,13 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
       if (hotel) {
         return {
           lado: ladoFinal,
-          hotel: ladoFinal === 'huesped' ? aHotel(hotel) : null,
+          hotel: aHotel(hotel),
           base: `/${codigo}`,
           compartido,
+          // Del lado del huésped la dirección ES el hotel. Del lado del
+          // personal falta que la cuenta lo confirme: acá sale la marca y el
+          // prefijo, nada más.
+          hotelConfirmado: ladoFinal === 'huesped',
           dominios,
         };
       }
@@ -257,5 +290,5 @@ export async function resolverHotel(hostname: string, pathname: string): Promise
     }
   }
 
-  return { lado: ladoFinal, hotel: null, base: '', compartido, dominios };
+  return { lado: ladoFinal, hotel: null, base: '', compartido, hotelConfirmado: false, dominios };
 }
