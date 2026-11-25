@@ -187,6 +187,35 @@ describe('el idioma de recepción', () => {
   });
 });
 
+describe('la tabla en el teléfono', () => {
+  /**
+   * ── EL FALLO QUE ESTO AGARRA ────────────────────────────────
+   * Son siete columnas: la tabla necesita 838 px. En un teléfono de 375 eso
+   * desplazaba la PÁGINA de lado —la barra de arriba se corría con ella— en
+   * vez de desplazarse la tabla sola. Medido entrando, el 25 de noviembre de
+   * 2026: `scrollWidth` 838 contra `clientWidth` 375.
+   *
+   * ── Y POR QUÉ ESTA PRUEBA NO LO MIDE ──────────────────────────
+   * Porque jsdom no calcula CSS: acá todo mide cero y un `scrollWidth` no
+   * diría nada. Lo que esta prueba fija es la INTENCIÓN —que la tabla tenga
+   * su propia caja que se desplaza— para que nadie la saque sin darse cuenta.
+   * La medida de verdad se toma en el navegador, con el teléfono emulado.
+   */
+  it('se desliza dentro de su caja, no arrastra la página', async () => {
+    renderRoutes(routes, { route: '/staff' });
+
+    const caja = (await tabla()).closest('[role="region"]');
+    expect(caja).toHaveClass('overflow-x-auto');
+  });
+
+  it('y esa caja se puede desplazar con el teclado', async () => {
+    renderRoutes(routes, { route: '/staff' });
+
+    const caja = (await tabla()).closest('[role="region"]');
+    expect(caja).toHaveAttribute('tabindex', '0');
+  });
+});
+
 describe('el demo, mientras Admin lo deje encendido', () => {
   it('se ofrece como una vista más de Llegadas', async () => {
     renderRoutes(routes, { route: '/staff' });

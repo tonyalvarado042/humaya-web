@@ -149,49 +149,68 @@ export function ArrivalsPage() {
           description={filtro === 'sin_correo' ? copy.vacioSinCorreo : copy.vacioCuerpo}
         />
       ) : (
-        <Table aria-label={copy.title}>
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell>{copy.colHuesped}</TableHeaderCell>
-              <TableHeaderCell>{copy.colFechas}</TableHeaderCell>
-              <TableHeaderCell>{copy.colVilla}</TableHeaderCell>
-              <TableHeaderCell>{copy.colPersonas}</TableHeaderCell>
-              <TableHeaderCell>{copy.colFuente}</TableHeaderCell>
-              <TableHeaderCell>{copy.colCodigo}</TableHeaderCell>
-              <TableHeaderCell>{copy.colEstado}</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filas.map((reserva) => (
-              <TableRow key={reserva.id}>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="text-text">{reserva.huesped}</span>
-                    {reserva.email ? (
-                      <span className="text-[12px] text-muted">{reserva.email}</span>
-                    ) : (
-                      <span className="text-[12px] text-on-alert">{copy.sinCorreoFila}</span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>{rango(reserva, locale)}</TableCell>
-                <TableCell>
-                  {reserva.villa ?? <span className="text-muted-soft">{copy.sinVilla}</span>}
-                </TableCell>
-                <TableCell>{reserva.personas ?? '—'}</TableCell>
-                <TableCell>{reserva.fuente ?? '—'}</TableCell>
-                <TableCell>
-                  <span className="font-mono text-[13px]">
-                    {reserva.codigoOta ?? copy.sinCodigo}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <EstadoTag estado={reserva.estado} copy={copy} />
-                </TableCell>
+        /**
+         * La tabla se desliza DENTRO de su caja, no arrastra la página.
+         *
+         * Son siete columnas y necesita 838 px. En un teléfono de 375 eso
+         * hacía que se desplazara la página entera de lado: la barra de
+         * arriba se corría con ella y el título quedaba fuera de la pantalla.
+         * Medido entrando, el 25 de noviembre de 2026.
+         *
+         * `Table.tsx` ya lo decía —«el scroll horizontal lo agrega el
+         * contenedor donde se use»— y esta pantalla era la única de recepción
+         * que no lo hacía. Las otras tres (huéspedes, agenda y las llegadas
+         * del demo) esconden la tabla por debajo de 1024 px y muestran
+         * tarjetas; esta no, y queda pendiente decidir si también las lleva.
+         *
+         * `tabIndex` y `role` porque una caja que se desplaza tiene que poder
+         * desplazarse con el teclado, no solo con el dedo.
+         */
+        <div role="region" aria-label={copy.title} tabIndex={0} className="min-w-0 overflow-x-auto">
+          <Table aria-label={copy.title}>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>{copy.colHuesped}</TableHeaderCell>
+                <TableHeaderCell>{copy.colFechas}</TableHeaderCell>
+                <TableHeaderCell>{copy.colVilla}</TableHeaderCell>
+                <TableHeaderCell>{copy.colPersonas}</TableHeaderCell>
+                <TableHeaderCell>{copy.colFuente}</TableHeaderCell>
+                <TableHeaderCell>{copy.colCodigo}</TableHeaderCell>
+                <TableHeaderCell>{copy.colEstado}</TableHeaderCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {filas.map((reserva) => (
+                <TableRow key={reserva.id}>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="text-text">{reserva.huesped}</span>
+                      {reserva.email ? (
+                        <span className="text-[12px] text-muted">{reserva.email}</span>
+                      ) : (
+                        <span className="text-[12px] text-on-alert">{copy.sinCorreoFila}</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>{rango(reserva, locale)}</TableCell>
+                  <TableCell>
+                    {reserva.villa ?? <span className="text-muted-soft">{copy.sinVilla}</span>}
+                  </TableCell>
+                  <TableCell>{reserva.personas ?? '—'}</TableCell>
+                  <TableCell>{reserva.fuente ?? '—'}</TableCell>
+                  <TableCell>
+                    <span className="font-mono text-[13px]">
+                      {reserva.codigoOta ?? copy.sinCodigo}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <EstadoTag estado={reserva.estado} copy={copy} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
 
       {enDemo ? null : <p className="m-0 text-[13px] text-muted-soft">{copy.fuenteDatos}</p>}
