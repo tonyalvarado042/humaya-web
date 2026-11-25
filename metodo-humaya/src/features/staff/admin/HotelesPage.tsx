@@ -336,6 +336,12 @@ export function HotelesPage() {
           onChange={(e) => setCodigo(e.target.value)}
         />
         <p className="m-0 font-mono text-[12px] break-all text-muted-soft">
+          {/* La landing primero, que es la que uno manda. Nace en el dominio
+              compartido, así que lleva `?hotel=` igual que la de los otros
+              hoteles de ahí. */}
+          {DOMINIO_NUEVO.personal}/inicio?hotel=
+          {codigo.trim().toLowerCase() || copy.codigoPlaceholder}
+          <br />
           {DOMINIO_NUEVO.huesped}/{codigo.trim().toLowerCase() || copy.codigoPlaceholder}
           <br />
           {DOMINIO_NUEVO.personal}
