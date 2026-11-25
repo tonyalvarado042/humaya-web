@@ -54,6 +54,14 @@ export {
 } from './useInterview';
 export { useAgendaPorServicio } from './useAgenda';
 export {
+  useBorrarEnlace,
+  useCrearEnlace,
+  useEditarEnlace,
+  useEnlaces,
+  useMoverEnlace,
+  useToggleEnlace,
+} from './useEnlaces';
+export {
   useAjustesTv,
   useAlrededor,
   useGuardarAlrededor,

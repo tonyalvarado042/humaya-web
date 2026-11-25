@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet, type RouteObject } from 'react-router-dom';
 import { ladoDe, MARCA, type Lado } from '@/marca';
 import { Mudanza, MudanzaAlHuesped } from '@/components/Mudanza';
 import { Placeholder } from '@/components/Placeholder';
@@ -17,6 +17,7 @@ import { VillaPage } from '@/features/guest-app/villa/VillaPage';
 import { AdminIndexPage } from '@/features/staff/admin/AdminIndexPage';
 import { AdminLayout } from '@/features/staff/admin/AdminLayout';
 import { AjustesPage } from '@/features/staff/admin/AjustesPage';
+import { EnlacesPage } from '@/features/staff/admin/EnlacesPage';
 import { HotelesPage } from '@/features/staff/admin/HotelesPage';
 import { BotPage } from '@/features/staff/admin/BotPage';
 import { MarcaPage } from '@/features/staff/admin/MarcaPage';
@@ -29,6 +30,7 @@ import { ConciergeThreadPage } from '@/features/staff/concierge/ConciergeThreadP
 import { GuestProfilePage } from '@/features/staff/guest-profile/GuestProfilePage';
 import { GuestsListPage } from '@/features/staff/guests/GuestsListPage';
 import { StaffLayout } from '@/features/staff/layout/StaffLayout';
+import { PortadaPage } from '@/features/staff/portada/PortadaPage';
 import { Puerta } from '@/features/staff/puerta/Puerta';
 import { SpaPage } from '@/features/staff/spa/SpaPage';
 
@@ -81,40 +83,58 @@ export function createRoutes({
         }
       : {
           path: '/staff',
+          /**
+           * La puerta envuelve TODO lo de recepción; el marco del panel, solo
+           * lo que va adentro del panel.
+           *
+           * Antes la puerta montaba `StaffLayout` directo, así que cualquier
+           * pantalla nueva de recepción nacía con barra lateral. La portada
+           * interna (`/staff/inicio`) no la quiere: es una portada, y la
+           * mitad de sus fichas llevan fuera del panel. Por eso el marco
+           * baja a ser una ruta sin dirección propia, que es como React
+           * Router dice «estas comparten marco y aquella no».
+           */
           element: (
             <Puerta>
-              <StaffLayout />
+              <Outlet />
             </Puerta>
           ),
           children: [
-            { index: true, element: <ArrivalsPage /> },
-            // Antes acá vivía la ficha SIN estadía, así que el menú siempre
-            // decía «No encontramos a ese huésped»: un destino que no llevaba
-            // a ninguna parte. Ahora es la lista de quién está en la casa.
-            { path: 'guests', element: <GuestsListPage /> },
-            { path: 'guests/:stayId', element: <GuestProfilePage /> },
-            { path: 'spa', element: <SpaPage /> },
-            { path: 'concierge', element: <ConciergeInboxPage /> },
-            { path: 'concierge/:stayId', element: <ConciergeThreadPage /> },
-            // Admin dejo de ser una pantalla y paso a ser seis, cada una con
-            // su direccion. Tony, 20 de noviembre de 2026: «debes mejorar
-            // Admin y separar por funcion, ejemplo: Admin - pagina TV, todo
-            // de TV». Ver features/staff/admin/secciones.ts.
+            { path: 'inicio', element: <PortadaPage /> },
             {
-              path: 'admin',
-              element: <AdminLayout />,
+              element: <StaffLayout />,
               children: [
-                { index: true, element: <AdminIndexPage /> },
-                { path: 'marca', element: <MarcaPage /> },
-                { path: 'menu', element: <MenuPage /> },
-                { path: 'servicios', element: <ServiciosPage /> },
-                { path: 'concierge', element: <BotPage /> },
-                { path: 'tv', element: <TvPage /> },
-                { path: 'ajustes', element: <AjustesPage /> },
-                // Crear hoteles. Solo la ve el super admin, y la base lo
-                // exige: cada funcion pregunta si quien llama es de
-                // plataforma antes de hacer nada.
-                { path: 'hoteles', element: <HotelesPage /> },
+                { index: true, element: <ArrivalsPage /> },
+                // Antes acá vivía la ficha SIN estadía, así que el menú siempre
+                // decía «No encontramos a ese huésped»: un destino que no llevaba
+                // a ninguna parte. Ahora es la lista de quién está en la casa.
+                { path: 'guests', element: <GuestsListPage /> },
+                { path: 'guests/:stayId', element: <GuestProfilePage /> },
+                { path: 'spa', element: <SpaPage /> },
+                { path: 'concierge', element: <ConciergeInboxPage /> },
+                { path: 'concierge/:stayId', element: <ConciergeThreadPage /> },
+                // Admin dejo de ser una pantalla y paso a ser seis, cada una con
+                // su direccion. Tony, 20 de noviembre de 2026: «debes mejorar
+                // Admin y separar por funcion, ejemplo: Admin - pagina TV, todo
+                // de TV». Ver features/staff/admin/secciones.ts.
+                {
+                  path: 'admin',
+                  element: <AdminLayout />,
+                  children: [
+                    { index: true, element: <AdminIndexPage /> },
+                    { path: 'marca', element: <MarcaPage /> },
+                    { path: 'menu', element: <MenuPage /> },
+                    { path: 'servicios', element: <ServiciosPage /> },
+                    { path: 'concierge', element: <BotPage /> },
+                    { path: 'tv', element: <TvPage /> },
+                    { path: 'enlaces', element: <EnlacesPage /> },
+                    { path: 'ajustes', element: <AjustesPage /> },
+                    // Crear hoteles. Solo la ve el super admin, y la base lo
+                    // exige: cada funcion pregunta si quien llama es de
+                    // plataforma antes de hacer nada.
+                    { path: 'hoteles', element: <HotelesPage /> },
+                  ],
+                },
               ],
             },
           ],

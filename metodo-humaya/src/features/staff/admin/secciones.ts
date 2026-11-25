@@ -2,6 +2,7 @@ import {
   Building2,
   Image,
   LayoutGrid,
+  Link2,
   MonitorPlay,
   Settings2,
   Sparkles,
@@ -88,6 +89,13 @@ export function seccionesAdmin(idioma: Idioma, conHoteles = false): SeccionAdmin
         Icon: MonitorPlay,
       },
       {
+        ruta: 'enlaces',
+        titulo: 'Links',
+        cuerpo:
+          'The internal home page: what this hotel’s team opens every day — the front desk, the guest app, the PMS, the website.',
+        Icon: Link2,
+      },
+      {
         ruta: 'ajustes',
         titulo: 'Settings',
         cuerpo: 'The demo sample data, and whatever belongs to none of the other sections.',
@@ -140,6 +148,13 @@ export function seccionesAdmin(idioma: Idioma, conHoteles = false): SeccionAdmin
       titulo: 'Pantalla del TV',
       cuerpo: 'El televisor de cada villa: su nombre, su foto, su mensaje y su dirección.',
       Icon: MonitorPlay,
+    },
+    {
+      ruta: 'enlaces',
+      titulo: 'Enlaces',
+      cuerpo:
+        'La portada interna: lo que el equipo de este hotel abre todos los días — recepción, la app del huésped, el PMS, el sitio web.',
+      Icon: Link2,
     },
     {
       ruta: 'ajustes',

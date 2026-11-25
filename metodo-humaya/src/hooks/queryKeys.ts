@@ -45,6 +45,9 @@ export const queryKeys = {
   servicioSlots: (servicioId: string, fecha: string) =>
     ['servicio-slots', servicioId, fecha] as const,
 
+  /** La portada interna del hotel: los enlaces que usa su equipo. */
+  enlaces: (soloHabilitados: boolean) => ['enlaces', soloHabilitados] as const,
+
   /** Las pantallas de los televisores de las villas. */
   villasTv: () => ['villas-tv'] as const,
   ajustesTv: () => ['ajustes-tv'] as const,

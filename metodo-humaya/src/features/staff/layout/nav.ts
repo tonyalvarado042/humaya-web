@@ -1,4 +1,4 @@
-import { CalendarClock, CalendarDays, MessageCircle, Settings, Users } from 'lucide-react';
+import { CalendarClock, CalendarDays, House, MessageCircle, Settings, Users } from 'lucide-react';
 import type { Idioma } from '@/hooks/useIdiomaElegido';
 
 export interface DestinoStaff {
@@ -16,9 +16,16 @@ export interface DestinoStaff {
  * idioma se comparte desde la puerta.
  *
  * "Villas" queda para después del MVP.
+ *
+ * ── POR QUÉ «INICIO» VA PRIMERO Y NO ES /staff ──────────────────────────
+ * `/staff/inicio` es la portada interna del hotel: las herramientas con las
+ * que trabaja su equipo, la mitad de ellas fuera de esta app. `/staff` sigue
+ * siendo las reservas del día, que es lo que recepción abre para trabajar.
+ * Son dos cosas distintas y por eso son dos destinos.
  */
 export const STAFF_NAV: Record<Idioma, DestinoStaff[]> = {
   en: [
+    { to: '/staff/inicio', label: 'Home', Icon: House, end: false },
     { to: '/staff', label: 'Bookings', Icon: CalendarDays, end: true },
     { to: '/staff/guests', label: 'Guests', Icon: Users, end: false },
     { to: '/staff/spa', label: 'Schedule', Icon: CalendarClock, end: false },
@@ -26,6 +33,7 @@ export const STAFF_NAV: Record<Idioma, DestinoStaff[]> = {
     { to: '/staff/admin', label: 'Admin', Icon: Settings, end: false },
   ],
   es: [
+    { to: '/staff/inicio', label: 'Inicio', Icon: House, end: false },
     { to: '/staff', label: 'Reservas', Icon: CalendarDays, end: true },
     { to: '/staff/guests', label: 'Huéspedes', Icon: Users, end: false },
     { to: '/staff/spa', label: 'Agenda', Icon: CalendarClock, end: false },
