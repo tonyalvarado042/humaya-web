@@ -78,6 +78,37 @@ export interface TvTextos {
 
   guiaTitulo: string;
   guiaCuerpo: string;
+  guiaBienvenida: string;
+  guiaBienvenidaAyuda: string;
+  guiaReglas: string;
+  guiaReglasAyuda: string;
+  guiaComoFunciona: string;
+  guiaComoFuncionaAyuda: string;
+  guiaSalida: string;
+  guiaSalidaAyuda: string;
+  guiaHora: string;
+  guiaPaso: string;
+  guiaAgregarPaso: string;
+  guiaEmergencias: string;
+  guiaEmergenciasAyuda: string;
+  guiaQuien: string;
+  guiaTelefono: string;
+  guiaTituloCampo: string;
+  guiaTextoCampo: string;
+  guiaAgregar: string;
+  guiaQuitar: string;
+  guiaNadaTodavia: string;
+
+  /** Crear una villa, que antes solo se podía en la base. */
+  nuevaVilla: string;
+  nuevaVillaAyuda: string;
+  nuevaVillaNombre: string;
+  nuevaVillaNombreAyuda: string;
+  crearVilla: string;
+  creandoVilla: string;
+  faltaNombreVilla: string;
+  noSePudoCrear: string;
+  cancelar: string;
 
   /** «Alrededor»: los lugares que el televisor recomienda. */
   alrededorTitulo: string;
@@ -205,11 +236,45 @@ export const tvCopy: Record<Idioma, TvTextos> = {
 
     guiaTitulo: 'La guía de la casa',
     guiaCuerpo:
-      'Las reglas, cómo funciona la villa, los lugares cercanos, los pasos de salida y las emergencias. Es la misma para todas las pantallas del hotel, y por eso todavía no se edita acá: con una copia por villa, cambiar una regla significaría cambiarla en cada una. Hoy se cambia en la base, en humaya_tv_ajustes.',
+      'Las reglas, cómo funciona la villa, los pasos de salida y las emergencias. Es la misma para todas las pantallas del hotel: cambiarla acá la cambia en todos los televisores a la vez.',
+    guiaBienvenida: 'El saludo',
+    guiaBienvenidaAyuda:
+      'Lo primero que lee el huésped al encender el televisor. Una villa puede poner el suyo propio en «Editar».',
+    guiaReglas: 'Las reglas de la casa',
+    guiaReglasAyuda: 'Silencio, áreas comunes, fumado, animales, visitas.',
+    guiaComoFunciona: 'Cómo funciona la villa',
+    guiaComoFuncionaAyuda: 'El Wi-Fi, el aire, la cafetera, lo que haya que explicar.',
+    guiaSalida: 'La salida',
+    guiaSalidaAyuda:
+      'Lo que le pedimos al huésped antes de irse. ⚠️ La hora de acá es la que muestra la tarjeta de la guía; la hora real de cada villa se pone en «Editar», y son dos campos distintos: si no coinciden, el televisor muestra las dos.',
+    guiaHora: 'La hora que muestra la guía',
+    guiaPaso: 'Paso',
+    guiaAgregarPaso: 'Agregar paso',
+    guiaEmergencias: 'Emergencias',
+    guiaEmergenciasAyuda: 'A quién llamar. Un teléfono equivocado acá es peor que ninguno.',
+    guiaQuien: 'Quién',
+    guiaTelefono: 'Teléfono',
+    guiaTituloCampo: 'Título',
+    guiaTextoCampo: 'Qué dice',
+    guiaAgregar: 'Agregar',
+    guiaQuitar: 'Quitar',
+    guiaNadaTodavia: 'Todavía no hay nada acá.',
+
+    nuevaVilla: 'Agregar villa',
+    nuevaVillaAyuda:
+      'Se crea con su clave y su dirección para el televisor. Todo lo demás —el Wi-Fi, la foto, el mensaje— se llena después, en Editar.',
+    nuevaVillaNombre: 'Nombre de la villa',
+    nuevaVillaNombreAyuda:
+      'Como la va a ver el huésped en la pantalla. Por ejemplo: V1 · CAPI CAPI.',
+    crearVilla: 'Crear la villa',
+    creandoVilla: 'Creando…',
+    faltaNombreVilla: 'Ponele un nombre.',
+    noSePudoCrear: 'No se pudo crear. Solo un administrador puede.',
+    cancelar: 'Cancelar',
 
     cargando: 'las pantallas del TV',
     vacio: 'Todavía no hay ninguna villa',
-    vacioCuerpo: 'Las villas se crean en la base, en humaya_tv_villas.',
+    vacioCuerpo: 'Agregá la primera acá abajo y la pantalla de su televisor queda lista.',
 
     instructivoTitulo: 'Cómo se prepara un televisor',
     instructivoCuerpo:
@@ -312,13 +377,47 @@ export const tvCopy: Record<Idioma, TvTextos> = {
     quitarCategoria: 'Remove the category',
     alrededorVacio: 'There are no places yet.',
 
+    guiaBienvenida: 'The welcome',
+    guiaBienvenidaAyuda:
+      'The first thing the guest reads when the TV turns on. A villa can set its own in “Edit”.',
+    guiaReglas: 'House rules',
+    guiaReglasAyuda: 'Quiet hours, shared areas, smoking, wildlife, visitors.',
+    guiaComoFunciona: 'How the villa works',
+    guiaComoFuncionaAyuda: 'Wi-Fi, air conditioning, the coffee maker, whatever needs explaining.',
+    guiaSalida: 'Check-out',
+    guiaSalidaAyuda:
+      'What we ask the guest to do before leaving. ⚠️ The time here is the one the guide card shows; each villa’s real check-out time is set under “Edit”, and they are two separate fields: if they disagree, the television shows both.',
+    guiaHora: 'The time the guide shows',
+    guiaPaso: 'Step',
+    guiaAgregarPaso: 'Add step',
+    guiaEmergencias: 'Emergencies',
+    guiaEmergenciasAyuda: 'Who to call. A wrong number here is worse than none.',
+    guiaQuien: 'Who',
+    guiaTelefono: 'Phone',
+    guiaTituloCampo: 'Title',
+    guiaTextoCampo: 'What it says',
+    guiaAgregar: 'Add',
+    guiaQuitar: 'Remove',
+    guiaNadaTodavia: 'Nothing here yet.',
+
+    nuevaVilla: 'Add villa',
+    nuevaVillaAyuda:
+      'It is created with its key and its TV address. Everything else — Wi-Fi, photo, message — is filled in afterwards, under Edit.',
+    nuevaVillaNombre: 'Villa name',
+    nuevaVillaNombreAyuda: 'As the guest will see it on screen. For example: V1 · CAPI CAPI.',
+    crearVilla: 'Create the villa',
+    creandoVilla: 'Creating…',
+    faltaNombreVilla: 'Give it a name.',
+    noSePudoCrear: 'It could not be created. Only an administrator can.',
+    cancelar: 'Cancel',
+
     guiaTitulo: 'The house guide',
     guiaCuerpo:
-      'The rules, how the villa works, the places nearby, the check-out steps and emergencies. It is the same for every screen in the hotel, which is why it is not edited here yet: with one copy per villa, changing a rule would mean changing it in each one. Today it is changed in the database, in humaya_tv_ajustes.',
+      'The rules, how the villa works, the check-out steps and emergencies. It is the same for every screen in the hotel: changing it here changes it on every television at once.',
 
     cargando: 'the TV screens',
     vacio: 'There are no villas yet',
-    vacioCuerpo: 'Villas are created in the database, in humaya_tv_villas.',
+    vacioCuerpo: 'Add the first one below and its TV screen is ready.',
 
     instructivoTitulo: 'How to set up a television',
     instructivoCuerpo: 'Done once per television, and no computer is needed in the hotel.',

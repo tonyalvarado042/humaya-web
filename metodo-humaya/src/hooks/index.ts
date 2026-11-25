@@ -64,9 +64,12 @@ export {
 export {
   useAjustesTv,
   useAlrededor,
+  useCrearVillaTv,
   useGuardarAlrededor,
   useGuardarAjustesTv,
+  useGuardarGuia,
   useGuardarVillaTv,
+  useGuiaDeLaCasa,
   useSubirFotoDelHotel,
   useSubirFotoTv,
   useVillasTv,

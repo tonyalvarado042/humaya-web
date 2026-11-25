@@ -1,15 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  crearVillaTv,
   getAjustesTv,
   getAlrededor,
+  getGuia,
   guardarAlrededor,
   getVillasTv,
   guardarAjustesTv,
+  guardarGuia,
   guardarVillaTv,
   subirFotoDelHotel,
   subirFotoTv,
 } from '@/services/tv';
-import type { AjustesTv, CategoriaCerca } from '@/services/tv';
+import type { AjustesTv, CategoriaCerca, GuiaDeLaCasa } from '@/services/tv';
 import type { CambiosVillaTv } from '@/types';
 import { queryKeys } from './queryKeys';
 
@@ -67,10 +70,40 @@ export function useGuardarAlrededor() {
   });
 }
 
+/** La guía de la casa: una sola para todas las pantallas del hotel. */
+export function useGuiaDeLaCasa() {
+  return useQuery({
+    queryKey: queryKeys.guiaTv(),
+    queryFn: getGuia,
+  });
+}
+
+export function useGuardarGuia() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (guia: GuiaDeLaCasa) => guardarGuia(guia),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.guiaTv() });
+    },
+  });
+}
+
 export function useVillasTv() {
   return useQuery({
     queryKey: queryKeys.villasTv(),
     queryFn: getVillasTv,
+  });
+}
+
+export function useCrearVillaTv() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (nombre: string) => crearVillaTv(nombre),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.villasTv() });
+    },
   });
 }
 

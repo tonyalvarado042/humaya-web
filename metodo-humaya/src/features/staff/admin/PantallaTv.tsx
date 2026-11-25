@@ -3,12 +3,14 @@ import { Badge, Button, Card, Input, Textarea } from '@/components/ui';
 import {
   useAjustesTv,
   useAlrededor,
+  useCrearVillaTv,
   useGuardarAlrededor,
   useGuardarAjustesTv,
   useGuardarVillaTv,
   useSubirFotoDelHotel,
   useVillasTv,
 } from '@/hooks';
+import { GuiaDeLaCasa } from './GuiaDeLaCasa';
 import { direccionDelTv, urlDeFoto } from '@/services/tv';
 import type { AjustesTv, CategoriaCerca } from '@/services/tv';
 import type { CambiosVillaTv, VillaTv } from '@/types';
@@ -76,13 +78,99 @@ export function PantallaTv() {
         ))
       )}
 
+      <VillaNueva />
+
       <Alrededor />
 
-      <Card variant="accent">
-        <h3 className="m-0 font-display text-lg font-medium">{copy.guiaTitulo}</h3>
-        <p className="m-0 text-sm leading-relaxed text-muted">{copy.guiaCuerpo}</p>
-      </Card>
+      <GuiaDeLaCasa />
     </section>
+  );
+}
+
+/**
+ * Crear una villa desde el panel.
+ *
+ * ── POR QUÉ SOLO PIDE EL NOMBRE ─────────────────────────────────────────
+ * Porque es lo único que hace falta para que la pantalla exista: la clave y
+ * la dirección las pone la base, y el resto —Wi-Fi, foto, mensaje, horas—
+ * ya se edita en «Editar», con los mismos campos para todas. Un formulario
+ * de quince campos para crear algo que después se edita igual es pedir dos
+ * veces lo mismo.
+ */
+function VillaNueva() {
+  const [idioma] = useIdiomaRecepcion();
+  const copy = tvCopy[idioma];
+  const crear = useCrearVillaTv();
+  const [abierto, setAbierto] = useState(false);
+  const [nombre, setNombre] = useState('');
+  const [falta, setFalta] = useState(false);
+
+  if (!abierto) {
+    return (
+      <Button
+        className="w-fit"
+        onClick={() => {
+          crear.reset();
+          setNombre('');
+          setFalta(false);
+          setAbierto(true);
+        }}
+      >
+        {copy.nuevaVilla}
+      </Button>
+    );
+  }
+
+  return (
+    <Card>
+      <form
+        className="flex flex-col gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!nombre.trim()) {
+            setFalta(true);
+            return;
+          }
+          setFalta(false);
+          crear.mutate(nombre, { onSuccess: () => setAbierto(false) });
+        }}
+      >
+        <div>
+          <h3 className="m-0 font-display text-lg font-medium">{copy.nuevaVilla}</h3>
+          <p className="m-0 max-w-prose text-[13px] leading-relaxed text-muted">
+            {copy.nuevaVillaAyuda}
+          </p>
+        </div>
+
+        <Input
+          label={copy.nuevaVillaNombre}
+          hint={copy.nuevaVillaNombreAyuda}
+          value={nombre}
+          error={falta ? copy.faltaNombreVilla : undefined}
+          onChange={(e) => setNombre(e.target.value)}
+        />
+
+        {crear.isError ? (
+          <p role="alert" className="m-0 text-sm text-on-alert">
+            {copy.noSePudoCrear}
+          </p>
+        ) : null}
+
+        <div className="flex flex-wrap gap-2">
+          <Button type="submit" disabled={crear.isPending}>
+            {crear.isPending ? copy.creandoVilla : copy.crearVilla}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={crear.isPending}
+            onClick={() => setAbierto(false)}
+          >
+            {copy.cancelar}
+          </Button>
+        </div>
+      </form>
+    </Card>
   );
 }
 

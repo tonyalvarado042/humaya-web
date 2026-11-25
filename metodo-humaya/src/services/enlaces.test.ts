@@ -47,9 +47,9 @@ describe('crear un enlace', () => {
   it('no deja entrar una dirección que no es web', async () => {
     supabaseStub.tablas.humaya_enlaces = [];
 
-    await expect(
-      crearEnlace({ etiqueta: 'Trampa', url: 'javascript:alert(1)' }),
-    ).rejects.toThrow('enlace_direccion_invalida');
+    await expect(crearEnlace({ etiqueta: 'Trampa', url: 'javascript:alert(1)' })).rejects.toThrow(
+      'enlace_direccion_invalida',
+    );
 
     // Y lo que importa: no quedó nada escrito.
     expect(supabaseStub.tablas.humaya_enlaces).toHaveLength(0);

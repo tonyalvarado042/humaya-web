@@ -53,7 +53,9 @@ describe('la lista', () => {
     stubSesionAbierta(ADMINISTRADOR);
     await abrir();
 
-    expect(screen.getByRole('heading', { name: 'Panel de recepción', level: 3 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Panel de recepción', level: 3 }),
+    ).toBeInTheDocument();
     // La dirección entera y no el dominio: es lo que hay que poder revisar
     // cuando un enlace no lleva a donde debía.
     expect(screen.getByText('https://staff.stayhumaya.com/staff')).toBeInTheDocument();
@@ -77,7 +79,9 @@ describe('quién puede cambiarlos', () => {
   it('a recepción le muestra la lista y le explica que no la puede cambiar', async () => {
     await abrir();
 
-    expect(screen.getByRole('heading', { name: 'Panel de recepción', level: 3 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Panel de recepción', level: 3 }),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Add link/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
     expect(screen.getByText(/Only an administrator can add or change links/)).toBeInTheDocument();
@@ -170,9 +174,7 @@ describe('apagar', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Turn off' }));
 
-    await vi.waitFor(() =>
-      expect(supabaseStub.tablas.humaya_enlaces[0].habilitado).toBe(false),
-    );
+    await vi.waitFor(() => expect(supabaseStub.tablas.humaya_enlaces[0].habilitado).toBe(false));
     expect(supabaseStub.tablas.humaya_enlaces).toHaveLength(1);
   });
 });

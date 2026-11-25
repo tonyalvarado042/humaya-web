@@ -48,7 +48,12 @@ beforeEach(() => {
       icono: 'gauge',
       orden: 2,
     }),
-    enlace({ etiqueta: 'Apagado por ahora', url: 'https://nada.test/', habilitado: false, orden: 3 }),
+    enlace({
+      etiqueta: 'Apagado por ahora',
+      url: 'https://nada.test/',
+      habilitado: false,
+      orden: 3,
+    }),
   ];
 });
 
@@ -133,17 +138,13 @@ describe('la portada interna', () => {
   it('el camino a configurarlos solo se le ofrece al administrador', async () => {
     abrir();
     await screen.findByRole('link', { name: /X10 Vision/ });
-    expect(
-      screen.queryByRole('link', { name: 'Set up these shortcuts' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Set up these shortcuts' })).not.toBeInTheDocument();
   });
 
   it('y al administrador sí', async () => {
     stubSesionAbierta(ADMINISTRADOR);
     abrir();
 
-    expect(
-      await screen.findByRole('link', { name: 'Set up these shortcuts' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Set up these shortcuts' })).toBeInTheDocument();
   });
 });

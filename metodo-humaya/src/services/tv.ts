@@ -1,4 +1,5 @@
 import type { CambiosVillaTv, ReservaDeVilla, VillaTv } from '@/types';
+import { codigoActual } from '@/marca';
 import { cliente, SUPABASE_URL } from './sesion';
 import { elNegocio } from './negocio';
 
@@ -174,6 +175,196 @@ export async function guardarVillaTv(id: string, cambios: CambiosVillaTv): Promi
 
   if (error) throw new Error(`tv_villa_${error.code ?? 'error'}`);
   if (!data || data.length === 0) throw new Error('tv_villa_sin_permiso');
+}
+
+/**
+ * Una villa nueva, creada desde el panel.
+ *
+ * ── POR QUÉ ESTO EXISTE ─────────────────────────────────────────────────
+ * Hasta el 24 de noviembre de 2026 la pantalla lo decía con todas las
+ * letras: «Las villas se crean en la base, en humaya_tv_villas». Tony, ese
+ * día, sobre un hotel recién creado: «un hotel nace vacío y no se puede
+ * llenar… arregla eso». Tenía razón: sin esto, vender la app a un hotel
+ * significaba que alguien le metiera las villas a mano con SQL.
+ *
+ * ── POR QUÉ EL ID LLEVA EL CÓDIGO DEL HOTEL ─────────────────────────────
+ * Porque la llave primaria de `humaya_tv_villas` es el `id` SOLO, sin el
+ * hotel. Dos hoteles que creen su «Villa 1» chocarían, y el segundo vería
+ * un error de llave repetida sin entender por qué. Con el código delante
+ * —`bikeandbed-villa-1`— cada hotel tiene su espacio de nombres.
+ *
+ * La CLAVE del televisor no se inventa acá: la pone la base
+ * (`encode(gen_random_bytes(12),'hex')`). Un secreto generado en el
+ * navegador es un secreto generado donde cualquiera puede mirar.
+ */
+export async function crearVillaTv(nombre: string): Promise<VillaTv> {
+  const limpio = nombre.trim();
+  if (!limpio) throw new Error('villa_sin_nombre');
+
+  const db = await cliente();
+
+  const { data: existentes } = await db
+    .from('humaya_tv_villas')
+    .select('id,orden')
+    .eq('negocio_id', elNegocio());
+
+  const usados = new Set(((existentes ?? []) as { id: string }[]).map((fila) => fila.id));
+  const orden =
+    Math.max(0, ...((existentes ?? []) as { orden?: number }[]).map((fila) => fila.orden ?? 0)) + 1;
+
+  const { data, error } = await db
+    .from('humaya_tv_villas')
+    .insert({ negocio_id: elNegocio(), id: idLibre(limpio, usados), nombre: limpio, orden })
+    .select('*')
+    .single();
+
+  if (error) throw new Error(`tv_villa_${error.code ?? 'error'}`);
+  return aVilla(data as unknown as Fila);
+}
+
+/**
+ * Un id de ruta a partir del nombre, con el código del hotel delante y sin
+ * chocar con los que ya existen.
+ *
+ * Un nombre que no deja ni una letra utilizable —solo emojis, solo signos—
+ * cae en `villa`, y el contador hace el resto. Antes que fallar, nombrar.
+ */
+function idLibre(nombre: string, usados: Set<string>): string {
+  const codigo = codigoActual() ?? 'hotel';
+  const trozo =
+    nombre
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 40) || 'villa';
+
+  const base = `${codigo}-${trozo}`;
+  if (!usados.has(base)) return base;
+  let n = 2;
+  while (usados.has(`${base}-${n}`)) n += 1;
+  return `${base}-${n}`;
+}
+
+// ── La guía de la casa ──────────────────────────────────────────────────
+
+/**
+ * Lo que el televisor muestra cuando el huésped busca cómo funciona la casa.
+ *
+ * ── POR QUÉ ES UNA SOLA PARA TODO EL HOTEL ──────────────────────────────
+ * Porque las reglas son del hotel, no de la villa. Con una copia por villa,
+ * cambiar la hora de silencio significaría cambiarla diez veces y que la
+ * décima quede vieja. `humaya-tv` lo respeta: usa la de la villa solo si
+ * tiene alguna, y si no la del hotel (ver `guiaDe` en esa función).
+ */
+export interface Regla {
+  title: string;
+  body: string;
+}
+
+export interface Telefono {
+  name: string;
+  phone: string;
+}
+
+export interface GuiaDeLaCasa {
+  /** El saludo. Una villa puede pisarlo con su propia bienvenida. */
+  welcome: string;
+  rules: Regla[];
+  howto: Regla[];
+  checkout: { time: string; steps: string[] };
+  emergency: Telefono[];
+}
+
+export const GUIA_VACIA: GuiaDeLaCasa = {
+  welcome: '',
+  rules: [],
+  howto: [],
+  checkout: { time: '', steps: [] },
+  emergency: [],
+};
+
+/** Las filas que sean objetos, sin lo que venga suelto en el jsonb. */
+function filasDe(valor: unknown): Record<string, unknown>[] {
+  if (!Array.isArray(valor)) return [];
+  return valor.filter(
+    (fila): fila is Record<string, unknown> => !!fila && typeof fila === 'object',
+  );
+}
+
+const texto = (valor: unknown): string => (typeof valor === 'string' ? valor : '');
+
+function comoReglas(valor: unknown): Regla[] {
+  return filasDe(valor).map((fila) => ({ title: texto(fila.title), body: texto(fila.body) }));
+}
+
+function comoTelefonos(valor: unknown): Telefono[] {
+  return filasDe(valor).map((fila) => ({ name: texto(fila.name), phone: texto(fila.phone) }));
+}
+
+/**
+ * Lo que venga en `guia`, leído con desconfianza: es un `jsonb` que se
+ * escribió a mano durante semanas. Lo que no tenga la forma esperada se
+ * trata como «no hay nada», que es lo que quiere decir — y nunca deja la
+ * pantalla rota.
+ */
+export function comoGuia(valor: unknown): GuiaDeLaCasa {
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return GUIA_VACIA;
+  const g = valor as Record<string, unknown>;
+  const salida = (g.checkout ?? {}) as Record<string, unknown>;
+  return {
+    welcome: texto(g.welcome),
+    rules: comoReglas(g.rules),
+    howto: comoReglas(g.howto),
+    checkout: {
+      time: texto(salida.time),
+      steps: Array.isArray(salida.steps)
+        ? salida.steps.filter((paso): paso is string => typeof paso === 'string')
+        : [],
+    },
+    emergency: comoTelefonos(g.emergency),
+  };
+}
+
+export async function getGuia(): Promise<GuiaDeLaCasa> {
+  const db = await cliente();
+  const { data, error } = await db
+    .from('humaya_tv_ajustes')
+    .select('guia')
+    .eq('negocio_id', elNegocio())
+    .maybeSingle();
+
+  if (error) throw new Error(`tv_guia_${error.code ?? 'error'}`);
+  return comoGuia(((data ?? {}) as { guia?: unknown }).guia);
+}
+
+/**
+ * Guarda la guía SIN tocar lo que no es suyo.
+ *
+ * Se vuelve a leer antes de escribir, igual que `guardarAlrededor`: `guia`
+ * es un jsonb entero y escribirlo de cero borraría los lugares de alrededor,
+ * que se editan en otro formulario de la misma pantalla.
+ */
+export async function guardarGuia(guia: GuiaDeLaCasa): Promise<void> {
+  const db = await cliente();
+  const { data: antes, error: leer } = await db
+    .from('humaya_tv_ajustes')
+    .select('guia')
+    .eq('negocio_id', elNegocio())
+    .maybeSingle();
+  if (leer) throw new Error(`tv_guia_${leer.code ?? 'error'}`);
+
+  const completa = { ...(((antes ?? {}) as { guia?: object }).guia ?? {}), ...guia };
+
+  const { data, error } = await db
+    .from('humaya_tv_ajustes')
+    .update({ guia: completa, actualizado_en: new Date().toISOString() })
+    .eq('negocio_id', elNegocio())
+    .select('negocio_id');
+
+  if (error) throw new Error(`tv_guia_${error.code ?? 'error'}`);
+  if (!data || data.length === 0) throw new Error('tv_guia_sin_permiso');
 }
 
 // ── La foto ─────────────────────────────────────────────────────────────

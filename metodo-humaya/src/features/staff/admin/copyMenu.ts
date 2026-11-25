@@ -12,6 +12,10 @@ export interface MenuTextos {
   titulo: string;
   cuerpo: string;
 
+  /** Cuando el hotel no tiene ninguna opcion. No deberia pasar nunca. */
+  vacio: string;
+  vacioCuerpo: string;
+
   habilitada: string;
   deshabilitada: string;
   habilitar: string;
@@ -40,6 +44,9 @@ export interface MenuTextos {
 export const menuCopy: Record<Idioma, MenuTextos> = {
   es: {
     titulo: 'Menú del huésped',
+    vacio: 'Este hotel no tiene ninguna opción de menú',
+    vacioCuerpo:
+      'Y debería: un hotel nuevo nace con las seis que trae la app. Estas opciones no se inventan —cada una es una pantalla del producto—, así que esto no se arregla agregando una a mano. Avisale a la plataforma para que vuelva a sembrar este hotel.',
     cuerpo:
       'Lo que ves acá es lo que el huésped ve en el Home y en la barra de abajo. Apagar una opción la saca de los dos lugares.',
 
@@ -74,6 +81,9 @@ export const menuCopy: Record<Idioma, MenuTextos> = {
 
   en: {
     titulo: 'Guest menu',
+    vacio: 'This hotel has no menu options',
+    vacioCuerpo:
+      'And it should: a new hotel is born with the six the app ships with. These options are not made up — each one is a screen of the product — so this is not fixed by adding one by hand. Tell the platform to seed this hotel again.',
     cuerpo:
       'What you see here is what the guest sees on the Home and in the bottom bar. Turning an option off removes it from both places.',
 

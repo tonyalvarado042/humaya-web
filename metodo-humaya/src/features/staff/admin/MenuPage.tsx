@@ -48,6 +48,19 @@ export function MenuPage() {
         <p className="m-0 max-w-prose text-sm leading-relaxed text-muted">{copy.cuerpo}</p>
       </div>
 
+      {/* Vacío no quiere decir «todavía no configuraron nada»: un hotel nace
+          con las seis. Si la lista sale en blanco, algo se rompió, y la
+          pantalla tiene que decirlo en vez de quedarse muda. Y NO se ofrece
+          un botón de «crear opción»: cada clave es una pantalla real de la
+          app (`/app/<clave>`), así que una inventada sería una ficha que
+          lleva a «Esta dirección no existe». */}
+      {opciones.data.length === 0 ? (
+        <Card>
+          <p className="m-0 font-display text-xl">{copy.vacio}</p>
+          <p className="m-0 max-w-prose text-sm leading-relaxed text-muted">{copy.vacioCuerpo}</p>
+        </Card>
+      ) : null}
+
       <ul className="m-0 flex list-none flex-col gap-2 p-0">
         {opciones.data.map((opcion) => (
           <li key={opcion.id}>
