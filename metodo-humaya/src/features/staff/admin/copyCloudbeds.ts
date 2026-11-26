@@ -1,5 +1,5 @@
 import type { Idioma } from '@/hooks/useIdiomaElegido';
-import type { FalloCloudbeds } from '@/services/cloudbeds';
+import type { FalloCloudbeds, Sincronizacion } from '@/services/cloudbeds';
 
 export interface CloudbedsTextos {
   titulo: string;
@@ -21,11 +21,19 @@ export interface CloudbedsTextos {
   llaveReemplazar: string;
   guardar: string;
   guardando: string;
-  guardada: string;
+
+  /** Traer reservas sin volver a pegar la llave. */
+  traer: string;
+  trayendo: string;
+
+  /** Qué pasó al final: lo que de verdad quedó, no «listo». */
+  resumen: (s: Sincronizacion) => string;
+  avisosFaltan: (faltan: string[]) => string;
+  hayMas: string;
+  llaveGuardadaPeroFallo: string;
 
   sinNumero: string;
   conLlave: string;
-  usaLaGeneral: string;
   sinLlave: string;
   reservas: string;
   noUsaCloudbeds: string;
@@ -37,7 +45,7 @@ export const cloudbedsCopy: Record<Idioma, CloudbedsTextos> = {
   en: {
     titulo: 'Cloudbeds',
     bajada:
-      'Each hotel connects to its own Cloudbeds property. Bookings from Airbnb, Booking, Expedia and the website all arrive through it.',
+      'Each hotel connects to its own Cloudbeds property, with its own key. Nothing is shared between hotels. Bookings from Airbnb, Booking, Expedia and the website all arrive through it.',
     cargando: 'Loading…',
     noSePudoLeer: 'We could not read this. It may be a connection problem.',
 
@@ -55,12 +63,23 @@ export const cloudbedsCopy: Record<Idioma, CloudbedsTextos> = {
     llavePlaceholder: 'Paste the cbat_… key',
     llaveReemplazar: 'Type a new one to replace it',
     guardar: 'Save key',
-    guardando: 'Saving…',
-    guardada: 'Key saved. It cannot be read again — not even here.',
+    guardando: 'Testing the key and pulling bookings…',
+
+    traer: 'Pull bookings again',
+    trayendo: 'Pulling…',
+
+    resumen: (s) =>
+      `Key saved and accepted by Cloudbeds. ${s.reservas.guardadas} of ` +
+      `${s.reservas.encontradas} bookings pulled` +
+      (s.reservas.fallaron > 0 ? `, ${s.reservas.fallaron} failed` : '') +
+      (s.webhooks.ok ? ', and new ones will now arrive on their own.' : '.'),
+    avisosFaltan: (faltan) =>
+      `These alerts did not register: ${faltan.join(', ')}. New bookings may not arrive on their own.`,
+    hayMas: 'There are more bookings left. Press “Pull bookings again” to continue.',
+    llaveGuardadaPeroFallo: 'The key was saved. What failed was pulling the bookings:',
 
     sinNumero: 'no property yet',
     conLlave: 'its own key',
-    usaLaGeneral: 'uses the general key',
     sinLlave: 'no key',
     reservas: 'bookings',
     noUsaCloudbeds: 'This hotel’s bookings do not come from Cloudbeds. Change it in Hotels.',
@@ -75,13 +94,18 @@ export const cloudbedsCopy: Record<Idioma, CloudbedsTextos> = {
       propiedad_no_registrada: 'Connect the property number first, then save its key.',
       llave_vacia: 'The key is empty.',
       llave_muy_corta: 'That key looks cut off. Cloudbeds keys are long — copy it whole.',
+      sin_llave: 'This hotel has no key of its own yet. There is no shared key to fall back on.',
+      llave_rechazada: 'Cloudbeds did not accept that key.',
+      llave_de_otro_hotel:
+        'That key belongs to a different Cloudbeds property. Each hotel needs the key issued by its own property.',
+      no_contesto: 'The server did not answer. Try again.',
       desconocido: 'It did not work. Try again.',
     },
   },
   es: {
     titulo: 'Cloudbeds',
     bajada:
-      'Cada hotel se conecta con su propia propiedad de Cloudbeds. Por ahí entran las reservas de Airbnb, Booking, Expedia y el sitio web.',
+      'Cada hotel se conecta con su propia propiedad de Cloudbeds, con su propia llave. Nada se comparte entre hoteles. Por ahí entran las reservas de Airbnb, Booking, Expedia y el sitio web.',
     cargando: 'Cargando…',
     noSePudoLeer: 'No pudimos leer esto. Puede ser un problema de conexión.',
 
@@ -99,12 +123,23 @@ export const cloudbedsCopy: Record<Idioma, CloudbedsTextos> = {
     llavePlaceholder: 'Pegá la llave cbat_…',
     llaveReemplazar: 'Escribí una nueva para reemplazarla',
     guardar: 'Guardar llave',
-    guardando: 'Guardando…',
-    guardada: 'Llave guardada. No se puede volver a leer — ni acá.',
+    guardando: 'Probando la llave y trayendo las reservas…',
+
+    traer: 'Traer las reservas otra vez',
+    trayendo: 'Trayendo…',
+
+    resumen: (s) =>
+      `Llave guardada y aceptada por Cloudbeds. Se trajeron ${s.reservas.guardadas} de ` +
+      `${s.reservas.encontradas} reservas` +
+      (s.reservas.fallaron > 0 ? `, fallaron ${s.reservas.fallaron}` : '') +
+      (s.webhooks.ok ? ', y las nuevas ya van a llegar solas.' : '.'),
+    avisosFaltan: (faltan) =>
+      `No quedaron registrados estos avisos: ${faltan.join(', ')}. Las reservas nuevas pueden no llegar solas.`,
+    hayMas: 'Quedaron reservas sin traer. Dale a «Traer las reservas otra vez» para seguir.',
+    llaveGuardadaPeroFallo: 'La llave quedó guardada. Lo que falló fue traer las reservas:',
 
     sinNumero: 'todavía sin propiedad',
     conLlave: 'con llave propia',
-    usaLaGeneral: 'usa la llave general',
     sinLlave: 'sin llave',
     reservas: 'reservas',
     noUsaCloudbeds: 'Las reservas de este hotel no entran por Cloudbeds. Se cambia en Hoteles.',
@@ -119,6 +154,12 @@ export const cloudbedsCopy: Record<Idioma, CloudbedsTextos> = {
       propiedad_no_registrada: 'Primero conectá el número de propiedad, después guardá su llave.',
       llave_vacia: 'La llave viene vacía.',
       llave_muy_corta: 'Esa llave se ve cortada. Las de Cloudbeds son largas — copiala entera.',
+      sin_llave:
+        'Este hotel todavía no tiene llave propia. No hay ninguna llave compartida que lo cubra.',
+      llave_rechazada: 'Cloudbeds no aceptó esa llave.',
+      llave_de_otro_hotel:
+        'Esa llave es de otra propiedad de Cloudbeds. Cada hotel necesita la llave que emite su propia propiedad.',
+      no_contesto: 'El servidor no contestó. Probá de nuevo.',
       desconocido: 'No se pudo. Probá de nuevo.',
     },
   },

@@ -6,7 +6,9 @@ import {
   ErrorCloudbeds,
   estadoCloudbeds,
   guardarLlave,
+  sincronizarHotel,
   type HotelCloudbeds,
+  type Sincronizacion,
 } from '@/services/cloudbeds';
 import { cloudbedsCopy, type CloudbedsTextos } from './copyCloudbeds';
 
@@ -21,6 +23,19 @@ import { cloudbedsCopy, type CloudbedsTextos } from './copyCloudbeds';
  * el CRM, y ese es el CRM de Tony — no el panel de un hotel. Una llave de
  * Cloudbeds es de UN hotel, igual que sus villas, sus servicios y sus
  * enlaces; su lugar es acá, donde cuelga de `negocio_id` como todo lo demás.
+ *
+ * ── GUARDAR LA LLAVE ES CONECTAR EL HOTEL ──────────────────────────────
+ * Tony, 26 de noviembre: «¿por qué dices que tienes que hacer unos botones
+ * de suscribir o importar? Porque se supone que al pegar la llave
+ * automáticamente se tiene que hacer eso, ¿o me equivoco?».
+ *
+ * No se equivocaba. Guardar la llave prueba la llave, registra los avisos y
+ * trae las reservas que ya existían. Tres botones habrían sido enseñarle la
+ * plomería: desde afuera, pegar la llave de HUMAYA trajo sus 68 reservas.
+ *
+ * El botón «traer otra vez» sí existe, pero para otra cosa: cuando Cloudbeds
+ * se cayó a mitad, o cuando quedaron reservas sin traer. No es un paso del
+ * camino normal; es la salida de un camino que falló.
  *
  * ── POR QUÉ LAS INSTRUCCIONES ESTÁN EN LA PANTALLA ─────────────────────
  * Porque el camino en Cloudbeds no se adivina: el formulario pide una
@@ -44,10 +59,18 @@ function Ficha({
   const [llave, setLlave] = useState('');
   const [ocupado, setOcupado] = useState(false);
   const [fallo, setFallo] = useState<string | null>(null);
-  const [listo, setListo] = useState<string | null>(null);
+  const [listo, setListo] = useState<Sincronizacion | null>(null);
 
   function contar(e: unknown) {
-    setFallo(e instanceof ErrorCloudbeds ? copy.alFallar[e.motivo] : copy.alFallar.desconocido);
+    if (!(e instanceof ErrorCloudbeds)) {
+      setFallo(copy.alFallar.desconocido);
+      return;
+    }
+    const porque = copy.alFallar[e.motivo];
+    // Que la llave haya quedado guardada cambia qué hacer después, así que se
+    // dice. Si no, Tony volvería a buscar una llave que Cloudbeds ya no
+    // muestra.
+    setFallo(e.llaveGuardada ? `${copy.llaveGuardadaPeroFallo} ${porque}` : porque);
   }
 
   async function conectar() {
@@ -71,12 +94,29 @@ function Ficha({
     setListo(null);
     setOcupado(true);
     try {
-      await guardarLlave(hotel.propertyId, llave);
+      const s = await guardarLlave(hotel.propertyId, llave);
       // Se vacía el campo apenas se guarda: dejar la llave a la vista en una
       // pantalla que alguien puede tener abierta es regalar justamente lo
       // que la bóveda protege.
       setLlave('');
-      setListo(copy.guardada);
+      setListo(s);
+      await onConectado();
+    } catch (e) {
+      setLlave('');
+      contar(e);
+      await onConectado();
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  async function traer() {
+    if (!hotel.propertyId) return;
+    setFallo(null);
+    setListo(null);
+    setOcupado(true);
+    try {
+      setListo(await sincronizarHotel(hotel.propertyId));
       await onConectado();
     } catch (e) {
       contar(e);
@@ -89,9 +129,7 @@ function Ficha({
     ? copy.sinNumero
     : hotel.llavePropia
       ? copy.conLlave
-      : hotel.llaveGeneral
-        ? copy.usaLaGeneral
-        : copy.sinLlave;
+      : copy.sinLlave;
 
   return (
     <li className="flex flex-col gap-3 rounded-2xl border border-line p-4">
@@ -124,6 +162,11 @@ function Ficha({
           <Button type="button" disabled={ocupado || !llave.trim()} onClick={() => void guardar()}>
             {ocupado ? copy.guardando : copy.guardar}
           </Button>
+          {hotel.llavePropia ? (
+            <Button type="button" variant="ghost" disabled={ocupado} onClick={() => void traer()}>
+              {ocupado ? copy.trayendo : copy.traer}
+            </Button>
+          ) : null}
         </div>
       ) : (
         <div className="flex flex-wrap items-end gap-2">
@@ -151,7 +194,20 @@ function Ficha({
           {fallo}
         </p>
       ) : null}
-      {listo ? <p className="m-0 text-[13px] text-muted">{listo}</p> : null}
+
+      {listo ? (
+        <div className="flex flex-col gap-1">
+          <p className="m-0 text-[13px] text-muted">{copy.resumen(listo)}</p>
+          {listo.webhooks.faltan.length > 0 ? (
+            <p role="alert" className="m-0 text-[13px] text-on-alert">
+              {copy.avisosFaltan(listo.webhooks.faltan)}
+            </p>
+          ) : null}
+          {listo.reservas.hayMas ? (
+            <p className="m-0 text-[13px] text-muted">{copy.hayMas}</p>
+          ) : null}
+        </div>
+      ) : null}
     </li>
   );
 }
