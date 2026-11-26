@@ -45,6 +45,32 @@ describe('la sección Hoteles del menú de Admin', () => {
   });
 });
 
+/**
+ * Cloudbeds va en la misma puerta que Hoteles.
+ *
+ * Tony, 25 de noviembre de 2026: «Ya tengo la API de Cloudbeds, pero no hay
+ * pantalla donde ponerla». La hay desde hoy, y es de plataforma por la misma
+ * razón: `humaya_cloudbeds_conectar` y `humaya_cloudbeds_guardar_llave`
+ * piden `humaya_soy_plataforma()` antes de tocar nada. Comprobado contra la
+ * base: sin cuenta, las dos levantan `solo_plataforma`.
+ */
+describe('la sección Cloudbeds del menú de Admin', () => {
+  it('no aparece para quien no es de plataforma', () => {
+    expect(seccionesAdmin('es', false).map((s) => s.ruta)).not.toContain('cloudbeds');
+    expect(seccionesAdmin('en', false).map((s) => s.ruta)).not.toContain('cloudbeds');
+  });
+
+  it('aparece para quien sí lo es, en los dos idiomas', () => {
+    expect(seccionesAdmin('es', true).map((s) => s.ruta)).toContain('cloudbeds');
+    expect(seccionesAdmin('en', true).map((s) => s.ruta)).toContain('cloudbeds');
+  });
+
+  it('no se llama igual que Hoteles: son dos pantallas distintas', () => {
+    const rutas = seccionesAdmin('es', true).map((s) => s.ruta);
+    expect(new Set(rutas).size).toBe(rutas.length);
+  });
+});
+
 describe('preguntar si soy de plataforma', () => {
   it('ante cualquier error dice que NO, y no tumba la pantalla', async () => {
     // Pasó de verdad: el cliente de prueba no tenía `rpc` y la promesa

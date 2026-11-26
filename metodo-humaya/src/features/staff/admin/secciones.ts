@@ -1,5 +1,6 @@
 import {
   Building2,
+  CalendarCheck,
   Image,
   LayoutGrid,
   Link2,
@@ -112,6 +113,13 @@ export function seccionesAdmin(idioma: Idioma, conHoteles = false): SeccionAdmin
               'Create a hotel, say where its bookings come from, and who works in it. Platform accounts only.',
             Icon: Building2,
           },
+          {
+            ruta: 'cloudbeds',
+            titulo: 'Cloudbeds',
+            cuerpo:
+              'Each hotel’s own Cloudbeds property and API key: where its real bookings come in from.',
+            Icon: CalendarCheck,
+          },
         ]
       : base;
   }
@@ -172,6 +180,13 @@ export function seccionesAdmin(idioma: Idioma, conHoteles = false): SeccionAdmin
           cuerpo:
             'Crear un hotel, decir de dónde entran sus reservas y quién trabaja en él. Solo cuentas de plataforma.',
           Icon: Building2,
+        },
+        {
+          ruta: 'cloudbeds',
+          titulo: 'Cloudbeds',
+          cuerpo:
+            'La propiedad de Cloudbeds de cada hotel y su llave: por ahí entran sus reservas de verdad.',
+          Icon: CalendarCheck,
         },
       ]
     : base;

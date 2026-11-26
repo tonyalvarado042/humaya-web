@@ -17,6 +17,7 @@ import { VillaPage } from '@/features/guest-app/villa/VillaPage';
 import { AdminIndexPage } from '@/features/staff/admin/AdminIndexPage';
 import { AdminLayout } from '@/features/staff/admin/AdminLayout';
 import { AjustesPage } from '@/features/staff/admin/AjustesPage';
+import { CloudbedsPage } from '@/features/staff/admin/CloudbedsPage';
 import { EnlacesPage } from '@/features/staff/admin/EnlacesPage';
 import { HotelesPage } from '@/features/staff/admin/HotelesPage';
 import { BotPage } from '@/features/staff/admin/BotPage';
@@ -123,6 +124,10 @@ export function createRoutes({
                     // exige: cada funcion pregunta si quien llama es de
                     // plataforma antes de hacer nada.
                     { path: 'hoteles', element: <HotelesPage /> },
+                    // La llave de Cloudbeds de cada hotel. Tambien de
+                    // plataforma: la base pide `humaya_soy_plataforma()`
+                    // antes de conectar nada o de tocar la boveda.
+                    { path: 'cloudbeds', element: <CloudbedsPage /> },
                   ],
                 },
               ],
