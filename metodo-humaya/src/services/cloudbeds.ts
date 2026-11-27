@@ -1,3 +1,4 @@
+import { elNegocio } from './negocio';
 import { cabeceraDeRecepcion, cliente } from './sesion';
 
 /**
@@ -33,6 +34,16 @@ import { cabeceraDeRecepcion, cliente } from './sesion';
  * que ya existían. Antes eso eran tres acciones de servidor que no llamaba
  * ninguna pantalla, y las 68 de HUMAYA entraron porque alguien las invocó a
  * mano: desde fuera parecía que pegar la llave las traía.
+ *
+ * ── LA FICHA ES LA DE ESTE HOTEL ───────────────────────────────────────
+ * Tony, 26 de noviembre de 2026, con Bike & Bed abierto: «sigues aún
+ * revolviendo hoteles, te he dicho mil veces, estoy en bike and bed y sale
+ * Humaya. ¿Por qué?».
+ *
+ * Porque `humaya_cloudbeds_estado()` no recibía ningún hotel: devolvía todos,
+ * y la pantalla los pintaba en fila. Ahora recibe el hotel en el que se está
+ * y devuelve una ficha o ninguna. No es que la pantalla los esconda: los
+ * datos del otro hotel ya no viajan al navegador.
  *
  * ── LA LLAVE NO VUELVE ─────────────────────────────────────────────────
  * `estado()` dice si hay llave y de cuándo es, nunca cuál es. Se guarda en
@@ -141,11 +152,22 @@ export interface Sincronizacion {
   };
 }
 
-export async function estadoCloudbeds(): Promise<HotelCloudbeds[]> {
+/**
+ * La ficha de Cloudbeds del hotel en el que se está. Null si no hay.
+ *
+ * Null significa dos cosas y las dos se dicen igual en la pantalla: que la
+ * cuenta no es de plataforma, o que este hotel no tiene ficha. Distinguirlas
+ * sería decirle a quien no puede entrar qué hay del otro lado.
+ */
+export async function estadoCloudbeds(): Promise<HotelCloudbeds | null> {
   const db = await cliente();
-  const { data, error } = await db.rpc('humaya_cloudbeds_estado');
+  const { data, error } = await db.rpc('humaya_cloudbeds_estado', {
+    p_negocio: elNegocio(),
+  });
   if (error) throw new Error('cloudbeds_no_se_pudo_leer');
-  return ((data ?? []) as Record<string, unknown>[]).map((f) => ({
+  const [f] = (data ?? []) as Record<string, unknown>[];
+  if (!f) return null;
+  return {
     negocioId: String(f.negocio_id),
     codigo: String(f.codigo ?? ''),
     nombre: String(f.nombre ?? ''),
@@ -154,7 +176,7 @@ export async function estadoCloudbeds(): Promise<HotelCloudbeds[]> {
     llavePropia: f.llave_propia === true,
     llaveDesde: (f.llave_propia_desde as string | null) ?? null,
     reservas: Number(f.reservas ?? 0),
-  }));
+  };
 }
 
 export async function conectarHotel(negocioId: string, propertyId: string): Promise<void> {

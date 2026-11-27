@@ -117,7 +117,7 @@ export function seccionesAdmin(idioma: Idioma, conHoteles = false): SeccionAdmin
             ruta: 'cloudbeds',
             titulo: 'Cloudbeds',
             cuerpo:
-              'Each hotel’s own Cloudbeds property and API key: where its real bookings come in from.',
+              'This hotel’s own Cloudbeds property and API key: where its real bookings come in from.',
             Icon: CalendarCheck,
           },
         ]
@@ -185,7 +185,7 @@ export function seccionesAdmin(idioma: Idioma, conHoteles = false): SeccionAdmin
           ruta: 'cloudbeds',
           titulo: 'Cloudbeds',
           cuerpo:
-            'La propiedad de Cloudbeds de cada hotel y su llave: por ahí entran sus reservas de verdad.',
+            'La propiedad de Cloudbeds de este hotel y su llave: por ahí entran sus reservas de verdad.',
           Icon: CalendarCheck,
         },
       ]

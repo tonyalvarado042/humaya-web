@@ -37,6 +37,22 @@ import { cloudbedsCopy, type CloudbedsTextos } from './copyCloudbeds';
  * se cayó a mitad, o cuando quedaron reservas sin traer. No es un paso del
  * camino normal; es la salida de un camino que falló.
  *
+ * ── UN HOTEL: EL QUE SE ESTÁ MIRANDO ───────────────────────────────────
+ * Tony, 26 de noviembre de 2026, con Bike & Bed abierto en el iPad: «sigues
+ * aún revolviendo hoteles, te he dicho mil veces, estoy en bike and bed y
+ * sale Humaya. ¿Por qué?».
+ *
+ * Porque esta pantalla nació como una lista de TODOS los hoteles: dentro de
+ * Bike & Bed se veía la propiedad de HUMAYA y sus 68 reservas. Era la misma
+ * confusión de siempre —la plomería de plataforma puesta donde va la ficha
+ * de un hotel—, y la regla de Tony no deja lugar a dudas: «cada hotel es una
+ * propiedad totalmente independiente (…) cuando entra en una pantalla no
+ * puedo ver nada del otro y viceversa».
+ *
+ * Ahora es la ficha del hotel en el que se está, y para configurar otro se
+ * cambia de hotel, que es por donde se cambia todo lo demás. La lista de
+ * hoteles vive en Hoteles, que es lo que esa pantalla es.
+ *
  * ── POR QUÉ LAS INSTRUCCIONES ESTÁN EN LA PANTALLA ─────────────────────
  * Porque el camino en Cloudbeds no se adivina: el formulario pide una
  * «Redirect URI» que con llave de API no se usa para nada, y la llave no
@@ -45,7 +61,7 @@ import { cloudbedsCopy, type CloudbedsTextos } from './copyCloudbeds';
  * ahí. Lo que cuesta explicar dos veces va escrito donde se usa.
  */
 
-/** Un hotel: su propiedad, su llave, y lo que le falta. */
+/** La ficha de este hotel: su propiedad, su llave, y lo que le falta. */
 function Ficha({
   hotel,
   copy,
@@ -132,9 +148,9 @@ function Ficha({
       : copy.sinLlave;
 
   return (
-    <li className="flex flex-col gap-3 rounded-2xl border border-line p-4">
+    <section className="flex flex-col gap-3 rounded-2xl border border-line p-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h3 className="m-0 text-[15px] font-semibold text-text">{hotel.nombre}</h3>
+        <h2 className="m-0 text-[17px] font-semibold text-text">{hotel.nombre}</h2>
         <span className="rounded-full bg-gold-track px-2 py-0.5 text-[12px] text-muted">
           {etiqueta}
         </span>
@@ -208,7 +224,7 @@ function Ficha({
           ) : null}
         </div>
       ) : null}
-    </li>
+    </section>
   );
 }
 
@@ -216,15 +232,18 @@ export function CloudbedsPage() {
   const [idioma] = useIdiomaRecepcion();
   const copy = cloudbedsCopy[idioma];
 
-  const [hoteles, setHoteles] = useState<HotelCloudbeds[] | null>(null);
+  const [hotel, setHotel] = useState<HotelCloudbeds | null>(null);
+  const [cargado, setCargado] = useState(false);
   const [fallo, setFallo] = useState<string | null>(null);
 
   const cargar = useCallback(async () => {
     try {
-      setHoteles(await estadoCloudbeds());
+      setHotel(await estadoCloudbeds());
       setFallo(null);
     } catch {
       setFallo(copy.noSePudoLeer);
+    } finally {
+      setCargado(true);
     }
   }, [copy.noSePudoLeer]);
 
@@ -246,15 +265,12 @@ export function CloudbedsPage() {
       </div>
 
       {fallo ? <p className="m-0 text-[14px] text-on-alert">{fallo}</p> : null}
-      {hoteles === null && !fallo ? (
-        <p className="m-0 text-[14px] text-muted">{copy.cargando}</p>
+      {!cargado && !fallo ? <p className="m-0 text-[14px] text-muted">{copy.cargando}</p> : null}
+      {cargado && !fallo && !hotel ? (
+        <p className="m-0 max-w-prose text-[14px] text-muted">{copy.sinFicha}</p>
       ) : null}
 
-      <ul className="m-0 flex list-none flex-col gap-3 p-0">
-        {(hoteles ?? []).map((h) => (
-          <Ficha key={h.negocioId} hotel={h} copy={copy} onConectado={cargar} />
-        ))}
-      </ul>
+      {hotel ? <Ficha hotel={hotel} copy={copy} onConectado={cargar} /> : null}
     </section>
   );
 }

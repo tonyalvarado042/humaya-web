@@ -89,39 +89,86 @@ describe('los motivos que devuelve la base', () => {
   });
 });
 
+/**
+ * Un cliente de mentira que acota por hotel, igual que la base.
+ *
+ * `humaya_cloudbeds_estado(p_negocio)` devuelve una fila o ninguna. El falso
+ * filtra de verdad, porque lo que se quiere fijar es que el servicio DIGA de
+ * qué hotel pregunta: uno que no mande el hotel sacaría la misma fila de un
+ * mock que devuelve siempre lo mismo.
+ */
+function conLaBase(filas: Record<string, unknown>[], negocio = 'n-bikeandbed') {
+  const pedidos: Record<string, unknown>[] = [];
+  vi.resetModules();
+  vi.doMock('./negocio', () => ({ elNegocio: () => negocio }));
+  vi.doMock('./sesion', () => ({
+    cliente: () =>
+      Promise.resolve({
+        rpc: (_n: string, args: Record<string, unknown>) => {
+          pedidos.push(args);
+          return Promise.resolve({
+            data: filas.filter((f) => f.negocio_id === args.p_negocio),
+            error: null,
+          });
+        },
+      }),
+    cabeceraDeRecepcion: () => Promise.resolve({}),
+  }));
+  return { pedidos, modulo: import('./cloudbeds') };
+}
+
 describe('lo que la pantalla recibe de la base', () => {
+  const BIKE = {
+    negocio_id: 'n-bikeandbed',
+    codigo: 'bikeandbed',
+    nombre: 'Bike & Bed by Humaya',
+    origen_reservas: 'cloudbeds',
+    property_id: null,
+    llave_propia: false,
+    llave_propia_desde: null,
+    reservas: 0,
+  };
+
+  const OTRO = {
+    ...BIKE,
+    negocio_id: 'n-humaya',
+    codigo: 'humaya',
+    nombre: 'HUMAYA',
+    reservas: 68,
+  };
+
   it('un hotel sin propiedad llega con propertyId en null, no en "null"', async () => {
     // Pasó con otras pantallas: `String(null)` deja el texto «null», que se
     // pinta igual que un número y hace creer que el hotel está conectado.
-    vi.resetModules();
-    vi.doMock('./sesion', () => ({
-      cliente: () =>
-        Promise.resolve({
-          rpc: () =>
-            Promise.resolve({
-              data: [
-                {
-                  negocio_id: 'abc',
-                  codigo: 'bikeandbed',
-                  nombre: 'Bike & Bed by Humaya',
-                  origen_reservas: 'cloudbeds',
-                  property_id: null,
-                  llave_propia: false,
-                  llave_propia_desde: null,
-                  reservas: 0,
-                },
-              ],
-              error: null,
-            }),
-        }),
-      cabeceraDeRecepcion: () => Promise.resolve({}),
-    }));
-    const { estadoCloudbeds } = await import('./cloudbeds');
+    const { modulo } = conLaBase([BIKE]);
+    const { estadoCloudbeds } = await modulo;
 
-    const [hotel] = await estadoCloudbeds();
+    const hotel = await estadoCloudbeds();
 
     expect(hotel?.propertyId).toBeNull();
     expect(hotel?.llavePropia).toBe(false);
+  });
+
+  it('le pide a la base el hotel en el que se está, y devuelve ese', async () => {
+    // Tony, 26 de noviembre de 2026: «estoy en bike and bed y sale Humaya».
+    // La función ya no devuelve todos los hoteles; hay que decirle cuál.
+    const { pedidos, modulo } = conLaBase([OTRO, BIKE]);
+    const { estadoCloudbeds } = await modulo;
+
+    const hotel = await estadoCloudbeds();
+
+    expect(pedidos).toEqual([{ p_negocio: 'n-bikeandbed' }]);
+    expect(hotel?.codigo).toBe('bikeandbed');
+  });
+
+  it('sin ficha devuelve null, que no es lo mismo que una ficha vacía', async () => {
+    // Pasa con una cuenta que no es de plataforma. La pantalla lo dice; si
+    // acá saliera un objeto con todo en blanco, pintaría una ficha de un
+    // hotel sin nombre y nadie entendería qué pasó.
+    const { modulo } = conLaBase([OTRO]);
+    const { estadoCloudbeds } = await modulo;
+
+    expect(await estadoCloudbeds()).toBeNull();
   });
 });
 
@@ -148,22 +195,27 @@ describe('guardar la llave deja el hotel conectado', () => {
     // Tony, 26 de noviembre de 2026: «se supone que al pegar la llave
     // automáticamente se tiene que hacer eso, ¿o me equivoco?». No se
     // equivocaba: esto fija que guardar la llave dispara la sincronización.
-    const fetchFalso = vi.fn((..._args: unknown[]) =>
-      respuesta(200, {
+    // La URL se guarda al vuelo en vez de sacarla de `mock.calls`: tipar ese
+    // arreglo obliga a declarar parametros que el mock no usa, y eso lo
+    // rechaza el linter.
+    const pedidas: string[] = [];
+    const fetchFalso = vi.fn((url: unknown) => {
+      pedidas.push(String(url));
+      return respuesta(200, {
         ok: true,
         property_id: '294717227995328',
         llave: { ok: true, alcanza: [{ property_id: '294717227995328', nombre: 'Bike And Bed' }] },
         webhooks: { ok: true, registrados: ['reservation/created'], faltan: [] },
         reservas: { encontradas: 34, guardadas: 34, sin_correo: 2, fallaron: 0, hay_mas: false },
-      }),
-    );
+      });
+    });
     vi.stubGlobal('fetch', fetchFalso);
 
     const { guardarLlave } = await conRpcBueno();
     const s = await guardarLlave('294717227995328', 'cbat_una-llave-bien-larga-de-prueba');
 
     expect(fetchFalso).toHaveBeenCalledTimes(1);
-    expect(String(fetchFalso.mock.calls[0]?.[0])).toContain('/cloudbeds-conectar');
+    expect(pedidas[0]).toContain('/cloudbeds-conectar');
     expect(s.reservas.guardadas).toBe(34);
     expect(s.webhooks.ok).toBe(true);
     expect(s.alcanza[0]?.nombre).toBe('Bike And Bed');

@@ -37,6 +37,8 @@ export interface CloudbedsTextos {
   sinLlave: string;
   reservas: string;
   noUsaCloudbeds: string;
+  /** Cuando la base no devuelve ficha para este hotel. */
+  sinFicha: string;
 
   alFallar: Record<FalloCloudbeds, string>;
 }
@@ -45,17 +47,17 @@ export const cloudbedsCopy: Record<Idioma, CloudbedsTextos> = {
   en: {
     titulo: 'Cloudbeds',
     bajada:
-      'Each hotel connects to its own Cloudbeds property, with its own key. Nothing is shared between hotels. Bookings from Airbnb, Booking, Expedia and the website all arrive through it.',
+      'This hotel’s own Cloudbeds property, with its own key. Nothing is shared with any other hotel. Bookings from Airbnb, Booking, Expedia and the website all arrive through it.',
     cargando: 'Loading…',
     noSePudoLeer: 'We could not read this. It may be a connection problem.',
 
     dondeSacarNumero:
-      'The property number is in the URL of that hotel’s Cloudbeds panel, after /connect/. Digits only.',
+      'The property number is in the URL of this hotel’s Cloudbeds panel, after /connect/. Digits only.',
     dondeSacarLlave:
       'The key: in Cloudbeds, Marketplace → API Credentials → New API Integration (redirect URI can be https://localhost), then scroll the table right to the API Key column and press Create. Cloudbeds shows it once.',
 
     numeroLabel: 'Property number',
-    numeroPlaceholder: '283417337204929',
+    numeroPlaceholder: '000000000000000',
     conectar: 'Connect',
     conectando: 'Connecting…',
 
@@ -83,6 +85,8 @@ export const cloudbedsCopy: Record<Idioma, CloudbedsTextos> = {
     sinLlave: 'no key',
     reservas: 'bookings',
     noUsaCloudbeds: 'This hotel’s bookings do not come from Cloudbeds. Change it in Hotels.',
+    sinFicha:
+      'There is no Cloudbeds record for this hotel. Only platform accounts can see or change it.',
 
     alFallar: {
       solo_plataforma: 'Only a platform account can connect a hotel.',
@@ -105,17 +109,17 @@ export const cloudbedsCopy: Record<Idioma, CloudbedsTextos> = {
   es: {
     titulo: 'Cloudbeds',
     bajada:
-      'Cada hotel se conecta con su propia propiedad de Cloudbeds, con su propia llave. Nada se comparte entre hoteles. Por ahí entran las reservas de Airbnb, Booking, Expedia y el sitio web.',
+      'La propiedad de Cloudbeds de este hotel, con su propia llave. Nada se comparte con ningún otro hotel. Por ahí entran las reservas de Airbnb, Booking, Expedia y el sitio web.',
     cargando: 'Cargando…',
     noSePudoLeer: 'No pudimos leer esto. Puede ser un problema de conexión.',
 
     dondeSacarNumero:
-      'El número de propiedad sale en la URL del panel de Cloudbeds de ese hotel, después de /connect/. Solo dígitos.',
+      'El número de propiedad sale en la URL del panel de Cloudbeds de este hotel, después de /connect/. Solo dígitos.',
     dondeSacarLlave:
       'La llave: en Cloudbeds, Marketplace → API Credentials → New API Integration (en redirect URI va https://localhost), y después deslizá la tabla a la derecha hasta la columna API Key y dale Create. Cloudbeds la muestra una sola vez.',
 
     numeroLabel: 'Número de propiedad',
-    numeroPlaceholder: '283417337204929',
+    numeroPlaceholder: '000000000000000',
     conectar: 'Conectar',
     conectando: 'Conectando…',
 
@@ -143,6 +147,8 @@ export const cloudbedsCopy: Record<Idioma, CloudbedsTextos> = {
     sinLlave: 'sin llave',
     reservas: 'reservas',
     noUsaCloudbeds: 'Las reservas de este hotel no entran por Cloudbeds. Se cambia en Hoteles.',
+    sinFicha:
+      'Este hotel no tiene ficha de Cloudbeds. Solo las cuentas de plataforma pueden verla o cambiarla.',
 
     alFallar: {
       solo_plataforma: 'Solo una cuenta de plataforma puede conectar un hotel.',
